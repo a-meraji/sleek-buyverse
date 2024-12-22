@@ -13,6 +13,13 @@ const Auth = () => {
 
   useEffect(() => {
     // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        console.log("User already logged in:", session.user);
+        navigate("/");
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
       
