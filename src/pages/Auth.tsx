@@ -16,6 +16,16 @@ const Auth = () => {
     
     if (!error) return;
 
+    // User already exists error
+    if (error.message.includes("User already registered") || error.message.includes("user_already_exists")) {
+      toast({
+        variant: "destructive",
+        title: "Account Already Exists",
+        description: "An account with this email already exists. Please sign in instead.",
+      });
+      return;
+    }
+
     // Password-related errors
     if (error.message.includes("weak_password")) {
       toast({
@@ -41,15 +51,6 @@ const Auth = () => {
         variant: "destructive",
         title: "Account Not Found",
         description: "No account exists with this email address.",
-      });
-      return;
-    }
-
-    if (error.message.includes("Email already registered")) {
-      toast({
-        variant: "destructive",
-        title: "Email Already Registered",
-        description: "This email is already associated with an account.",
       });
       return;
     }
@@ -133,7 +134,7 @@ const Auth = () => {
       }
 
       // Handle failed authentication attempts
-      if (event === "USER_DELETED" || event === "TOKEN_REFRESHED") {
+      if (event === "TOKEN_REFRESHED") {
         console.error("Auth event:", event);
         toast({
           variant: "destructive",
@@ -174,10 +175,6 @@ const Auth = () => {
               }}
               providers={[]}
               redirectTo={window.location.origin}
-              onError={(error) => {
-                console.error("Auth UI error:", error);
-                handleAuthError(error);
-              }}
             />
           </div>
         </div>
