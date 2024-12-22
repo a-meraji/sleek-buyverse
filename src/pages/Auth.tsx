@@ -5,6 +5,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/components/ui/use-toast";
+import { AuthError } from "@supabase/supabase-js";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -31,11 +32,11 @@ const Auth = () => {
       }
 
       // Handle auth errors
-      if (event === "USER_DELETED" || event === "TOKEN_REFRESHED") {
-        console.error("Auth error:", event);
+      if (event === "PASSWORD_RECOVERY" || event === "TOKEN_REFRESHED") {
+        console.error("Auth event:", event);
         toast({
           variant: "destructive",
-          title: "Authentication Error",
+          title: "Authentication Event",
           description: "Please try signing in again.",
         });
       }
@@ -54,6 +55,9 @@ const Auth = () => {
           <h1 className="text-3xl font-bold mb-8">Welcome</h1>
           
           <div className="bg-card p-6 rounded-lg shadow-sm">
+            <p className="text-sm text-muted-foreground mb-4">
+              Please note: Password must be at least 6 characters long.
+            </p>
             <SupabaseAuth 
               supabaseClient={supabase}
               appearance={{
