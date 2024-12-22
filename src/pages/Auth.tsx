@@ -17,6 +17,7 @@ const Auth = () => {
       console.log("Auth state changed:", event, session);
       
       if (event === "SIGNED_IN") {
+        console.log("User signed in successfully:", session?.user);
         toast({
           title: "Welcome back!",
           description: "You have successfully signed in.",
@@ -25,6 +26,7 @@ const Auth = () => {
       }
 
       if (event === "SIGNED_OUT") {
+        console.log("User signed out");
         toast({
           title: "Signed out",
           description: "You have been signed out successfully.",
