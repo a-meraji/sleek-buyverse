@@ -1,62 +1,58 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
   const { toast } = useToast();
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: isLogin ? "Welcome back!" : "Account created",
-      description: isLogin ? "You have been successfully logged in." : "Your account has been created successfully.",
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session);
+      
+      if (event === "SIGNED_IN") {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+        navigate("/");
+      }
     });
-  };
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate, toast]);
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
-          <h1 className="text-3xl font-bold mb-8">
-            {isLogin ? "Sign In" : "Create Account"}
-          </h1>
+          <h1 className="text-3xl font-bold mb-8">Welcome</h1>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div className="space-y-2">
-                <label htmlFor="name">Full Name</label>
-                <Input id="name" type="text" required />
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <label htmlFor="email">Email</label>
-              <Input id="email" type="email" required />
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="password">Password</label>
-              <Input id="password" type="password" required />
-            </div>
-            
-            <Button type="submit" className="w-full">
-              {isLogin ? "Sign In" : "Create Account"}
-            </Button>
-          </form>
-          
-          <p className="mt-4 text-center">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-primary underline"
-            >
-              {isLogin ? "Sign Up" : "Sign In"}
-            </button>
-          </p>
+          <div className="bg-card p-6 rounded-lg shadow-sm">
+            <SupabaseAuth 
+              supabaseClient={supabase}
+              appearance={{
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: 'rgb(var(--primary))',
+                      brandAccent: 'rgb(var(--primary))',
+                    },
+                  },
+                },
+              }}
+              providers={[]}
+            />
+          </div>
         </div>
       </main>
     </div>
