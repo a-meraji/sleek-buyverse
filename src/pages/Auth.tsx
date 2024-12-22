@@ -22,6 +22,23 @@ const Auth = () => {
         });
         navigate("/");
       }
+
+      if (event === "SIGNED_OUT") {
+        toast({
+          title: "Signed out",
+          description: "You have been signed out successfully.",
+        });
+      }
+
+      // Handle auth errors
+      if (event === "USER_DELETED" || event === "TOKEN_REFRESHED") {
+        console.error("Auth error:", event);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Please try signing in again.",
+        });
+      }
     });
 
     return () => {
@@ -51,6 +68,7 @@ const Auth = () => {
                 },
               }}
               providers={[]}
+              redirectTo={window.location.origin}
             />
           </div>
         </div>
