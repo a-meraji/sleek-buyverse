@@ -70,6 +70,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          isAdmin: boolean
           shipping_address: Json | null
         }
         Insert: {
@@ -78,6 +79,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          isAdmin?: boolean
           shipping_address?: Json | null
         }
         Update: {
@@ -86,6 +88,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          isAdmin?: boolean
           shipping_address?: Json | null
         }
         Relationships: []
