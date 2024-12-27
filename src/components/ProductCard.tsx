@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@supabase/auth-helpers-react";
+import { useState, useEffect } from "react";
 
 interface ProductCardProps {
   id: string;
@@ -15,13 +15,30 @@ interface ProductCardProps {
 export function ProductCard({ id, name, price, image }: ProductCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const auth = useAuth();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('ProductCard auth state changed:', event, session);
+      setUserId(session?.user?.id ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const addToCart = useMutation({
     mutationFn: async () => {
       console.log('Adding to cart:', { productId: id });
       
-      if (!auth?.user?.id) {
+      if (!userId) {
         throw new Error('User not authenticated');
       }
 
@@ -30,7 +47,7 @@ export function ProductCard({ id, name, price, image }: ProductCardProps) {
         .from('cart_items')
         .select('*')
         .eq('product_id', id)
-        .eq('user_id', auth.user.id)
+        .eq('user_id', userId)
         .maybeSingle();
 
       console.log('Existing cart item check:', { existingItem, fetchError });
@@ -56,7 +73,7 @@ export function ProductCard({ id, name, price, image }: ProductCardProps) {
         const { error: insertError } = await supabase
           .from('cart_items')
           .insert({
-            user_id: auth.user.id,
+            user_id: userId,
             product_id: id,
             quantity: 1
           });
