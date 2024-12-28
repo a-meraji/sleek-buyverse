@@ -14,6 +14,7 @@ const Products = () => {
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const searchQuery = searchParams.get('search') || '';
 
   const { data: products, isLoading, error } = useQuery({
@@ -92,29 +93,37 @@ const Products = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
-        <ProductsHeader setSortOrder={setSortOrder} />
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <FilterSidebar
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            categories={categories}
-          />
-          <div className="lg:col-span-3">
-            <div className="mb-6 lg:hidden">
+      <main className="container mx-auto px-4">
+        <ProductsHeader 
+          setSortOrder={setSortOrder} 
+          setMobileFiltersOpen={setMobileFiltersOpen}
+        />
+        <section className="pb-24 pt-6">
+          <h2 className="sr-only">Products</h2>
+
+          <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+            <FilterSidebar
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              categories={categories}
+            />
+
+            <div className="lg:col-span-3">
               <MobileFilters
+                open={mobileFiltersOpen}
+                setOpen={setMobileFiltersOpen}
                 priceRange={priceRange}
                 setPriceRange={setPriceRange}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
                 categories={categories}
               />
+              <ProductGrid products={products} />
             </div>
-            <ProductGrid products={products} />
           </div>
-        </div>
+        </section>
       </main>
     </div>
   );

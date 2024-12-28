@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { Disclosure } from "@headlessui/react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface FilterSidebarProps {
   priceRange: number[];
@@ -18,45 +18,81 @@ export const FilterSidebar = ({
   categories,
 }: FilterSidebarProps) => {
   return (
-    <div className="hidden lg:block space-y-6">
-      <div>
-        <h3 className="font-medium mb-4">Price Range</h3>
-        <Slider
-          defaultValue={priceRange}
-          max={1000}
-          step={1}
-          onValueChange={setPriceRange}
-        />
-        <div className="flex justify-between text-sm mt-2">
-          <span>${priceRange[0]}</span>
-          <span>${priceRange[1]}</span>
-        </div>
-      </div>
-
-      {categories && categories.length > 0 && (
-        <div>
-          <h3 className="font-medium mb-4">Categories</h3>
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <div key={category} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`category-desktop-${category}`}
-                  checked={selectedCategory === category}
-                  onCheckedChange={() => 
-                    setSelectedCategory(selectedCategory === category ? null : category)
-                  }
+    <form className="hidden lg:block">
+      <div className="space-y-6">
+        <Disclosure defaultOpen>
+          {({ open }) => (
+            <>
+              <Disclosure.Button className="flex w-full items-center justify-between py-3 text-sm text-gray-400 hover:text-gray-500">
+                <span className="font-medium text-gray-900">Price Range</span>
+                <span className="ml-6 flex items-center">
+                  {open ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                </span>
+              </Disclosure.Button>
+              <Disclosure.Panel className="pt-6">
+                <Slider
+                  defaultValue={priceRange}
+                  max={1000}
+                  step={1}
+                  onValueChange={setPriceRange}
                 />
-                <label
-                  htmlFor={`category-desktop-${category}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {category}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+                <div className="flex justify-between text-sm mt-2">
+                  <span>${priceRange[0]}</span>
+                  <span>${priceRange[1]}</span>
+                </div>
+              </Disclosure.Panel>
+            </>
+          )}
+        </Disclosure>
+
+        {categories && categories.length > 0 && (
+          <Disclosure defaultOpen>
+            {({ open }) => (
+              <>
+                <Disclosure.Button className="flex w-full items-center justify-between py-3 text-sm text-gray-400 hover:text-gray-500">
+                  <span className="font-medium text-gray-900">Categories</span>
+                  <span className="ml-6 flex items-center">
+                    {open ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
+                  </span>
+                </Disclosure.Button>
+                <Disclosure.Panel className="pt-6">
+                  <div className="space-y-4">
+                    {categories.map((category) => (
+                      <div key={category} className="flex items-center">
+                        <input
+                          id={`category-${category}`}
+                          name="category"
+                          value={category}
+                          type="checkbox"
+                          checked={selectedCategory === category}
+                          onChange={(e) => 
+                            setSelectedCategory(e.target.checked ? category : null)
+                          }
+                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <label
+                          htmlFor={`category-${category}`}
+                          className="ml-3 text-sm text-gray-600"
+                        >
+                          {category}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </Disclosure.Panel>
+              </>
+            )}
+          </Disclosure>
+        )}
+      </div>
+    </form>
   );
 };
