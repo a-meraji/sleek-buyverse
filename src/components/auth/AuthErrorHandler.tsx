@@ -9,11 +9,35 @@ export const useAuthErrorHandler = () => {
   const { toast } = useToast();
 
   const handleAuthError = (error: AuthError | null) => {
-    console.error("Auth error:", error);
+    console.error("Auth error details:", {
+      message: error?.message,
+      status: error?.status,
+      name: error?.name,
+    });
     
     if (!error) return;
 
-    // Check for invalid credentials error - both message formats
+    // Network or connection errors
+    if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+      toast({
+        variant: "destructive",
+        title: "Connection Error",
+        description: "Please check your internet connection and try again.",
+      });
+      return;
+    }
+
+    // Rate limiting errors
+    if (error.status === 429) {
+      toast({
+        variant: "destructive",
+        title: "Too Many Attempts",
+        description: "Please wait a moment before trying again.",
+      });
+      return;
+    }
+
+    // Invalid credentials (status 400)
     if (
       error.message.includes("Invalid login credentials") || 
       error.message.includes("invalid_credentials") ||
@@ -27,18 +51,18 @@ export const useAuthErrorHandler = () => {
       return;
     }
 
-    // Missing email error
-    if (error.message.includes("missing email")) {
+    // Email not verified (status 400)
+    if (error.message.includes("Email not confirmed")) {
       toast({
         variant: "destructive",
-        title: "Email Required",
-        description: "Please enter your email address.",
+        title: "Email Not Verified",
+        description: "Please check your email and verify your account before signing in.",
       });
       return;
     }
 
-    // User already exists error
-    if (error.message.includes("User already registered") || error.message.includes("user_already_exists")) {
+    // Account already exists (status 400)
+    if (error.message.includes("User already registered")) {
       toast({
         variant: "destructive",
         title: "Account Already Exists",
@@ -47,41 +71,62 @@ export const useAuthErrorHandler = () => {
       return;
     }
 
-    // Password-related errors
-    if (error.message.includes("weak_password")) {
+    // Invalid email format (status 400)
+    if (error.message.includes("Invalid email")) {
       toast({
         variant: "destructive",
-        title: "Password Too Weak",
-        description: "Password should be at least 6 characters long and contain a mix of characters.",
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
       });
       return;
     }
 
-    // Email-related errors
+    // Password requirements not met (status 400)
+    if (error.message.includes("Password should be")) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Password",
+        description: "Password must be at least 6 characters long.",
+      });
+      return;
+    }
+
+    // Account not found (status 400/404)
     if (error.message.includes("User not found")) {
       toast({
         variant: "destructive",
         title: "Account Not Found",
-        description: "No account exists with this email address.",
+        description: "No account exists with this email address. Please sign up instead.",
       });
       return;
     }
 
-    if (error.message.includes("Email not confirmed")) {
+    // Server errors (status 500+)
+    if (error.status && error.status >= 500) {
       toast({
         variant: "destructive",
-        title: "Email Not Verified",
-        description: "Please check your email and verify your account.",
+        title: "Server Error",
+        description: "We're experiencing technical difficulties. Please try again later.",
       });
       return;
     }
 
-    // Rate limiting and other errors
-    if (error.message.includes("Too many requests")) {
+    // OAuth provider errors
+    if (error.message.includes("Provider not supported") || error.message.includes("oauth")) {
       toast({
         variant: "destructive",
-        title: "Too Many Attempts",
-        description: "Please wait a moment before trying again.",
+        title: "Authentication Error",
+        description: "There was a problem with the authentication provider. Please try again.",
+      });
+      return;
+    }
+
+    // Session expired or invalid
+    if (error.message.includes("session")) {
+      toast({
+        variant: "destructive",
+        title: "Session Expired",
+        description: "Your session has expired. Please sign in again.",
       });
       return;
     }
