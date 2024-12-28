@@ -2,7 +2,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { Navbar } from "@/components/Navbar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Squares2X2Icon } from "lucide-react";
+import { Loader2, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -14,7 +14,7 @@ const Index = () => {
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .limit(6); // Limit to 6 products on the main page
+        .limit(6);
       
       if (error) {
         console.error('Error fetching products:', error);
@@ -60,7 +60,7 @@ const Index = () => {
           <h1 className="text-3xl font-bold">New Arrivals</h1>
           <Link to="/products">
             <Button variant="outline" className="gap-2">
-              <Squares2X2Icon className="h-4 w-4" />
+              <Grid className="h-4 w-4" />
               View All Products
             </Button>
           </Link>
