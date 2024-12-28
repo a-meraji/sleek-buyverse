@@ -1,7 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { X } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
-import { useEffect, useState } from "react";
+import { PriceRangeFilter } from "./filters/PriceRangeFilter";
+import { CategoryFilter } from "./filters/CategoryFilter";
 
 interface MobileFiltersProps {
   open: boolean;
@@ -22,24 +22,6 @@ export const MobileFilters = ({
   setSelectedCategory,
   categories,
 }: MobileFiltersProps) => {
-  const [localPriceRange, setLocalPriceRange] = useState(priceRange);
-  
-  // Update local state when props change
-  useEffect(() => {
-    setLocalPriceRange(priceRange);
-  }, [priceRange]);
-
-  // Debounced update
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (localPriceRange[0] !== priceRange[0] || localPriceRange[1] !== priceRange[1]) {
-        setPriceRange(localPriceRange);
-      }
-    }, 500); // Wait 500ms after the last change
-
-    return () => clearTimeout(timer);
-  }, [localPriceRange, setPriceRange, priceRange]);
-
   return (
     <Dialog as="div" open={open} onClose={setOpen} className="relative z-40 lg:hidden">
       <div className="fixed inset-0 bg-black bg-opacity-25" />
@@ -59,53 +41,17 @@ export const MobileFilters = ({
           </div>
 
           <div className="mt-4 border-t border-gray-200">
-            <div className="px-4 py-6">
-              <h3 className="font-medium text-gray-900 mb-4">Price Range</h3>
-              <Slider
-                defaultValue={localPriceRange}
-                value={localPriceRange}
-                max={1000}
-                step={1}
-                minStepsBetweenThumbs={1}
-                onValueChange={(values) => {
-                  setLocalPriceRange([values[0], values[1]]);
-                }}
-                className="w-full"
-              />
-              <div className="flex justify-between text-sm mt-2">
-                <span>${localPriceRange[0]}</span>
-                <span>${localPriceRange[1]}</span>
-              </div>
-            </div>
-
-            {categories && categories.length > 0 && (
-              <div className="px-4 py-6 border-t border-gray-200">
-                <h3 className="font-medium text-gray-900 mb-4">Categories</h3>
-                <div className="space-y-4">
-                  {categories.map((category) => (
-                    <div key={category} className="flex items-center">
-                      <input
-                        id={`category-mobile-${category}`}
-                        name="category"
-                        value={category}
-                        type="checkbox"
-                        checked={selectedCategory === category}
-                        onChange={(e) => 
-                          setSelectedCategory(e.target.checked ? category : null)
-                        }
-                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                      />
-                      <label
-                        htmlFor={`category-mobile-${category}`}
-                        className="ml-3 text-sm text-gray-600"
-                      >
-                        {category}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <PriceRangeFilter 
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              isMobile
+            />
+            <CategoryFilter
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              categories={categories}
+              isMobile
+            />
           </div>
         </Dialog.Panel>
       </div>
