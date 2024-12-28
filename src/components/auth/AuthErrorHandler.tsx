@@ -13,6 +13,8 @@ export const useAuthErrorHandler = () => {
       message: error?.message,
       status: error?.status,
       name: error?.name,
+      body: error?.message.includes("statusText undefined") ? 
+        JSON.parse(error.message.split("body: ")[1]) : null
     });
     
     if (!error) return;
@@ -37,19 +39,23 @@ export const useAuthErrorHandler = () => {
       return;
     }
 
-    // Invalid credentials (status 400) - Improved password handling
+    // Invalid credentials (status 400) - Handle the specific error format
     if (
       error.message.includes("Invalid login credentials") || 
       error.message.includes("invalid_credentials") ||
       (error.status === 400 && error.message.includes("failed to call url"))
     ) {
-      console.log("Invalid credentials error:", error);
-      toast({
-        variant: "destructive",
-        title: "Invalid Password",
-        description: "The password you entered is incorrect. Please try again.",
-      });
-      return;
+      const errorBody = error.message.includes("statusText undefined") ? 
+        JSON.parse(error.message.split("body: ")[1]) : null;
+
+      if (errorBody?.code === "invalid_credentials") {
+        toast({
+          variant: "destructive",
+          title: "Invalid Credentials",
+          description: "The email or password you entered is incorrect. Please try again.",
+        });
+        return;
+      }
     }
 
     // Email not verified (status 400)
