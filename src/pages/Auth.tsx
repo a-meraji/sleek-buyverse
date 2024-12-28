@@ -16,6 +16,16 @@ const Auth = () => {
     
     if (!error) return;
 
+    // Missing email error
+    if (error.message.includes("missing email")) {
+      toast({
+        variant: "destructive",
+        title: "Email Required",
+        description: "Please enter your email address.",
+      });
+      return;
+    }
+
     // User already exists error
     if (error.message.includes("User already registered") || error.message.includes("user_already_exists")) {
       toast({
@@ -83,8 +93,9 @@ const Auth = () => {
   };
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
       if (error) {
         console.error("Session check error:", error);
         handleAuthError(error);
@@ -95,7 +106,9 @@ const Auth = () => {
         console.log("User already logged in:", session.user);
         navigate("/");
       }
-    });
+    };
+
+    checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
@@ -132,16 +145,6 @@ const Auth = () => {
           description: "Check your email for password reset instructions.",
         });
       }
-
-      // Handle failed authentication attempts
-      if (event === "TOKEN_REFRESHED") {
-        console.error("Auth event:", event);
-        toast({
-          variant: "destructive",
-          title: "Authentication Event",
-          description: "Please try signing in again.",
-        });
-      }
     });
 
     return () => {
@@ -158,7 +161,7 @@ const Auth = () => {
           
           <div className="bg-card p-6 rounded-lg shadow-sm">
             <p className="text-sm text-muted-foreground mb-4">
-              Please note: Password must be at least 6 characters long and contain a mix of characters for security.
+              Please enter your email and password to continue.
             </p>
             <SupabaseAuth 
               supabaseClient={supabase}
@@ -174,7 +177,8 @@ const Auth = () => {
                 },
               }}
               providers={[]}
-              redirectTo={window.location.origin}
+              redirectTo={`${window.location.origin}/`}
+              onError={(error) => handleAuthError(error)}
             />
           </div>
         </div>
