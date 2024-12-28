@@ -1,6 +1,7 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { useEffect, useState } from "react";
 
 interface FilterSidebarProps {
   priceRange: number[];
@@ -17,6 +18,24 @@ export const FilterSidebar = ({
   setSelectedCategory,
   categories,
 }: FilterSidebarProps) => {
+  const [localPriceRange, setLocalPriceRange] = useState(priceRange);
+  
+  // Update local state when props change
+  useEffect(() => {
+    setLocalPriceRange(priceRange);
+  }, [priceRange]);
+
+  // Debounced update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localPriceRange[0] !== priceRange[0] || localPriceRange[1] !== priceRange[1]) {
+        setPriceRange(localPriceRange);
+      }
+    }, 500); // Wait 500ms after the last change
+
+    return () => clearTimeout(timer);
+  }, [localPriceRange, setPriceRange, priceRange]);
+
   return (
     <form className="hidden lg:block">
       <div className="space-y-6">
@@ -35,14 +54,16 @@ export const FilterSidebar = ({
               </Disclosure.Button>
               <Disclosure.Panel className="pt-6">
                 <Slider
-                  defaultValue={priceRange}
+                  defaultValue={localPriceRange}
+                  value={localPriceRange}
                   max={1000}
                   step={1}
-                  onValueChange={setPriceRange}
+                  minStepsBetweenThumbs={1}
+                  onValueChange={setLocalPriceRange}
                 />
                 <div className="flex justify-between text-sm mt-2">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
+                  <span>${localPriceRange[0]}</span>
+                  <span>${localPriceRange[1]}</span>
                 </div>
               </Disclosure.Panel>
             </>

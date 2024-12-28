@@ -1,6 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { X } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { useEffect, useState } from "react";
 
 interface MobileFiltersProps {
   open: boolean;
@@ -21,6 +22,24 @@ export const MobileFilters = ({
   setSelectedCategory,
   categories,
 }: MobileFiltersProps) => {
+  const [localPriceRange, setLocalPriceRange] = useState(priceRange);
+  
+  // Update local state when props change
+  useEffect(() => {
+    setLocalPriceRange(priceRange);
+  }, [priceRange]);
+
+  // Debounced update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localPriceRange[0] !== priceRange[0] || localPriceRange[1] !== priceRange[1]) {
+        setPriceRange(localPriceRange);
+      }
+    }, 500); // Wait 500ms after the last change
+
+    return () => clearTimeout(timer);
+  }, [localPriceRange, setPriceRange, priceRange]);
+
   return (
     <Dialog as="div" open={open} onClose={setOpen} className="relative z-40 lg:hidden">
       <div className="fixed inset-0 bg-black bg-opacity-25" />
@@ -43,14 +62,16 @@ export const MobileFilters = ({
             <div className="px-4 py-6">
               <h3 className="font-medium text-gray-900 mb-4">Price Range</h3>
               <Slider
-                defaultValue={priceRange}
+                defaultValue={localPriceRange}
+                value={localPriceRange}
                 max={1000}
                 step={1}
-                onValueChange={setPriceRange}
+                minStepsBetweenThumbs={1}
+                onValueChange={setLocalPriceRange}
               />
               <div className="flex justify-between text-sm mt-2">
-                <span>${priceRange[0]}</span>
-                <span>${priceRange[1]}</span>
+                <span>${localPriceRange[0]}</span>
+                <span>${localPriceRange[1]}</span>
               </div>
             </div>
 
