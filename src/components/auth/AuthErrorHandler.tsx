@@ -17,7 +17,7 @@ export const useAuthErrorHandler = () => {
     if (
       error.message.includes("Invalid login credentials") || 
       error.message.includes("invalid_credentials") ||
-      (error.status === 400 && error.error_type === "http_client_error")
+      (error.status === 400 && error.message.includes("failed to call url"))
     ) {
       toast({
         variant: "destructive",
