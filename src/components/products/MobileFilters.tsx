@@ -67,7 +67,10 @@ export const MobileFilters = ({
                 max={1000}
                 step={1}
                 minStepsBetweenThumbs={1}
-                onValueChange={setLocalPriceRange}
+                onValueChange={(values) => {
+                  setLocalPriceRange([values[0], values[1]]);
+                }}
+                className="w-full"
               />
               <div className="flex justify-between text-sm mt-2">
                 <span>${localPriceRange[0]}</span>
