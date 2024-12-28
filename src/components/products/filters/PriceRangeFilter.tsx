@@ -33,8 +33,8 @@ export const PriceRangeFilter = ({
   const content = (
     <>
       <Slider
-        defaultValue={localPriceRange}
-        value={localPriceRange}
+        defaultValue={[localPriceRange[0], localPriceRange[1]]}
+        value={[localPriceRange[0], localPriceRange[1]]}
         max={1000}
         step={1}
         minStepsBetweenThumbs={1}
