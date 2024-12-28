@@ -13,22 +13,26 @@ export const useAuthErrorHandler = () => {
     
     if (!error) return;
 
+    // Check for invalid credentials error - both message formats
+    if (
+      error.message.includes("Invalid login credentials") || 
+      error.message.includes("invalid_credentials") ||
+      (error.status === 400 && error.error_type === "http_client_error")
+    ) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Credentials",
+        description: "The email or password you entered is incorrect. Please try again.",
+      });
+      return;
+    }
+
     // Missing email error
     if (error.message.includes("missing email")) {
       toast({
         variant: "destructive",
         title: "Email Required",
         description: "Please enter your email address.",
-      });
-      return;
-    }
-
-    // Invalid credentials error
-    if (error.message.includes("Invalid login credentials") || error.message.includes("invalid_credentials")) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Credentials",
-        description: "The email or password you entered is incorrect.",
       });
       return;
     }
