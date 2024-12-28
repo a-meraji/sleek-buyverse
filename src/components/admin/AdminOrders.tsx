@@ -13,19 +13,29 @@ export function AdminOrders() {
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin-orders"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get orders
+      const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
-        .select(`
-          *,
-          profiles:user_id (
-            email,
-            full_name
-          )
-        `)
-        .order("created_at", { ascending: false });
+        .select("*, user_id");
 
-      if (error) throw error;
-      return data;
+      if (ordersError) throw ordersError;
+
+      // Then get profiles for these orders
+      const userIds = ordersData.map(order => order.user_id);
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email, full_name")
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const ordersWithProfiles = ordersData.map(order => ({
+        ...order,
+        profile: profilesData.find(profile => profile.id === order.user_id)
+      }));
+
+      return ordersWithProfiles;
     },
   });
 
@@ -47,7 +57,7 @@ export function AdminOrders() {
           <TableRow key={order.id}>
             <TableCell>{order.id.slice(0, 8)}</TableCell>
             <TableCell>
-              {order.profiles?.full_name || order.profiles?.email}
+              {order.profile?.full_name || order.profile?.email || 'Unknown User'}
             </TableCell>
             <TableCell className="capitalize">{order.status}</TableCell>
             <TableCell>${order.total_amount}</TableCell>
