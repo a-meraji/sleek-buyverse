@@ -14,23 +14,28 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error("Session check error:", error);
-        onError(error);
-        return;
-      }
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session check error:", error);
+          onError(error);
+          return;
+        }
 
-      if (session) {
-        console.log("User already logged in:", session.user);
-        navigate("/");
+        if (session) {
+          console.log("User already logged in:", session.user);
+          navigate("/");
+        }
+      } catch (err) {
+        console.error("Unexpected error during session check:", err);
+        onError(err as AuthError);
       }
     };
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
       console.log("Auth state changed:", event, session);
       
       if (event === "SIGNED_IN") {
@@ -58,10 +63,16 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
         });
       }
 
-      // Handle errors from specific auth events
+      if (event === "SIGNED_OUT") {
+        console.log("User signed out");
+        navigate("/auth");
+      }
+
+      // Handle authentication errors
       if (event === "TOKEN_REFRESHED" && !session) {
         const error = session as unknown as AuthError;
         if (error?.message) {
+          console.error("Token refresh error:", error);
           onError(error);
         }
       }
