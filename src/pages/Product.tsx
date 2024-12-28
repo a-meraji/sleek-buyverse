@@ -1,16 +1,35 @@
 import { useParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 const Product = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedSize, setSelectedSize] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Product detail auth state changed:', event, session);
+      setUserId(session?.user?.id ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
@@ -32,20 +51,89 @@ const Product = () => {
     },
   });
 
-  const addToCart = () => {
-    if (!selectedSize) {
+  const addToCart = useMutation({
+    mutationFn: async () => {
+      console.log('Adding to cart from product detail:', { productId: id });
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      if (!selectedSize) {
+        throw new Error('Size not selected');
+      }
+
+      // First check if item already exists in cart
+      const { data: existingItem, error: fetchError } = await supabase
+        .from('cart_items')
+        .select('*')
+        .eq('product_id', id)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      console.log('Existing cart item check:', { existingItem, fetchError });
+
+      if (fetchError) {
+        console.error('Error checking cart:', fetchError);
+        throw fetchError;
+      }
+
+      if (existingItem) {
+        // Update quantity if item exists
+        const { error: updateError } = await supabase
+          .from('cart_items')
+          .update({ quantity: existingItem.quantity + 1 })
+          .eq('id', existingItem.id);
+
+        if (updateError) {
+          console.error('Error updating cart:', updateError);
+          throw updateError;
+        }
+      } else {
+        // Insert new item if it doesn't exist
+        const { error: insertError } = await supabase
+          .from('cart_items')
+          .insert({
+            user_id: userId,
+            product_id: id,
+            quantity: 1
+          });
+
+        if (insertError) {
+          console.error('Error inserting to cart:', insertError);
+          throw insertError;
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
       toast({
-        title: "Please select a size",
-        variant: "destructive",
+        title: "Added to cart",
+        description: `${product?.name} (${selectedSize}) has been added to your cart.`,
       });
-      return;
-    }
-    
-    toast({
-      title: "Added to cart",
-      description: `${product?.name} (${selectedSize}) has been added to your cart.`,
-    });
-  };
+    },
+    onError: (error) => {
+      console.error('Error adding to cart:', error);
+      if (error.message === 'User not authenticated') {
+        toast({
+          title: "Please sign in",
+          description: "You need to be signed in to add items to cart.",
+          variant: "destructive",
+        });
+      } else if (error.message === 'Size not selected') {
+        toast({
+          title: "Please select a size",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add item to cart. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+  });
 
   if (isLoading) {
     return (
@@ -112,7 +200,8 @@ const Product = () => {
             <Button
               className="w-full"
               size="lg"
-              onClick={addToCart}
+              onClick={() => addToCart.mutate()}
+              disabled={addToCart.isPending}
             >
               Add to Cart
             </Button>
