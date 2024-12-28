@@ -5,7 +5,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/components/ui/use-toast";
-import { AuthError } from "@supabase/supabase-js";
+import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -111,7 +111,7 @@ const Auth = () => {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
       console.log("Auth state changed:", event, session);
       
       if (event === "SIGNED_IN") {
@@ -147,8 +147,8 @@ const Auth = () => {
         });
       }
 
-      // Handle authentication errors through the event listener
-      if (event === "USER_DELETED" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
+      // Handle errors from specific auth events
+      if (event === "TOKEN_REFRESHED" && !session) {
         const error = session as unknown as AuthError;
         if (error?.message) {
           handleAuthError(error);
