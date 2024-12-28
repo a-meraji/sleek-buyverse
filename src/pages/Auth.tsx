@@ -26,6 +26,16 @@ const Auth = () => {
       return;
     }
 
+    // Invalid credentials error
+    if (error.message.includes("Invalid login credentials") || error.message.includes("invalid_credentials")) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Credentials",
+        description: "The email or password you entered is incorrect.",
+      });
+      return;
+    }
+
     // User already exists error
     if (error.message.includes("User already registered") || error.message.includes("user_already_exists")) {
       toast({
@@ -42,15 +52,6 @@ const Auth = () => {
         variant: "destructive",
         title: "Password Too Weak",
         description: "Password should be at least 6 characters long and contain a mix of characters.",
-      });
-      return;
-    }
-
-    if (error.message.includes("invalid_credentials")) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Credentials",
-        description: "The email or password you entered is incorrect.",
       });
       return;
     }
@@ -145,6 +146,14 @@ const Auth = () => {
           description: "Check your email for password reset instructions.",
         });
       }
+
+      // Handle authentication errors through the event listener
+      if (event === "USER_DELETED" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
+        const error = session as unknown as AuthError;
+        if (error?.message) {
+          handleAuthError(error);
+        }
+      }
     });
 
     return () => {
@@ -178,7 +187,6 @@ const Auth = () => {
               }}
               providers={[]}
               redirectTo={`${window.location.origin}/`}
-              onError={(error) => handleAuthError(error)}
             />
           </div>
         </div>
