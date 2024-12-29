@@ -39,21 +39,37 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
         console.log('Marking messages as read with IDs:', unreadIds);
 
         // Update messages as read
-        const { error: updateError } = await supabase
+        const { data: updateResult, error: updateError } = await supabase
           .from('chat_messages')
           .update({ is_read: true })
           .in('id', unreadIds)
-          .eq('session_id', sessionId);
+          .select();
+
+        console.log('Update result:', updateResult);
 
         if (updateError) {
           console.error('Error marking messages as read:', updateError);
           return data;
         }
 
-        // Return updated messages with is_read set to true for the updated messages
-        return data.map(msg => 
-          unreadIds.includes(msg.id) ? { ...msg, is_read: true } : msg
-        );
+        // Verify the update worked by fetching the latest data
+        const { data: verifyData, error: verifyError } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .in('id', unreadIds);
+
+        console.log('Verification data:', verifyData);
+
+        if (verifyError) {
+          console.error('Error verifying updates:', verifyError);
+          return data;
+        }
+
+        // Return updated messages
+        return data.map(msg => {
+          const updatedMsg = verifyData?.find(updated => updated.id === msg.id);
+          return updatedMsg || msg;
+        });
       }
 
       return data;
