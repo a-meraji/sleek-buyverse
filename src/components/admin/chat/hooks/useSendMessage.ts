@@ -28,6 +28,8 @@ export const useSendMessage = (sessionId: string | null) => {
     try {
       const user = await getCurrentUser();
       
+      chatLogger.info('Got sender_id', user.id);
+      
       await sendMessageToSupabase({
         session_id: sessionId,
         content: content.trim(),
