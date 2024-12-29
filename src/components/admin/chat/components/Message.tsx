@@ -13,10 +13,10 @@ export const Message = ({ message }: MessageProps) => {
     <div
       className={`flex ${
         message.sender_id ? "justify-end" : "justify-start"
-      }`}
+      } mb-4`}
     >
       <div
-        className={`rounded-lg px-4 py-2 max-w-[80%] max-h-[200px] overflow-y-auto ${
+        className={`rounded-lg px-4 py-2 max-w-[80%] break-words ${
           message.sender_id
             ? "bg-primary text-primary-foreground"
             : "bg-muted"
