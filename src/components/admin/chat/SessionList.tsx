@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -14,48 +14,32 @@ interface SessionListProps {
 }
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
-  const [sessions, setSessions] = useState<any[]>([]);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchSessions = async () => {
+  const { data: sessions = [] } = useQuery({
+    queryKey: ['chat-sessions'],
+    queryFn: async () => {
       console.log('Fetching chat sessions...');
       const { data, error } = await supabase
         .from('chat_sessions')
-        .select('*, user:user_id (email)')
+        .select(`
+          *,
+          user:user_id (email),
+          messages:chat_messages(count)
+        `)
         .eq('status', 'active')
-        .order('created_at', { ascending: false });
+        .order('last_message_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching sessions:', error);
-        return;
+        return [];
       }
 
       console.log('Fetched sessions:', data);
-      setSessions(data);
-    };
-
-    fetchSessions();
-
-    const channel = supabase
-      .channel('admin-chat-sessions')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'chat_sessions',
-        },
-        (payload) => {
-          console.log('Chat session change received:', payload);
-          fetchSessions();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+      return data;
+    },
+    refetchInterval: 5000, // Refetch every 5 seconds
+  });
 
   return (
     <div className="space-y-4">
@@ -74,7 +58,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
                 {session.user?.email || "Anonymous"}
               </CardTitle>
               <CardDescription className="text-xs">
-                {new Date(session.created_at).toLocaleString()}
+                {new Date(session.last_message_at).toLocaleString()}
               </CardDescription>
             </CardHeader>
           </Card>

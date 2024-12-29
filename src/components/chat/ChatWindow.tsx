@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Send } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface ChatWindowProps {
   open: boolean;
@@ -14,11 +15,12 @@ interface ChatWindowProps {
 
 export const ChatWindow = ({ open, onClose }: ChatWindowProps) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
+  // Initialize chat session
   useEffect(() => {
     const initializeChat = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -32,7 +34,6 @@ export const ChatWindow = ({ open, onClose }: ChatWindowProps) => {
         return;
       }
 
-      // Get or create chat session
       const { data: existingSession, error: fetchError } = await supabase
         .from('chat_sessions')
         .select('id')
@@ -70,29 +71,11 @@ export const ChatWindow = ({ open, onClose }: ChatWindowProps) => {
     }
   }, [open, toast, onClose]);
 
-  useEffect(() => {
-    if (!sessionId) return;
-
-    // Subscribe to new messages
-    const channel = supabase
-      .channel('chat-messages')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chat_messages',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          console.log('New message received:', payload);
-          setMessages((current) => [...current, payload.new]);
-        }
-      )
-      .subscribe();
-
-    // Fetch existing messages
-    const fetchMessages = async () => {
+  // Fetch messages periodically
+  const { data: messages = [] } = useQuery({
+    queryKey: ['chat-messages', sessionId],
+    queryFn: async () => {
+      if (!sessionId) return [];
       const { data, error } = await supabase
         .from('chat_messages')
         .select('*')
@@ -101,29 +84,37 @@ export const ChatWindow = ({ open, onClose }: ChatWindowProps) => {
 
       if (error) {
         console.error('Error fetching messages:', error);
-        return;
+        return [];
       }
-
-      setMessages(data);
-    };
-
-    fetchMessages();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [sessionId]);
+      return data;
+    },
+    enabled: !!sessionId,
+    refetchInterval: 3000, // Refetch every 3 seconds
+  });
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !sessionId) return;
 
     setLoading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Error",
+        description: "You must be signed in to send messages.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase
       .from('chat_messages')
       .insert({
         session_id: sessionId,
         content: newMessage.trim(),
+        sender_id: session.user.id,
       });
 
     setLoading(false);
@@ -138,6 +129,7 @@ export const ChatWindow = ({ open, onClose }: ChatWindowProps) => {
     }
 
     setNewMessage("");
+    queryClient.invalidateQueries({ queryKey: ['chat-messages', sessionId] });
   };
 
   return (

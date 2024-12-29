@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Send } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
 
 interface MessageInputProps {
   sessionId: string | null;
@@ -11,6 +13,8 @@ interface MessageInputProps {
 export const MessageInput = ({ sessionId }: MessageInputProps) => {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +24,6 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
     console.log('Sending message:', {
       session_id: sessionId,
       content: newMessage.trim(),
-      sender_id: null,
     });
 
     const { error } = await supabase
@@ -28,16 +31,21 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       .insert({
         session_id: sessionId,
         content: newMessage.trim(),
-        sender_id: null, // null sender_id indicates admin message
       });
 
     setLoading(false);
     if (error) {
       console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
       return;
     }
 
     setNewMessage("");
+    queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', sessionId] });
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -7,54 +7,29 @@ interface MessageListProps {
 }
 
 export const MessageList = ({ sessionId }: MessageListProps) => {
-  const [messages, setMessages] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (!sessionId) return;
-
-    console.log('Setting up message subscription for session:', sessionId);
-
-    const fetchMessages = async () => {
+  const { data: messages = [] } = useQuery({
+    queryKey: ['admin-chat-messages', sessionId],
+    queryFn: async () => {
+      if (!sessionId) return [];
+      
       console.log('Fetching messages for session:', sessionId);
       const { data, error } = await supabase
         .from('chat_messages')
-        .select('*')
+        .select('*, sender:sender_id(email)')
         .eq('session_id', sessionId)
         .order('created_at', { ascending: true });
 
       if (error) {
         console.error('Error fetching messages:', error);
-        return;
+        return [];
       }
 
       console.log('Fetched messages:', data);
-      setMessages(data);
-    };
-
-    fetchMessages();
-
-    const channel = supabase
-      .channel(`admin-chat-messages-${sessionId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chat_messages',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          console.log('New message received:', payload);
-          setMessages((current) => [...current, payload.new]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      console.log('Cleaning up message subscription');
-      supabase.removeChannel(channel);
-    };
-  }, [sessionId]);
+      return data;
+    },
+    enabled: !!sessionId,
+    refetchInterval: 3000, // Refetch every 3 seconds
+  });
 
   return (
     <ScrollArea className="flex-1 pr-4">
