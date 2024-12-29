@@ -15,12 +15,13 @@ export const Navbar = () => {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session);
       setUser(session?.user ?? null);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Navbar auth state changed:", event, session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", { event: _event, session });
       setUser(session?.user ?? null);
     });
 
@@ -30,7 +31,19 @@ export const Navbar = () => {
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error);
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    console.log("User signed out successfully");
+    setUser(null);
     toast({
       title: "Signed out",
       description: "You have been successfully signed out.",
