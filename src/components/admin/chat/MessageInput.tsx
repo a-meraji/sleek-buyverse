@@ -29,8 +29,9 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       // Get the current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      // Log raw session data
+      // Log raw session data and response
       console.log('Raw session data:', session);
+      console.log(`response of retrieving sender_id: ${JSON.stringify({ session, error: sessionError })}`);
       
       if (sessionError) {
         console.error('Session error:', sessionError);
@@ -54,6 +55,7 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
 
       // Log the sender_id from session
       console.log('sender_id retrieved successfully:', session.user.id);
+      console.log(`getting sender_id: ${session.user.id}`);
 
       // Create message data with the sender_id from session
       const messageData = {
