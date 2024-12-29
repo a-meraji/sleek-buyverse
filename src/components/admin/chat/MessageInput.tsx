@@ -40,6 +40,23 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       sender_id: session.user.id,
     });
 
+    // First verify that the user is actually an admin
+    const { data: adminData, error: adminError } = await supabase
+      .from('admin_users')
+      .select('id')
+      .eq('id', session.user.id)
+      .single();
+
+    if (adminError || !adminData) {
+      toast({
+        title: "Error",
+        description: "You don't have permission to send messages as admin.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase
       .from('chat_messages')
       .insert({
