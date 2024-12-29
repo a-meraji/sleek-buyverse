@@ -23,6 +23,8 @@ export const useChatSession = (open: boolean, onClose: () => void) => {
         return;
       }
 
+      console.log('Checking for existing chat session for user:', session.user.id);
+      
       const { data: existingSession, error: fetchError } = await supabase
         .from('chat_sessions')
         .select('id')
@@ -39,7 +41,7 @@ export const useChatSession = (open: boolean, onClose: () => void) => {
         console.log('Found existing chat session:', existingSession);
         setSessionId(existingSession.id);
       } else {
-        console.log('Creating new chat session...');
+        console.log('No existing session found, creating new chat session...');
         const { data: newSession, error: createError } = await supabase
           .from('chat_sessions')
           .insert({ user_id: session.user.id })
