@@ -44,7 +44,7 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
     };
 
     // Log the complete message data before sending
-    console.log('Sending message with data:', messageData);
+    console.log('Sending message with complete data:', messageData);
 
     // Single insert operation
     const { error } = await supabase
