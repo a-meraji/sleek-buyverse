@@ -1,40 +1,19 @@
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SessionList } from "./chat/SessionList";
 import { MessageList } from "./chat/MessageList";
 import { MessageInput } from "./chat/MessageInput";
+import { useAdmin } from "@/hooks/useAdmin";
 
 export const AdminChat = () => {
+  const { data: adminStatus, isLoading } = useAdmin();
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
-
-  // Fetch admin status
-  const { data: isAdmin, isLoading } = useQuery({
-    queryKey: ['admin-status'],
-    queryFn: async () => {
-      console.log('Checking admin status...');
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        console.log('No session found');
-        return false;
-      }
-
-      console.log('Checking user metadata for:', session.user.id);
-      return session.user.user_metadata?.is_admin || false;
-    },
-  });
 
   if (isLoading) {
     return <div>Loading admin status...</div>;
   }
 
-  if (!isAdmin) {
+  if (!adminStatus?.isAdmin) {
     return (
       <div className="p-4">
         <h2 className="text-lg font-semibold">Access Denied</h2>

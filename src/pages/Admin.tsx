@@ -6,45 +6,13 @@ import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useAdmin } from "@/hooks/useAdmin";
 
 export default function Admin() {
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Check admin status using the admin_users table
-  const { data: adminStatus, isLoading } = useQuery({
-    queryKey: ["admin-status"],
-    queryFn: async () => {
-      console.log("Checking admin status...");
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        console.log("No session found");
-        return { isAdmin: false, role: null };
-      }
-
-      // Query the admin_users table
-      const { data: adminUser, error } = await supabase
-        .from("admin_users")
-        .select("role")
-        .eq("id", session.user.id)
-        .single();
-
-      if (error) {
-        console.error("Error checking admin status:", error);
-        return { isAdmin: false, role: null };
-      }
-
-      console.log("Admin status:", adminUser);
-      return {
-        isAdmin: adminUser?.role === "admin" || adminUser?.role === "super_admin",
-        role: adminUser?.role
-      };
-    },
-  });
+  const { data: adminStatus, isLoading } = useAdmin();
 
   useEffect(() => {
     if (!isLoading && !adminStatus?.isAdmin) {

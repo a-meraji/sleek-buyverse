@@ -13,6 +13,8 @@ export function useAdmin() {
         return { isAdmin: false, role: null };
       }
 
+      console.log("Checking admin status for user:", session.user.id);
+      
       const { data: adminUser, error } = await supabase
         .from("admin_users")
         .select("role")
@@ -24,6 +26,8 @@ export function useAdmin() {
         return { isAdmin: false, role: null };
       }
 
+      console.log("Admin status:", adminUser);
+      
       return {
         isAdmin: adminUser?.role === "admin" || adminUser?.role === "super_admin",
         role: adminUser?.role
