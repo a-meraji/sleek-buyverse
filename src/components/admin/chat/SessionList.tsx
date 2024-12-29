@@ -7,6 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { useEffect } from "react";
 
 interface SessionListProps {
   selectedSession: string | null;
@@ -26,7 +27,7 @@ interface ChatSession {
 }
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
-  const { data: sessions = [], isError, error } = useQuery<ChatSession[]>({
+  const { data: sessions = [], refetch } = useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
     queryFn: async () => {
       console.log('Fetching chat sessions...');
@@ -44,7 +45,6 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         throw error;
       }
 
-      // Instead of fetching users directly, we'll use the profiles data from the sessions
       const sessionsWithEmails = chatSessions?.map(session => ({
         ...session,
         user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous')
@@ -53,17 +53,41 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
       console.log('Fetched sessions:', sessionsWithEmails);
       return sessionsWithEmails || [];
     },
-    refetchInterval: 5000, // Refetch every 5 seconds
   });
 
-  if (isError) {
-    console.error('Query error:', error);
-    return (
-      <div className="p-4 text-red-500">
-        Error loading chat sessions. Please try again later.
-      </div>
-    );
-  }
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'chat_sessions'
+        },
+        (payload) => {
+          console.log('Chat session changed:', payload);
+          refetch();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chat_messages'
+        },
+        (payload) => {
+          console.log('New message received:', payload);
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   return (
     <div className="space-y-4">

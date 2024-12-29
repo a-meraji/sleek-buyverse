@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect } from "react";
 
 interface MessageListProps {
   sessionId: string | null;
 }
 
 export const MessageList = ({ sessionId }: MessageListProps) => {
-  const { data: messages = [] } = useQuery({
+  const { data: messages = [], refetch } = useQuery({
     queryKey: ['admin-chat-messages', sessionId],
     queryFn: async () => {
       if (!sessionId) return [];
@@ -28,8 +29,32 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
       return data;
     },
     enabled: !!sessionId,
-    refetchInterval: 3000, // Refetch every 3 seconds
   });
+
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `session_id=eq.${sessionId}`
+        },
+        (payload) => {
+          console.log('New message received:', payload);
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [sessionId, refetch]);
 
   return (
     <ScrollArea className="flex-1 pr-4">
