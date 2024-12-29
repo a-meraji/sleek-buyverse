@@ -24,11 +24,11 @@ interface ChatSession {
   user_details: {
     email: string | null;
   } | null;
-  messages: Array<{ count: number }>;
+  messages: { count: number }[];
 }
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
-  const { data: sessions = [] } = useQuery<ChatSession[]>({
+  const { data: sessions = [], isError, error } = useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
     queryFn: async () => {
       console.log('Fetching chat sessions...');
@@ -36,7 +36,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          user_details:profiles!chat_sessions_user_id_fkey(email),
+          user_details:profiles(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -53,11 +53,17 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
     refetchInterval: 5000, // Refetch every 5 seconds
   });
 
+  if (isError) {
+    console.error('Query error:', error);
+  }
+
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Active Chats ({sessions.length})</h3>
+      <h3 className="text-lg font-semibold">
+        Active Chats ({sessions?.length || 0})
+      </h3>
       <ScrollArea className="h-[calc(100vh-14rem)]">
-        {sessions.map((session) => (
+        {sessions?.map((session) => (
           <Card
             key={session.id}
             className={`mb-2 cursor-pointer ${
