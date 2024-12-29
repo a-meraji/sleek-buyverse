@@ -12,18 +12,37 @@ export const useUnreadMessages = () => {
       const { data: session } = await supabase.auth.getSession();
       if (!session?.session?.user?.id) return 0;
 
+      // First get the admin user IDs
+      const { data: adminUsers, error: adminError } = await supabase
+        .from('admin_users')
+        .select('id');
+
+      if (adminError) {
+        console.error('Error fetching admin users:', adminError);
+        return 0;
+      }
+
+      const adminIds = adminUsers.map(admin => admin.id);
+
+      // Get the user's chat session
+      const { data: chatSession, error: sessionError } = await supabase
+        .from('chat_sessions')
+        .select('id')
+        .eq('user_id', session.session.user.id)
+        .single();
+
+      if (sessionError) {
+        console.error('Error fetching chat session:', sessionError);
+        return 0;
+      }
+
+      // Count unread messages from admins
       const { count, error } = await supabase
         .from('chat_messages')
         .select('*', { count: 'exact', head: true })
         .eq('is_read', false)
-        .isNull('sender_id') // Messages from admin have null sender_id
-        .eq('session_id', (
-          await supabase
-            .from('chat_sessions')
-            .select('id')
-            .eq('user_id', session.session.user.id)
-            .single()
-        ).data?.id);
+        .in('sender_id', adminIds)
+        .eq('session_id', chatSession.id);
 
       if (error) {
         console.error('Error fetching unread messages:', error);

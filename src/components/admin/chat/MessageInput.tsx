@@ -21,9 +21,23 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
     if (!newMessage.trim() || !sessionId) return;
 
     setLoading(true);
-    console.log('Sending message:', {
+    
+    // Get the current admin's user ID
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: "Error",
+        description: "You must be signed in to send messages.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    console.log('Sending message as admin:', {
       session_id: sessionId,
       content: newMessage.trim(),
+      sender_id: session.user.id,
     });
 
     const { error } = await supabase
@@ -31,6 +45,7 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       .insert({
         session_id: sessionId,
         content: newMessage.trim(),
+        sender_id: session.user.id, // Include the admin's user ID
       });
 
     setLoading(false);

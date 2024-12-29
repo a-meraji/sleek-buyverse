@@ -1,5 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
@@ -14,13 +14,32 @@ interface MessageListProps {
 }
 
 export const MessageList = ({ messages }: MessageListProps) => {
+  const [adminIds, setAdminIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchAdminIds = async () => {
+      const { data: adminUsers, error } = await supabase
+        .from('admin_users')
+        .select('id');
+
+      if (error) {
+        console.error('Error fetching admin users:', error);
+        return;
+      }
+
+      setAdminIds(adminUsers.map(admin => admin.id));
+    };
+
+    fetchAdminIds();
+  }, []);
+
   useEffect(() => {
     const markMessagesAsRead = async () => {
       const { data: session } = await supabase.auth.getSession();
       if (!session?.session?.user?.id) return;
 
       const unreadAdminMessages = messages.filter(
-        (msg) => !msg.is_read && !msg.sender_id
+        (msg) => !msg.is_read && adminIds.includes(msg.sender_id || '')
       );
 
       if (unreadAdminMessages.length > 0) {
@@ -37,7 +56,7 @@ export const MessageList = ({ messages }: MessageListProps) => {
     };
 
     markMessagesAsRead();
-  }, [messages]);
+  }, [messages, adminIds]);
 
   return (
     <div className="flex-1 overflow-hidden px-6">
