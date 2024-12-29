@@ -22,51 +22,55 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
 
     setLoading(true);
     
-    // Get the current session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    
-    if (sessionError || !session) {
-      console.error('Session error:', sessionError);
+    try {
+      // Get the current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        throw new Error('Authentication error');
+      }
+
+      if (!session?.user?.id) {
+        console.error('No user ID found in session');
+        throw new Error('No authenticated user found');
+      }
+
+      // Log the sender_id from session
+      console.log('sender_id is:', session.user.id);
+
+      // Create message data with the sender_id from session
+      const messageData = {
+        session_id: sessionId,
+        content: newMessage.trim(),
+        sender_id: session.user.id,
+      };
+
+      // Log the complete message data before sending
+      console.log('Sending message with complete data:', messageData);
+
+      // Single insert operation
+      const { error: insertError } = await supabase
+        .from('chat_messages')
+        .insert(messageData);
+
+      if (insertError) {
+        console.error('Error sending message:', insertError);
+        throw new Error('Failed to send message');
+      }
+
+      setNewMessage("");
+      queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', sessionId] });
+    } catch (error) {
+      console.error('Error in sendMessage:', error);
       toast({
         title: "Error",
-        description: "You must be signed in to send messages.",
+        description: error instanceof Error ? error.message : "Failed to send message. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Log the sender_id from session
-    console.log(`sender_id is: ${session.user.id}`);
-
-    // Create message data with the sender_id from session
-    const messageData = {
-      session_id: sessionId,
-      content: newMessage.trim(),
-      sender_id: session.user.id,
-    };
-
-    // Log the complete message data before sending
-    console.log('Sending message with complete data:', messageData);
-
-    // Single insert operation
-    const { error } = await supabase
-      .from('chat_messages')
-      .insert(messageData);
-
-    setLoading(false);
-    if (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setNewMessage("");
-    queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', sessionId] });
   };
 
   return (
