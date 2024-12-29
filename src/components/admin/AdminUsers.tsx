@@ -13,10 +13,8 @@ type AdminUser = {
   id: string;
   role: string | null;
   created_at: string;
-  auth_user: {
-    email: string;
-    last_sign_in_at: string;
-  } | null;
+  email: string | null;
+  last_sign_in_at: string | null;
 };
 
 export function AdminUsers() {
@@ -30,10 +28,8 @@ export function AdminUsers() {
           id,
           role,
           created_at,
-          auth_user:id (
-            email,
-            last_sign_in_at
-          )
+          email:id,
+          last_sign_in_at:id
         `)
         .order("created_at", { ascending: false });
 
@@ -62,11 +58,11 @@ export function AdminUsers() {
       <TableBody>
         {adminUsers?.map((user) => (
           <TableRow key={user.id}>
-            <TableCell>{user.auth_user?.email || "N/A"}</TableCell>
+            <TableCell>{user.email || "N/A"}</TableCell>
             <TableCell className="capitalize">{user.role || "user"}</TableCell>
             <TableCell>
-              {user.auth_user?.last_sign_in_at
-                ? new Date(user.auth_user.last_sign_in_at).toLocaleDateString()
+              {user.last_sign_in_at
+                ? new Date(user.last_sign_in_at).toLocaleDateString()
                 : "Never"}
             </TableCell>
             <TableCell>
