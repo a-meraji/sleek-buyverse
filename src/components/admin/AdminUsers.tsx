@@ -10,27 +10,22 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 export function AdminUsers() {
-  const { data: users, isLoading } = useQuery({
+  const { data: adminUsers, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      // Get all users from auth
-      const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers();
-      if (authError) throw authError;
-
-      // Get admin roles
-      const { data: adminUsers, error: adminError } = await supabase
+      console.log("Fetching admin users...");
+      const { data, error } = await supabase
         .from("admin_users")
-        .select("id, role");
+        .select("id, role, created_at")
+        .order("created_at", { ascending: false });
 
-      if (adminError) throw adminError;
+      if (error) {
+        console.error("Error fetching admin users:", error);
+        throw error;
+      }
 
-      // Combine the data
-      const usersWithRoles = authUsers?.map(user => ({
-        ...user,
-        role: adminUsers?.find(admin => admin.id === user.id)?.role || "user"
-      })) || [];
-
-      return usersWithRoles;
+      console.log("Fetched admin users:", data);
+      return data;
     },
   });
 
@@ -40,15 +35,15 @@ export function AdminUsers() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Email</TableHead>
+          <TableHead>ID</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Created At</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {users?.map((user) => (
+        {adminUsers?.map((user) => (
           <TableRow key={user.id}>
-            <TableCell>{user.email}</TableCell>
+            <TableCell>{user.id}</TableCell>
             <TableCell className="capitalize">{user.role}</TableCell>
             <TableCell>
               {new Date(user.created_at).toLocaleDateString()}
