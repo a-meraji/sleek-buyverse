@@ -48,12 +48,18 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
       // Then for each session, get the unread count
       const sessionsWithUnreadCounts = await Promise.all(
         chatSessions.map(async (session) => {
-          const { count, error: countError } = await supabase
+          let query = supabase
             .from('chat_messages')
             .select('*', { count: 'exact', head: true })
             .eq('session_id', session.id)
-            .eq('is_read', false)
-            .not('sender_id', 'eq', session.admin_id); // Only count messages not from admin
+            .eq('is_read', false);
+
+          // If there's an admin assigned, only count messages not from them
+          if (session.admin_id) {
+            query = query.neq('sender_id', session.admin_id);
+          }
+
+          const { count, error: countError } = await query;
 
           if (countError) {
             console.error('Error counting unread messages:', countError);
