@@ -15,6 +15,7 @@ interface MessageListProps {
 
 export const MessageList = ({ messages }: MessageListProps) => {
   const [adminIds, setAdminIds] = useState<string[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAdminIds = async () => {
@@ -30,7 +31,15 @@ export const MessageList = ({ messages }: MessageListProps) => {
       setAdminIds(adminUsers.map(admin => admin.id));
     };
 
+    const getCurrentUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setCurrentUserId(session.user.id);
+      }
+    };
+
     fetchAdminIds();
+    getCurrentUser();
   }, []);
 
   useEffect(() => {
@@ -62,24 +71,27 @@ export const MessageList = ({ messages }: MessageListProps) => {
     <div className="flex-1 overflow-hidden px-6">
       <ScrollArea className="h-[calc(100vh-180px)]">
         <div className="space-y-4 pr-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.sender_id ? "justify-end" : "justify-start"
-              }`}
-            >
+          {messages.map((message) => {
+            const isCurrentUser = message.sender_id === currentUserId;
+            return (
               <div
-                className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                  message.sender_id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                key={message.id}
+                className={`flex ${
+                  isCurrentUser ? "justify-end" : "justify-start"
                 }`}
               >
-                {message.content}
+                <div
+                  className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                    isCurrentUser
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  }`}
+                >
+                  {message.content}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </ScrollArea>
     </div>
