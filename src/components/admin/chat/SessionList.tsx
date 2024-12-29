@@ -32,29 +32,50 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
     queryKey: ['chat-sessions'],
     queryFn: async () => {
       console.log('Fetching chat sessions...');
-      const { data: chatSessions, error } = await supabase
+      
+      // First get all active sessions
+      const { data: chatSessions, error: sessionsError } = await supabase
         .from('chat_sessions')
-        .select(`
-          *,
-          unread_count:chat_messages(count)
-        `)
+        .select('*')
         .eq('status', 'active')
-        .eq('chat_messages.is_read', false)
         .order('last_message_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching sessions:', error);
-        throw error;
+      if (sessionsError) {
+        console.error('Error fetching sessions:', sessionsError);
+        throw sessionsError;
       }
 
-      const sessionsWithEmails = chatSessions?.map(session => ({
-        ...session,
-        user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous'),
-        unread_count: session.unread_count?.[0]?.count || 0
-      }));
+      // Then for each session, get the unread count
+      const sessionsWithUnreadCounts = await Promise.all(
+        chatSessions.map(async (session) => {
+          const { count, error: countError } = await supabase
+            .from('chat_messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('session_id', session.id)
+            .eq('is_read', false)
+            .not('sender_id', 'eq', session.admin_id); // Only count messages not from admin
 
-      console.log('Fetched sessions:', sessionsWithEmails);
-      return sessionsWithEmails || [];
+          if (countError) {
+            console.error('Error counting unread messages:', countError);
+            return {
+              ...session,
+              user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous'),
+              unread_count: 0
+            };
+          }
+
+          console.log(`Session ${session.id} has ${count} unread messages`);
+          
+          return {
+            ...session,
+            user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous'),
+            unread_count: count || 0
+          };
+        })
+      );
+
+      console.log('Sessions with unread counts:', sessionsWithUnreadCounts);
+      return sessionsWithUnreadCounts;
     },
   });
 
