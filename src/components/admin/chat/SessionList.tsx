@@ -21,7 +21,7 @@ type ChatSession = {
   created_at: string;
   updated_at: string;
   last_message_at: string;
-  user: {
+  profiles: {
     email: string | null;
   } | null;
   messages: {
@@ -38,7 +38,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          user:profiles!chat_sessions_user_id_fkey(email),
+          profiles:profiles(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -69,7 +69,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
           >
             <CardHeader className="p-4">
               <CardTitle className="text-sm">
-                {session.user?.email || "Anonymous"}
+                {session.profiles?.email || "Anonymous"}
               </CardTitle>
               <CardDescription className="text-xs">
                 {new Date(session.last_message_at).toLocaleString()}
