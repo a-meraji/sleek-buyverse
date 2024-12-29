@@ -44,19 +44,10 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         throw error;
       }
 
-      // Fetch user emails from auth.users
-      const userIds = chatSessions?.map(session => session.user_id).filter(Boolean) || [];
-      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
-
-      if (usersError) {
-        console.error('Error fetching users:', usersError);
-        throw usersError;
-      }
-
-      // Map user emails to sessions
+      // Instead of fetching users directly, we'll use the profiles data from the sessions
       const sessionsWithEmails = chatSessions?.map(session => ({
         ...session,
-        user_email: users?.find(u => u.id === session.user_id)?.email || 'Anonymous'
+        user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous')
       }));
 
       console.log('Fetched sessions:', sessionsWithEmails);
