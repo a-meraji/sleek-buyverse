@@ -13,15 +13,30 @@ export const useMarkMessagesAsRead = () => {
       const unreadIds = unreadUserMessages.map(msg => msg.id);
       console.log('Marking messages as read with IDs:', unreadIds);
 
-      // Update messages as read - Adding session_id to ensure we update the correct messages
+      // First, verify the messages exist
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .in('id', unreadIds)
+        .eq('session_id', sessionId);
+
+      console.log('Verification data:', verifyData);
+      
+      if (verifyError) {
+        console.error('Error verifying messages:', verifyError);
+        return messages;
+      }
+
+      // Update messages as read
       const { data: updateResult, error: updateError } = await supabase
         .from('chat_messages')
         .update({ is_read: true })
         .in('id', unreadIds)
-        .eq('session_id', sessionId) // Add this condition
+        .eq('session_id', sessionId)
         .select();
 
-      console.log('Update result:', updateResult);
+      console.log('Update operation result:', updateResult);
+      console.log('Update operation error:', updateError);
 
       if (updateError) {
         console.error('Error marking messages as read:', updateError);
