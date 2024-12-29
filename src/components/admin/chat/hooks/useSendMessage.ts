@@ -9,19 +9,25 @@ export const useSendMessage = (sessionId: string | null) => {
   const { toast } = useToast();
 
   const sendMessage = async (content: string) => {
-    if (!content.trim() || !sessionId) return;
+    // Log the attempt to send message first
+    console.log('Attempting to send message:', {
+      session_id: sessionId,
+      content: content
+    });
+
+    if (!content.trim() || !sessionId) {
+      console.log('Cannot send message: content is empty or no session ID');
+      return false;
+    }
 
     setLoading(true);
     
     try {
-      // Log before getting session
-      console.log('Attempting to get current session...');
+      console.log('Getting current session...');
       
-      // Get the current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      // Log raw session data and response
-      console.log(`response of retrieving sender_id: ${JSON.stringify({ session, error: sessionError })}`);
+      console.log('Session response:', { session, error: sessionError });
       
       if (sessionError) {
         console.error('Session error:', sessionError);
@@ -43,23 +49,14 @@ export const useSendMessage = (sessionId: string | null) => {
         throw new Error('No user ID found');
       }
 
-      // Log the sender_id from session
-      console.log(`getting sender_id: ${session.user.id}`);
+      console.log('Got sender_id:', session.user.id);
 
-      // Create message data
       const messageData = {
         session_id: sessionId,
         content: content.trim(),
         sender_id: session.user.id,
       };
 
-      // Log before sending message
-      console.log('Sending message:', {
-        session_id: sessionId,
-        content: content.trim()
-      });
-
-      // Log the complete message data before sending
       console.log('Sending message with complete data:', messageData);
 
       const { error: insertError } = await supabase
@@ -71,7 +68,7 @@ export const useSendMessage = (sessionId: string | null) => {
         throw new Error('Failed to send message');
       }
 
-      console.log('Message sent successfully with sender_id:', session.user.id);
+      console.log('Message sent successfully');
       
       queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', sessionId] });
       return true;
