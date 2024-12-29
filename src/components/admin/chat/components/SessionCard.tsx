@@ -89,8 +89,8 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
           </CardTitle>
           {unreadCount > 0 && (
             <Badge 
-              variant="destructive" 
-              className="h-6 w-6 flex items-center justify-center rounded-full p-0"
+              variant="default"
+              className="h-5 w-5 flex items-center justify-center rounded-full p-0 bg-[#0EA5E9] text-[0.7rem] font-medium text-white"
             >
               {unreadCount}
             </Badge>
