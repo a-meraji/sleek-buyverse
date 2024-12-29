@@ -21,22 +21,19 @@ interface ChatSession {
   created_at: string;
   updated_at: string;
   last_message_at: string;
-  user_details: {
-    email: string;
-  } | null;
+  user_email: string | null;
   messages: { count: number }[];
 }
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
-  const { data: sessions, isError, error } = useQuery<ChatSession[]>({
+  const { data: sessions = [], isError, error } = useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
     queryFn: async () => {
       console.log('Fetching chat sessions...');
-      const { data, error } = await supabase
+      const { data: chatSessions, error } = await supabase
         .from('chat_sessions')
         .select(`
           *,
-          user_details:profiles(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -47,8 +44,21 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         throw error;
       }
 
-      console.log('Fetched sessions:', data);
-      return data || [];
+      // Fetch user emails in a separate query
+      const userIds = chatSessions?.map(session => session.user_id).filter(Boolean) || [];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .in('id', userIds);
+
+      // Map user emails to sessions
+      const sessionsWithEmails = chatSessions?.map(session => ({
+        ...session,
+        user_email: profiles?.find(p => p.id === session.user_id)?.email || 'Anonymous'
+      }));
+
+      console.log('Fetched sessions:', sessionsWithEmails);
+      return sessionsWithEmails || [];
     },
     refetchInterval: 5000, // Refetch every 5 seconds
   });
@@ -65,10 +75,10 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">
-        Active Chats ({sessions?.length || 0})
+        Active Chats ({sessions.length || 0})
       </h3>
       <ScrollArea className="h-[calc(100vh-14rem)]">
-        {sessions?.map((session) => (
+        {sessions.map((session) => (
           <Card
             key={session.id}
             className={`mb-2 cursor-pointer ${
@@ -78,7 +88,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
           >
             <CardHeader className="p-4">
               <CardTitle className="text-sm">
-                {session.user_details?.email || "Anonymous"}
+                {session.user_email || "Anonymous"}
               </CardTitle>
               <CardDescription className="text-xs">
                 {new Date(session.last_message_at).toLocaleString()}
