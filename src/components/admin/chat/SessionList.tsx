@@ -38,7 +38,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          profiles:profiles!chat_sessions_user_id_fkey(email),
+          profiles:profiles(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
