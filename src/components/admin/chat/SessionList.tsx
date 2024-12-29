@@ -13,7 +13,7 @@ interface SessionListProps {
   onSelectSession: (sessionId: string) => void;
 }
 
-type ChatSession = {
+interface ChatSession {
   id: string;
   user_id: string | null;
   admin_id: string | null;
@@ -24,10 +24,8 @@ type ChatSession = {
   profiles: {
     email: string | null;
   } | null;
-  messages: {
-    count: number;
-  }[];
-};
+  messages: Array<{ count: number }>;
+}
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
   const { data: sessions = [] } = useQuery<ChatSession[]>({
@@ -38,7 +36,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          profiles:user_id(email),
+          profiles:profiles(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
