@@ -1,14 +1,13 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminProducts } from "@/components/admin/AdminProducts";
-import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminOrders } from "@/components/admin/AdminOrders";
+import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminChat } from "@/components/admin/AdminChat";
-import { Navbar } from "@/components/Navbar";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -16,25 +15,47 @@ export default function Admin() {
 
   useEffect(() => {
     const checkAdminStatus = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({
-          title: "Access Denied",
-          description: "Please sign in to access the admin dashboard.",
-          variant: "destructive",
-        });
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
         navigate("/auth");
         return;
       }
 
-      const isAdmin = session.user.user_metadata?.is_admin === true;
-      if (!isAdmin) {
+      // Check if user is admin
+      const { data: { users }, error } = await supabase.auth.admin.listUsers({
+        filters: {
+          email: "eq.admin@admin.com"
+        }
+      });
+
+      if (error) {
+        console.error("Error checking admin status:", error);
+        return;
+      }
+
+      const adminUser = users[0];
+      if (adminUser && !adminUser.user_metadata?.is_admin) {
+        // Update user metadata to make them admin
+        const { error: updateError } = await supabase.auth.admin.updateUserById(
+          adminUser.id,
+          { user_metadata: { is_admin: true } }
+        );
+
+        if (updateError) {
+          console.error("Error updating admin status:", updateError);
+          toast({
+            title: "Error",
+            description: "Failed to update admin status",
+            variant: "destructive",
+          });
+          return;
+        }
+
         toast({
-          title: "Access Denied",
-          description: "You don't have permission to access the admin dashboard.",
-          variant: "destructive",
+          title: "Success",
+          description: "Admin status updated successfully",
         });
-        navigate("/");
       }
     };
 
@@ -42,35 +63,31 @@ export default function Admin() {
   }, [navigate, toast]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
-        <Tabs defaultValue="products" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="products">Products & Inventory</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="chat">Customer Service</TabsTrigger>
-          </TabsList>
-          <TabsContent value="products">
-            <AdminProducts />
-          </TabsContent>
-          <TabsContent value="users">
-            <AdminUsers />
-          </TabsContent>
-          <TabsContent value="orders">
-            <AdminOrders />
-          </TabsContent>
-          <TabsContent value="analytics">
-            <AdminAnalytics />
-          </TabsContent>
-          <TabsContent value="chat">
-            <AdminChat />
-          </TabsContent>
-        </Tabs>
-      </div>
+    <div className="container mx-auto py-10">
+      <Tabs defaultValue="analytics" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="products">Products</TabsTrigger>
+          <TabsTrigger value="orders">Orders</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="chat">Chat</TabsTrigger>
+        </TabsList>
+        <TabsContent value="analytics" className="space-y-4">
+          <AdminAnalytics />
+        </TabsContent>
+        <TabsContent value="products" className="space-y-4">
+          <AdminProducts />
+        </TabsContent>
+        <TabsContent value="orders" className="space-y-4">
+          <AdminOrders />
+        </TabsContent>
+        <TabsContent value="users" className="space-y-4">
+          <AdminUsers />
+        </TabsContent>
+        <TabsContent value="chat" className="space-y-4">
+          <AdminChat />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
