@@ -6,7 +6,7 @@ export const useSessionUser = () => {
     chatLogger.info('Getting current session');
     
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    console.log(session);
+
     chatLogger.info('Session response', { session, error: sessionError });
     
     if (sessionError) {
