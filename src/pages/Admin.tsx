@@ -5,6 +5,7 @@ import { AdminProducts } from "@/components/admin/AdminProducts";
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
+import { AdminChat } from "@/components/admin/AdminChat";
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -56,6 +57,7 @@ export default function Admin() {
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="chat">Customer Service</TabsTrigger>
           </TabsList>
           <TabsContent value="products">
             <AdminProducts />
@@ -68,6 +70,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="analytics">
             <AdminAnalytics />
+          </TabsContent>
+          <TabsContent value="chat">
+            <AdminChat />
           </TabsContent>
         </Tabs>
       </div>

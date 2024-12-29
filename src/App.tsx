@@ -9,6 +9,7 @@ import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import { ChatButton } from "./components/chat/ChatButton";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
+        <ChatButton />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
