@@ -94,9 +94,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">
-        Active Chats ({sessions.length || 0})
-      </h3>
+      <h3 className="text-lg font-semibold">Active Chats</h3>
       <ScrollArea className="h-[calc(100vh-14rem)]">
         {sessions.map((session) => (
           <Card
