@@ -7,6 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useEffect } from "react";
 
 interface SessionListProps {
@@ -24,6 +25,7 @@ interface ChatSession {
   last_message_at: string;
   user_email: string | null;
   messages: { count: number }[];
+  unread_count: number;
 }
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
@@ -35,9 +37,11 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          messages:chat_messages(count)
+          messages:chat_messages(count),
+          unread_count:chat_messages(count)
         `)
         .eq('status', 'active')
+        .eq('chat_messages.is_read', false)
         .order('last_message_at', { ascending: false });
 
       if (error) {
@@ -47,7 +51,8 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
 
       const sessionsWithEmails = chatSessions?.map(session => ({
         ...session,
-        user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous')
+        user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous'),
+        unread_count: session.unread_count?.[0]?.count || 0
       }));
 
       console.log('Fetched sessions:', sessionsWithEmails);
@@ -104,9 +109,16 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
             onClick={() => onSelectSession(session.id)}
           >
             <CardHeader className="p-4">
-              <CardTitle className="text-sm">
-                {session.user_email || "Anonymous"}
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm">
+                  {session.user_email || "Anonymous"}
+                </CardTitle>
+                {session.unread_count > 0 && (
+                  <Badge variant="destructive" className="ml-2">
+                    {session.unread_count}
+                  </Badge>
+                )}
+              </div>
               <CardDescription className="text-xs">
                 {new Date(session.last_message_at).toLocaleString()}
               </CardDescription>

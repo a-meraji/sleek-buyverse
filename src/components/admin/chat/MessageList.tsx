@@ -25,6 +25,17 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
         return [];
       }
 
+      // Mark messages as read
+      const { error: updateError } = await supabase
+        .from('chat_messages')
+        .update({ is_read: true })
+        .eq('session_id', sessionId)
+        .eq('is_read', false);
+
+      if (updateError) {
+        console.error('Error marking messages as read:', updateError);
+      }
+
       console.log('Fetched messages:', data);
       return data;
     },
