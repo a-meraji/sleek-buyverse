@@ -64,6 +64,12 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
         sender_id: session.user.id,
       };
 
+      // Log the message data before sending
+      console.log('Sending message:', {
+        session_id: sessionId,
+        content: newMessage.trim()
+      });
+
       // Log the complete message data before sending
       console.log('Sending message with complete data:', messageData);
 
