@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Toaster } from "@/components/ui/toaster";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SessionList } from "./chat/SessionList";
 import { MessageList } from "./chat/MessageList";
@@ -37,7 +37,7 @@ export const AdminChat = () => {
             <CardTitle>Customer Service Chat</CardTitle>
           </CardHeader>
           <CardContent className="h-[calc(100%-4rem)] flex flex-col p-0">
-            <div className="flex-1 overflow-hidden px-6">
+            <div className="max-h-[calc(100%-4rem)] overflow-y-auto px-6">
               <MessageList sessionId={selectedSession} />
             </div>
             <div className="p-6 pt-0">

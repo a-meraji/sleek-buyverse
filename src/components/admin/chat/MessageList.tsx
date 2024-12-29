@@ -67,7 +67,7 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
   }, [sessionId, refetch]);
 
   return (
-    <ScrollArea className="h-full pr-4">
+    <ScrollArea className="h-full w-full">
       <div className="space-y-4">
         {messages.map((message) => (
           <Message key={message.id} message={message} />
