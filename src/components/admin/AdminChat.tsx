@@ -15,21 +15,36 @@ export const AdminChat = () => {
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
 
   // Fetch admin status
-  const { data: isAdmin } = useQuery({
+  const { data: isAdmin, isLoading } = useQuery({
     queryKey: ['admin-status'],
     queryFn: async () => {
+      console.log('Checking admin status...');
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return false;
+      if (!session) {
+        console.log('No session found');
+        return false;
+      }
 
-      const { data: profile } = await supabase
+      console.log('Checking profile for user:', session.user.id);
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('isAdmin')
         .eq('id', session.user.id)
         .single();
 
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return false;
+      }
+
+      console.log('Profile admin status:', profile?.isAdmin);
       return profile?.isAdmin || false;
     },
   });
+
+  if (isLoading) {
+    return <div>Loading admin status...</div>;
+  }
 
   if (!isAdmin) {
     return (
