@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMessages } from "./hooks/useMessages";
 import { useMarkMessagesAsRead } from "./hooks/useMarkMessagesAsRead";
 import { Message } from "./components/Message";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface MessageListProps {
   sessionId: string | null;
@@ -12,14 +13,33 @@ interface MessageListProps {
 export const MessageList = ({ sessionId }: MessageListProps) => {
   const { data: messages = [], refetch } = useMessages(sessionId);
   const { markMessagesAsRead } = useMarkMessagesAsRead();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!sessionId || !messages.length) return;
     
-    markMessagesAsRead(messages, sessionId).then(() => {
+    markMessagesAsRead(messages, sessionId).then((updatedMessages) => {
+      // Get the count of remaining unread messages from users
+      const unreadCount = updatedMessages.filter(
+        msg => !msg.is_read && msg.sender_id !== null
+      ).length;
+      
+      console.log('Updating session with unread count:', unreadCount);
+      
+      // Update the sessions cache with new unread count
+      queryClient.setQueryData(['chat-sessions'], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((session: any) => {
+          if (session.id === sessionId) {
+            return { ...session, unread_count: unreadCount };
+          }
+          return session;
+        });
+      });
+      
       refetch();
     });
-  }, [messages, sessionId, refetch]);
+  }, [messages, sessionId, refetch, queryClient]);
 
   useEffect(() => {
     if (!sessionId) return;

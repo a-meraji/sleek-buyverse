@@ -20,7 +20,7 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
   const [unreadCount, setUnreadCount] = useState(session.unread_count);
   const queryClient = useQueryClient();
 
-  // Update local state when prop changes
+  // Update local state when session data changes
   useEffect(() => {
     console.log('Session unread count updated:', session.unread_count);
     setUnreadCount(session.unread_count);
@@ -39,16 +39,8 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
         },
         (payload) => {
           console.log('Message updated:', payload);
-          
-          // If a message was marked as read
-          if (payload.new.is_read && !payload.old.is_read) {
-            console.log('Message marked as read, updating unread count');
-            setUnreadCount(prev => Math.max(0, prev - 1));
-            
-            // Invalidate queries to refresh data
-            queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
-            queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
-          }
+          queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
+          queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
         }
       )
       .subscribe();
