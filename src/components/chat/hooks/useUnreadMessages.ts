@@ -36,12 +36,13 @@ export const useUnreadMessages = () => {
         return 0;
       }
 
-      // Count unread messages from admins
+      // Count unread messages from admins, excluding the current admin's messages
       const { count, error } = await supabase
         .from('chat_messages')
         .select('*', { count: 'exact', head: true })
         .eq('is_read', false)
         .in('sender_id', adminIds)
+        .neq('sender_id', session.session.user.id) // Exclude current admin's messages
         .eq('session_id', chatSession.id);
 
       if (error) {
