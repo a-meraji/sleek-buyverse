@@ -47,12 +47,13 @@ export const MessageList = ({ messages }: MessageListProps) => {
       const { data: session } = await supabase.auth.getSession();
       if (!session?.session?.user?.id) return;
 
+      // Find unread admin messages
       const unreadAdminMessages = messages.filter(
         (msg) => !msg.is_read && adminIds.includes(msg.sender_id || '')
       );
 
       if (unreadAdminMessages.length > 0) {
-        console.log('Marking messages as read:', unreadAdminMessages.map(m => m.id));
+        console.log('Marking admin messages as read:', unreadAdminMessages.map(m => m.id));
         const { error } = await supabase
           .from('chat_messages')
           .update({ is_read: true })
@@ -73,6 +74,7 @@ export const MessageList = ({ messages }: MessageListProps) => {
         <div className="space-y-4 pr-4">
           {messages.map((message) => {
             const isCurrentUser = message.sender_id === currentUserId;
+            const isAdmin = adminIds.includes(message.sender_id || '');
             return (
               <div
                 key={message.id}
@@ -84,6 +86,8 @@ export const MessageList = ({ messages }: MessageListProps) => {
                   className={`rounded-lg px-4 py-2 max-w-[80%] ${
                     isCurrentUser
                       ? "bg-primary text-primary-foreground"
+                      : isAdmin
+                      ? "bg-blue-100"
                       : "bg-muted"
                   }`}
                 >

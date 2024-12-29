@@ -8,7 +8,7 @@ export const useUnreadMessages = () => {
   const { data, refetch } = useQuery({
     queryKey: ['unread-messages'],
     queryFn: async () => {
-      console.log('Fetching unread messages count...');
+      console.log('Fetching unread admin messages count...');
       const { data: session } = await supabase.auth.getSession();
       if (!session?.session?.user?.id) return 0;
 
@@ -29,9 +29,9 @@ export const useUnreadMessages = () => {
         .from('chat_sessions')
         .select('id')
         .eq('user_id', session.session.user.id)
-        .single();
+        .maybeSingle();
 
-      if (sessionError) {
+      if (sessionError || !chatSession) {
         console.error('Error fetching chat session:', sessionError);
         return 0;
       }
@@ -49,7 +49,7 @@ export const useUnreadMessages = () => {
         return 0;
       }
 
-      console.log('Unread messages count:', count);
+      console.log('Unread admin messages count:', count);
       return count || 0;
     },
     enabled: true,
