@@ -9,7 +9,11 @@ interface MessageData {
 
 export const useMessageOperations = () => {
   const sendMessageToSupabase = async (messageData: MessageData) => {
-    chatLogger.info('Sending message with complete data', messageData);
+    chatLogger.info('Attempting to send message with sender_id', {
+      sender_id: messageData.sender_id,
+      session_id: messageData.session_id,
+      content: messageData.content
+    });
 
     const { error: insertError } = await supabase
       .from('chat_messages')
