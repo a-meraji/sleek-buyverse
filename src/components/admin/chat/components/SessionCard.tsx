@@ -20,7 +20,6 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
   const [unreadCount, setUnreadCount] = useState(session.unread_count);
   const queryClient = useQueryClient();
 
-  // Update local state when session data changes
   useEffect(() => {
     console.log('Session unread count updated:', session.unread_count);
     setUnreadCount(session.unread_count);
@@ -56,13 +55,19 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
           table: 'chat_messages',
           filter: `session_id=eq.${session.id}`
         },
-        (payload) => {
+        async (payload) => {
           console.log('New message received:', payload);
-          // If the message is from a user (has sender_id) and is not read
-          if (payload.new.sender_id && !payload.new.is_read) {
-            console.log('Increasing unread count for new message');
+          
+          // Get current user session
+          const { data: { session: currentSession } } = await supabase.auth.getSession();
+          const currentUserId = currentSession?.user?.id;
+          
+          // Only increment unread count if message is from user (not from current admin)
+          if (payload.new.sender_id && !payload.new.is_read && payload.new.sender_id !== currentUserId) {
+            console.log('Increasing unread count for new message from user');
             setUnreadCount(prev => prev + 1);
           }
+          
           queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
           queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
         }
