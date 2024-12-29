@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -13,10 +13,24 @@ interface SessionListProps {
   onSelectSession: (sessionId: string) => void;
 }
 
-export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
-  const queryClient = useQueryClient();
+type ChatSession = {
+  id: string;
+  user_id: string | null;
+  admin_id: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  last_message_at: string;
+  user: {
+    email: string | null;
+  } | null;
+  messages: {
+    count: number;
+  }[];
+};
 
-  const { data: sessions = [] } = useQuery({
+export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
+  const { data: sessions = [] } = useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
     queryFn: async () => {
       console.log('Fetching chat sessions...');
@@ -24,7 +38,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          user:user_id (email),
+          user:profiles!chat_sessions_user_id_fkey(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
