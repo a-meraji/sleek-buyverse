@@ -9,6 +9,16 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 
+type AdminUser = {
+  id: string;
+  role: string | null;
+  created_at: string;
+  auth_user: {
+    email: string;
+    last_sign_in_at: string;
+  } | null;
+};
+
 export function AdminUsers() {
   const { data: adminUsers, isLoading } = useQuery({
     queryKey: ["admin-users"],
@@ -33,7 +43,7 @@ export function AdminUsers() {
       }
 
       console.log("Fetched admin users:", users);
-      return users;
+      return users as AdminUser[];
     },
   });
 
