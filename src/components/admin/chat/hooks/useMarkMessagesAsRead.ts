@@ -2,9 +2,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const useMarkMessagesAsRead = () => {
   const markMessagesAsRead = async (messages: any[], sessionId: string) => {
-    // Find unread user messages
+    // Get current user id
+    const { data: { session } } = await supabase.auth.getSession();
+    const currentUserId = session?.user?.id;
+
+    // Find unread user messages that are not from the current user
     const unreadUserMessages = messages.filter(
-      msg => !msg.is_read && msg.sender_id !== null
+      msg => !msg.is_read && msg.sender_id !== null && msg.sender_id !== currentUserId
     );
 
     console.log('Unread user messages:', unreadUserMessages);
