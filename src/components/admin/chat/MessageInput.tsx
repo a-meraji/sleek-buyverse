@@ -51,13 +51,20 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       return;
     }
 
-    // Structure the message data exactly like the user-side component
-    const { error } = await supabase.from('chat_messages').insert([{
+    console.log('Sending message:', {
       session_id: sessionId,
-      sender_id: session.user.id,
       content: newMessage.trim(),
-      is_read: false,
-    }]);
+      sender_id: session.user.id,
+    });
+
+    // Structure the message data exactly like the user-side component
+    const { error } = await supabase
+      .from('chat_messages')
+      .insert({
+        session_id: sessionId,
+        content: newMessage.trim(),
+        sender_id: session.user.id,
+      });
 
     setLoading(false);
     if (error) {
