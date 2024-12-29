@@ -1,4 +1,5 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useSessionUser } from '../hooks/useSessionUser';
 
 interface MessageProps {
@@ -11,7 +12,12 @@ interface MessageProps {
 
 export const Message = ({ message }: MessageProps) => {
   const { getCurrentUser } = useSessionUser();
-  const user = getCurrentUser();
+  
+  const { data: user } = useQuery({
+    queryKey: ['current-user'],
+    queryFn: getCurrentUser,
+  });
+
   const isCurrentUser = user?.id === message.sender_id;
 
   return (
