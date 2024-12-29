@@ -38,7 +38,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          profiles:profiles!chat_sessions_user_id_fkey(email),
+          profiles:user_id(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -46,7 +46,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
 
       if (error) {
         console.error('Error fetching sessions:', error);
-        return [];
+        throw error;
       }
 
       console.log('Fetched sessions:', data);
