@@ -35,13 +35,14 @@ export const useSessionList = () => {
 
       const sessionsWithUnreadCounts = await Promise.all(
         chatSessions.map(async (session) => {
-          // Count only unread messages from users, excluding current admin's messages
+          // Count only unread messages from users (where sender_id is NOT the current admin)
           const { count, error: countError } = await supabase
             .from('chat_messages')
             .select('*', { count: 'exact', head: true })
             .eq('session_id', session.id)
             .eq('is_read', false)
-            .not('sender_id', 'eq', currentUserId); // Exclude current admin's messages
+            .neq('sender_id', currentUserId) // Exclude messages from current admin
+            .not('sender_id', 'is', null); // Only count messages from users (not null sender_id)
 
           if (countError) {
             console.error('Error counting unread messages:', countError);
@@ -52,7 +53,7 @@ export const useSessionList = () => {
             };
           }
 
-          console.log(`Session ${session.id} has ${count} unread messages (excluding admin's messages)`);
+          console.log(`Session ${session.id} has ${count} unread messages from users (excluding admin's messages)`);
           
           return {
             ...session,
