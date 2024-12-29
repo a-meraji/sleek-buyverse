@@ -30,7 +30,7 @@ type ChatSession = {
 };
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
-  const { data: sessions = [] } = useQuery<ChatSession[]>({
+  const { data: sessions } = useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
     queryFn: async () => {
       console.log('Fetching chat sessions...');
@@ -38,7 +38,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          profiles:profiles!chat_sessions_user_id_fkey(email),
+          profiles:user_id(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -46,7 +46,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
 
       if (error) {
         console.error('Error fetching sessions:', error);
-        return [];
+        throw error;
       }
 
       console.log('Fetched sessions:', data);
@@ -59,7 +59,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Active Chats</h3>
       <ScrollArea className="h-[calc(100vh-14rem)]">
-        {sessions.map((session) => (
+        {sessions?.map((session) => (
           <Card
             key={session.id}
             className={`mb-2 cursor-pointer ${
