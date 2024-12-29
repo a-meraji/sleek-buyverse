@@ -29,7 +29,7 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
           {session.unread_count > 0 && (
             <Badge 
               variant="destructive" 
-              className="px-2 py-0.5 text-xs font-semibold"
+              className="h-6 w-6 flex items-center justify-center rounded-full p-0"
             >
               {session.unread_count}
             </Badge>
