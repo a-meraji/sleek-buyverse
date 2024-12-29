@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/toaster";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SessionList } from "./chat/SessionList";
 import { MessageList } from "./chat/MessageList";
