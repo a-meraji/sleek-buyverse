@@ -51,20 +51,19 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       return;
     }
 
-    console.log('Sending message as admin:', {
-      session_id: sessionId,
+    const messageData = {
       content: newMessage.trim(),
+      session_id: sessionId,
       sender_id: session.user.id,
-    });
+      is_read: false,
+    };
+
+    console.log('Sending message as admin:', messageData);
 
     // Insert the message with the admin's user ID
     const { error } = await supabase
       .from('chat_messages')
-      .insert({
-        session_id: sessionId,
-        content: newMessage.trim(),
-        sender_id: session.user.id,
-      });
+      .insert(messageData);
 
     setLoading(false);
     if (error) {
