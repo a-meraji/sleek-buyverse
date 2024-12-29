@@ -32,13 +32,13 @@ export const useSessionList = () => {
 
       const sessionsWithUnreadCounts = await Promise.all(
         chatSessions.map(async (session) => {
-          // Only count unread messages from users (where sender_id is not null)
+          // Count only unread messages from users
           const { count, error: countError } = await supabase
             .from('chat_messages')
             .select('*', { count: 'exact', head: true })
             .eq('session_id', session.id)
             .eq('is_read', false)
-            .not('sender_id', 'is', null); // Only count messages from users
+            .not('sender_id', 'is', null); // Only count unread messages from users
 
           if (countError) {
             console.error('Error counting unread messages:', countError);
