@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,16 @@ interface EditProductDialogProps {
 }
 
 export function EditProductDialog({ product, onClose }: EditProductDialogProps) {
-  const [formData, setFormData] = useState<Product | null>(product);
+  const [formData, setFormData] = useState<Product | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Set initial form data when product changes
+  useEffect(() => {
+    if (product) {
+      setFormData(product);
+    }
+  }, [product]);
 
   const updateProduct = useMutation({
     mutationFn: async () => {
@@ -27,8 +34,8 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
         .update({
           name: formData.name,
           description: formData.description,
-          price: Number(formData.price),
-          stock: Number(formData.stock),
+          price: formData.price,
+          stock: formData.stock,
           category: formData.category,
           image_url: formData.image_url,
           sku: formData.sku,
@@ -101,7 +108,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
                 min="0"
                 step="0.01"
                 value={formData?.price ?? ""}
-                onChange={(e) => setFormData(prev => prev ? { ...prev, price: e.target.value } : null)}
+                onChange={(e) => setFormData(prev => prev ? { ...prev, price: Number(e.target.value) } : null)}
                 required
               />
             </div>
@@ -113,7 +120,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
                 type="number"
                 min="0"
                 value={formData?.stock ?? ""}
-                onChange={(e) => setFormData(prev => prev ? { ...prev, stock: e.target.value } : null)}
+                onChange={(e) => setFormData(prev => prev ? { ...prev, stock: Number(e.target.value) } : null)}
                 required
               />
             </div>
