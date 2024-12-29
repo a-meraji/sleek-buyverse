@@ -41,8 +41,8 @@ export const useSessionList = () => {
             .select('*', { count: 'exact', head: true })
             .eq('session_id', session.id)
             .eq('is_read', false)
-            .neq('sender_id', currentUserId) // Exclude messages from current admin
-            .not('sender_id', 'is', null); // Only count messages from users (not null sender_id)
+            .not('sender_id', currentUserId); // Exclude messages from current admin
+
 
           if (countError) {
             console.error('Error counting unread messages:', countError);
