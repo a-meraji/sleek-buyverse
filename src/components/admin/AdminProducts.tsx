@@ -13,10 +13,13 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductForm } from "./ProductForm";
+import { EditProductDialog } from "./EditProductDialog";
+import { Product } from "@/types";
 
 export function AdminProducts() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -67,7 +70,11 @@ export function AdminProducts() {
         </TableHeader>
         <TableBody>
           {filteredProducts?.map((product) => (
-            <TableRow key={product.id}>
+            <TableRow 
+              key={product.id}
+              className="cursor-pointer hover:bg-muted/60"
+              onClick={() => setSelectedProduct(product)}
+            >
               <TableCell>
                 <img
                   src={product.image_url}
@@ -84,6 +91,11 @@ export function AdminProducts() {
           ))}
         </TableBody>
       </Table>
+
+      <EditProductDialog
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+      />
     </div>
   );
 }
