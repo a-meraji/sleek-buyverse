@@ -23,7 +23,7 @@ export default function Admin() {
       }
 
       // Check if user is admin@admin.com
-      if (user.email === "admin@admin.com" && !user.user_metadata?.is_admin) {
+      if (user.email === "admin@admin.com") {
         // Update user metadata to make them admin
         const { error: updateError } = await supabase.auth.updateUser({
           data: { is_admin: true }
@@ -42,6 +42,14 @@ export default function Admin() {
         toast({
           title: "Success",
           description: "Admin status updated successfully",
+        });
+      } else if (!user.user_metadata?.is_admin) {
+        // If not admin@admin.com and not an admin, redirect to home
+        navigate("/");
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to access this page",
+          variant: "destructive",
         });
       }
     };

@@ -16,22 +16,24 @@ export function AdminOrders() {
       // First get orders
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
-        .select("*, user_id");
+        .select("*");
 
       if (ordersError) throw ordersError;
 
-      // Then get user data from auth.users
-      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
+      // Get current user data
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       
-      if (usersError) throw usersError;
+      if (userError) throw userError;
 
-      // Combine the data
-      const ordersWithUsers = ordersData.map(order => ({
+      // For now, just return orders with the current user's email
+      const ordersWithUser = ordersData.map(order => ({
         ...order,
-        user: users.find(user => user.id === order.user_id)
+        user: {
+          email: user?.email || 'Unknown User'
+        }
       }));
 
-      return ordersWithUsers;
+      return ordersWithUser;
     },
   });
 
