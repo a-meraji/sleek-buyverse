@@ -25,12 +25,14 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
         return [];
       }
 
-      // Mark messages as read
+      // Mark messages as read only if they're from the user (sender_id is not null)
+      // and they're currently unread
       const { error: updateError } = await supabase
         .from('chat_messages')
         .update({ is_read: true })
         .eq('session_id', sessionId)
-        .eq('is_read', false);
+        .eq('is_read', false)
+        .not('sender_id', 'is', null); // Only mark user messages as read
 
       if (updateError) {
         console.error('Error marking messages as read:', updateError);
