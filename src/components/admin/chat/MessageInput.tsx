@@ -22,9 +22,11 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
 
     setLoading(true);
     
-    // Get the current admin's user ID
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // Get the current session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      console.error('Session error:', sessionError);
       toast({
         title: "Error",
         description: "You must be signed in to send messages.",
@@ -34,23 +36,7 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       return;
     }
 
-    // First verify that the user is actually an admin
-    const { data: adminData, error: adminError } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', session.user.id)
-      .single();
-
-    if (adminError || !adminData) {
-      toast({
-        title: "Error",
-        description: "You don't have permission to send messages as admin.",
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
-    }
-
+    // Create message data with the sender_id from session
     const messageData = {
       session_id: sessionId,
       content: newMessage.trim(),
@@ -59,6 +45,7 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
 
     console.log('Sending message with data:', messageData);
 
+    // Single insert operation
     const { error } = await supabase
       .from('chat_messages')
       .insert(messageData);
