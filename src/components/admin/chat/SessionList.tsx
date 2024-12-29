@@ -22,13 +22,13 @@ interface ChatSession {
   updated_at: string;
   last_message_at: string;
   user_details: {
-    email: string | null;
+    email: string;
   } | null;
   messages: { count: number }[];
 }
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
-  const { data: sessions = [], isError, error } = useQuery<ChatSession[]>({
+  const { data: sessions, isError, error } = useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
     queryFn: async () => {
       console.log('Fetching chat sessions...');
@@ -36,7 +36,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          user_details:profiles!inner(email),
+          user_details:profiles(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -55,6 +55,11 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
 
   if (isError) {
     console.error('Query error:', error);
+    return (
+      <div className="p-4 text-red-500">
+        Error loading chat sessions. Please try again later.
+      </div>
+    );
   }
 
   return (
