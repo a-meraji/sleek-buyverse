@@ -38,21 +38,31 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
         const unreadIds = unreadUserMessages.map(msg => msg.id);
         console.log('Marking messages as read with IDs:', unreadIds);
 
-        const { data: updateResult, error: updateError } = await supabase
+        // First update the messages
+        const { error: updateError } = await supabase
           .from('chat_messages')
           .update({ is_read: true })
-          .in('id', unreadIds)
-          .select();
+          .in('id', unreadIds);
 
         if (updateError) {
           console.error('Error marking messages as read:', updateError);
-        } else {
-          console.log('Messages marked as read:', updateResult);
-          // Update the messages array with the new read status
-          return data.map(msg => 
-            unreadIds.includes(msg.id) ? { ...msg, is_read: true } : msg
-          );
+          return data;
         }
+
+        // Then fetch the updated messages to confirm the changes
+        const { data: updatedMessages, error: fetchError } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .eq('session_id', sessionId)
+          .order('created_at', { ascending: true });
+
+        if (fetchError) {
+          console.error('Error fetching updated messages:', fetchError);
+          return data;
+        }
+
+        console.log('Messages updated successfully:', updatedMessages);
+        return updatedMessages;
       }
 
       return data;
