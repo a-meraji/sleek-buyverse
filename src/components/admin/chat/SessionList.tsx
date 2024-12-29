@@ -21,7 +21,7 @@ interface ChatSession {
   created_at: string;
   updated_at: string;
   last_message_at: string;
-  user: {
+  user_details: {
     email: string | null;
   } | null;
   messages: Array<{ count: number }>;
@@ -36,7 +36,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          user:profiles!chat_sessions_user_id_fkey(email),
+          user_details:profiles!chat_sessions_user_id_fkey(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -55,7 +55,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Active Chats</h3>
+      <h3 className="text-lg font-semibold">Active Chats ({sessions.length})</h3>
       <ScrollArea className="h-[calc(100vh-14rem)]">
         {sessions.map((session) => (
           <Card
@@ -67,7 +67,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
           >
             <CardHeader className="p-4">
               <CardTitle className="text-sm">
-                {session.user?.email || "Anonymous"}
+                {session.user_details?.email || "Anonymous"}
               </CardTitle>
               <CardDescription className="text-xs">
                 {new Date(session.last_message_at).toLocaleString()}
