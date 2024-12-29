@@ -20,9 +20,13 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
   const [unreadCount, setUnreadCount] = useState(session.unread_count);
   const queryClient = useQueryClient();
 
+  // Update local state when prop changes
   useEffect(() => {
+    console.log('Session unread count updated:', session.unread_count);
     setUnreadCount(session.unread_count);
+  }, [session.unread_count]);
 
+  useEffect(() => {
     const channel = supabase
       .channel('chat-updates')
       .on(
@@ -35,9 +39,12 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
         },
         (payload) => {
           console.log('Message updated:', payload);
+          queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
           queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
-          // Update local unread count
+          
+          // Update local unread count immediately
           if (payload.new.is_read && !payload.old.is_read) {
+            console.log('Decreasing unread count');
             setUnreadCount(prev => Math.max(0, prev - 1));
           }
         }
@@ -47,7 +54,7 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [session.id, session.unread_count, queryClient]);
+  }, [session.id, queryClient]);
 
   return (
     <Card
