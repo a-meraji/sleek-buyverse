@@ -1,81 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect } from "react";
+import { useMessages } from "./hooks/useMessages";
+import { useMarkMessagesAsRead } from "./hooks/useMarkMessagesAsRead";
+import { Message } from "./components/Message";
 
 interface MessageListProps {
   sessionId: string | null;
 }
 
 export const MessageList = ({ sessionId }: MessageListProps) => {
-  const { data: messages = [], refetch } = useQuery({
-    queryKey: ['admin-chat-messages', sessionId],
-    queryFn: async () => {
-      if (!sessionId) return [];
-      
-      console.log('Fetching messages for session:', sessionId);
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('session_id', sessionId)
-        .order('created_at', { ascending: true });
+  const { data: messages = [], refetch } = useMessages(sessionId);
+  const { markMessagesAsRead } = useMarkMessagesAsRead();
 
-      if (error) {
-        console.error('Error fetching messages:', error);
-        return [];
-      }
-
-      console.log('Fetched messages:', data);
-
-      // Find unread user messages
-      const unreadUserMessages = data.filter(
-        msg => !msg.is_read && msg.sender_id !== null
-      );
-
-      console.log('Unread user messages:', unreadUserMessages);
-
-      if (unreadUserMessages.length > 0) {
-        const unreadIds = unreadUserMessages.map(msg => msg.id);
-        console.log('Marking messages as read with IDs:', unreadIds);
-
-        // Update messages as read
-        const { data: updateResult, error: updateError } = await supabase
-          .from('chat_messages')
-          .update({ is_read: true })
-          .in('id', unreadIds)
-          .select();
-
-        console.log('Update result:', updateResult);
-
-        if (updateError) {
-          console.error('Error marking messages as read:', updateError);
-          return data;
-        }
-
-        // Verify the update worked by fetching the latest data
-        const { data: verifyData, error: verifyError } = await supabase
-          .from('chat_messages')
-          .select('*')
-          .in('id', unreadIds);
-
-        console.log('Verification data:', verifyData);
-
-        if (verifyError) {
-          console.error('Error verifying updates:', verifyError);
-          return data;
-        }
-
-        // Return updated messages
-        return data.map(msg => {
-          const updatedMsg = verifyData?.find(updated => updated.id === msg.id);
-          return updatedMsg || msg;
-        });
-      }
-
-      return data;
-    },
-    enabled: !!sessionId,
-  });
+  useEffect(() => {
+    if (!sessionId || !messages.length) return;
+    
+    markMessagesAsRead(messages, sessionId).then(() => {
+      refetch();
+    });
+  }, [messages, sessionId, refetch]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -106,22 +50,7 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
     <ScrollArea className="flex-1 pr-4">
       <div className="space-y-4">
         {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${
-              message.sender_id ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                message.sender_id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted"
-              }`}
-            >
-              {message.content}
-            </div>
-          </div>
+          <Message key={message.id} message={message} />
         ))}
       </div>
     </ScrollArea>
