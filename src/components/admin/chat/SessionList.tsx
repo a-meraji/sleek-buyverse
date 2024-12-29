@@ -38,7 +38,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          profiles:profiles(email),
+          profiles:profiles!chat_sessions_user_id_fkey(email),
           messages:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -50,7 +50,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
       }
 
       console.log('Fetched sessions:', data);
-      return data;
+      return data || [];
     },
     refetchInterval: 5000, // Refetch every 5 seconds
   });
