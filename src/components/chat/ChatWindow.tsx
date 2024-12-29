@@ -33,26 +33,34 @@ export const ChatWindow = ({ open, onClose }: ChatWindowProps) => {
       }
 
       // Get or create chat session
-      const { data: existingSession } = await supabase
+      const { data: existingSession, error: fetchError } = await supabase
         .from('chat_sessions')
         .select('id')
         .eq('user_id', session.user.id)
         .eq('status', 'active')
-        .single();
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('Error fetching chat session:', fetchError);
+        return;
+      }
 
       if (existingSession) {
+        console.log('Found existing chat session:', existingSession);
         setSessionId(existingSession.id);
       } else {
-        const { data: newSession, error } = await supabase
+        console.log('Creating new chat session...');
+        const { data: newSession, error: createError } = await supabase
           .from('chat_sessions')
           .insert({ user_id: session.user.id })
           .select()
           .single();
 
-        if (error) {
-          console.error('Error creating chat session:', error);
+        if (createError) {
+          console.error('Error creating chat session:', createError);
           return;
         }
+        console.log('Created new chat session:', newSession);
         setSessionId(newSession.id);
       }
     };
