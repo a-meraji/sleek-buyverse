@@ -14,9 +14,17 @@ export function AdminUsers() {
     queryKey: ["admin-users"],
     queryFn: async () => {
       console.log("Fetching admin users...");
-      const { data, error } = await supabase
+      const { data: users, error } = await supabase
         .from("admin_users")
-        .select("id, role, created_at")
+        .select(`
+          id,
+          role,
+          created_at,
+          auth_user:id (
+            email,
+            last_sign_in_at
+          )
+        `)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -24,8 +32,8 @@ export function AdminUsers() {
         throw error;
       }
 
-      console.log("Fetched admin users:", data);
-      return data;
+      console.log("Fetched admin users:", users);
+      return users;
     },
   });
 
@@ -35,16 +43,22 @@ export function AdminUsers() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>ID</TableHead>
+          <TableHead>Email</TableHead>
           <TableHead>Role</TableHead>
+          <TableHead>Last Sign In</TableHead>
           <TableHead>Created At</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {adminUsers?.map((user) => (
           <TableRow key={user.id}>
-            <TableCell>{user.id}</TableCell>
-            <TableCell className="capitalize">{user.role}</TableCell>
+            <TableCell>{user.auth_user?.email || "N/A"}</TableCell>
+            <TableCell className="capitalize">{user.role || "user"}</TableCell>
+            <TableCell>
+              {user.auth_user?.last_sign_in_at
+                ? new Date(user.auth_user.last_sign_in_at).toLocaleDateString()
+                : "Never"}
+            </TableCell>
             <TableCell>
               {new Date(user.created_at).toLocaleDateString()}
             </TableCell>
