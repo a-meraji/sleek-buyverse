@@ -24,7 +24,6 @@ interface ChatSession {
   updated_at: string;
   last_message_at: string;
   user_email: string | null;
-  messages: { count: number }[];
   unread_count: number;
 }
 
@@ -37,7 +36,6 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         .from('chat_sessions')
         .select(`
           *,
-          messages:chat_messages(count),
           unread_count:chat_messages(count)
         `)
         .eq('status', 'active')
@@ -114,7 +112,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
                   {session.user_email || "Anonymous"}
                 </CardTitle>
                 {session.unread_count > 0 && (
-                  <Badge variant="destructive" className="ml-2">
+                  <Badge variant="destructive">
                     {session.unread_count}
                   </Badge>
                 )}
