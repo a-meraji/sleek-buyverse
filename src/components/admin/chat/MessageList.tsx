@@ -27,27 +27,31 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
 
       console.log('Fetched messages:', data);
 
-      // Only proceed with marking messages as read if we have messages
-      if (data && data.length > 0) {
-        // Find unread user messages
-        const unreadUserMessages = data.filter(
-          msg => !msg.is_read && msg.sender_id !== null
-        );
+      // Find unread user messages
+      const unreadUserMessages = data.filter(
+        msg => !msg.is_read && msg.sender_id !== null
+      );
 
-        if (unreadUserMessages.length > 0) {
-          // Mark unread user messages as read
-          const { data: updateResult, error: updateError } = await supabase
-            .from('chat_messages')
-            .update({ is_read: true })
-            .eq('session_id', sessionId)
-            .in('id', unreadUserMessages.map(msg => msg.id))
-            .select();
+      console.log('Unread user messages:', unreadUserMessages);
 
-          if (updateError) {
-            console.error('Error marking messages as read:', updateError);
-          } else {
-            console.log('Messages marked as read:', updateResult);
-          }
+      if (unreadUserMessages.length > 0) {
+        const unreadIds = unreadUserMessages.map(msg => msg.id);
+        console.log('Marking messages as read with IDs:', unreadIds);
+
+        const { data: updateResult, error: updateError } = await supabase
+          .from('chat_messages')
+          .update({ is_read: true })
+          .in('id', unreadIds)
+          .select();
+
+        if (updateError) {
+          console.error('Error marking messages as read:', updateError);
+        } else {
+          console.log('Messages marked as read:', updateResult);
+          // Update the messages array with the new read status
+          return data.map(msg => 
+            unreadIds.includes(msg.id) ? { ...msg, is_read: true } : msg
+          );
         }
       }
 
