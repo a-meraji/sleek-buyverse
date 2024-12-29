@@ -44,17 +44,19 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         throw error;
       }
 
-      // Fetch user emails in a separate query
+      // Fetch user emails from auth.users
       const userIds = chatSessions?.map(session => session.user_id).filter(Boolean) || [];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, email')
-        .in('id', userIds);
+      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
+
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        throw usersError;
+      }
 
       // Map user emails to sessions
       const sessionsWithEmails = chatSessions?.map(session => ({
         ...session,
-        user_email: profiles?.find(p => p.id === session.user_id)?.email || 'Anonymous'
+        user_email: users?.find(u => u.id === session.user_id)?.email || 'Anonymous'
       }));
 
       console.log('Fetched sessions:', sessionsWithEmails);

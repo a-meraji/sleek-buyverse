@@ -21,9 +21,7 @@ export function AdminAnalytics() {
       if (productsError) throw productsError;
 
       // Get total users
-      const { count: usersCount, error: usersError } = await supabase
-        .from("profiles")
-        .select("*", { count: 'exact', head: true });
+      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
 
       if (usersError) throw usersError;
 
@@ -32,7 +30,7 @@ export function AdminAnalytics() {
       return {
         totalRevenue,
         totalProducts: productsCount || 0,
-        totalUsers: usersCount || 0,
+        totalUsers: users?.length || 0,
       };
     },
   });

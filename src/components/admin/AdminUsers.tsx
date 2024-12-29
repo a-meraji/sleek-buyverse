@@ -13,13 +13,10 @@ export function AdminUsers() {
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data: { users }, error } = await supabase.auth.admin.listUsers();
 
       if (error) throw error;
-      return data;
+      return users || [];
     },
   });
 
@@ -29,7 +26,6 @@ export function AdminUsers() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Admin Status</TableHead>
           <TableHead>Created At</TableHead>
@@ -38,9 +34,8 @@ export function AdminUsers() {
       <TableBody>
         {users?.map((user) => (
           <TableRow key={user.id}>
-            <TableCell>{user.full_name}</TableCell>
             <TableCell>{user.email}</TableCell>
-            <TableCell>{user.isAdmin ? "Admin" : "User"}</TableCell>
+            <TableCell>{user.user_metadata?.is_admin ? "Admin" : "User"}</TableCell>
             <TableCell>
               {new Date(user.created_at).toLocaleDateString()}
             </TableCell>

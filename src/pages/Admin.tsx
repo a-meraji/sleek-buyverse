@@ -27,13 +27,8 @@ export default function Admin() {
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("isAdmin")
-        .eq("id", session.user.id)
-        .single();
-
-      if (!profile?.isAdmin) {
+      const isAdmin = session.user.user_metadata?.is_admin === true;
+      if (!isAdmin) {
         toast({
           title: "Access Denied",
           description: "You don't have permission to access the admin dashboard.",
