@@ -46,14 +46,16 @@ export const useChatSession = (open: boolean, onClose: () => void) => {
           .from('chat_sessions')
           .insert({ user_id: session.user.id })
           .select()
-          .single();
+          .maybeSingle();
 
         if (createError) {
           console.error('Error creating chat session:', createError);
           return;
         }
         console.log('Created new chat session:', newSession);
-        setSessionId(newSession.id);
+        if (newSession) {
+          setSessionId(newSession.id);
+        }
       }
     };
 
