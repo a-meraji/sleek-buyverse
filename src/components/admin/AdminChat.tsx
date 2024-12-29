@@ -21,6 +21,7 @@ export const AdminChat = () => {
 
   useEffect(() => {
     const fetchSessions = async () => {
+      console.log('Fetching chat sessions...');
       const { data, error } = await supabase
         .from('chat_sessions')
         .select(`
@@ -38,6 +39,7 @@ export const AdminChat = () => {
         return;
       }
 
+      console.log('Fetched sessions:', data);
       setSessions(data);
       if (data.length > 0 && !selectedSession) {
         setSelectedSession(data[0].id);
@@ -46,8 +48,8 @@ export const AdminChat = () => {
 
     fetchSessions();
 
-    // Subscribe to new sessions
-    const channel = supabase
+    // Subscribe to new sessions and session updates
+    const sessionsChannel = supabase
       .channel('chat-sessions')
       .on(
         'postgres_changes',
@@ -56,23 +58,26 @@ export const AdminChat = () => {
           schema: 'public',
           table: 'chat_sessions',
         },
-        () => {
+        (payload) => {
+          console.log('Chat session change received:', payload);
           fetchSessions();
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(sessionsChannel);
     };
   }, [selectedSession]);
 
   useEffect(() => {
     if (!selectedSession) return;
 
+    console.log('Setting up message subscription for session:', selectedSession);
+
     // Subscribe to new messages
-    const channel = supabase
-      .channel('admin-chat-messages')
+    const messagesChannel = supabase
+      .channel(`chat-messages-${selectedSession}`)
       .on(
         'postgres_changes',
         {
@@ -90,6 +95,7 @@ export const AdminChat = () => {
 
     // Fetch existing messages
     const fetchMessages = async () => {
+      console.log('Fetching messages for session:', selectedSession);
       const { data, error } = await supabase
         .from('chat_messages')
         .select('*')
@@ -101,13 +107,15 @@ export const AdminChat = () => {
         return;
       }
 
+      console.log('Fetched messages:', data);
       setMessages(data);
     };
 
     fetchMessages();
 
     return () => {
-      supabase.removeChannel(channel);
+      console.log('Cleaning up message subscription');
+      supabase.removeChannel(messagesChannel);
     };
   }, [selectedSession]);
 
@@ -116,6 +124,12 @@ export const AdminChat = () => {
     if (!newMessage.trim() || !selectedSession) return;
 
     setLoading(true);
+    console.log('Sending message:', {
+      session_id: selectedSession,
+      content: newMessage.trim(),
+      sender_id: null,
+    });
+
     const { error } = await supabase
       .from('chat_messages')
       .insert({
