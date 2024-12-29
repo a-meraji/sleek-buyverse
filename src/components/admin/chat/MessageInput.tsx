@@ -43,6 +43,7 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       sender_id: session.user.id,
     };
 
+    // Log the complete message data before sending
     console.log('Sending message with data:', messageData);
 
     // Single insert operation
