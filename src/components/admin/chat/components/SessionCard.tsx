@@ -39,20 +39,47 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
         },
         (payload) => {
           console.log('Message updated:', payload);
+          
+          // If a message was marked as read
+          if (payload.new.is_read && !payload.old.is_read) {
+            console.log('Message marked as read, updating unread count');
+            setUnreadCount(prev => Math.max(0, prev - 1));
+            
+            // Invalidate queries to refresh data
+            queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
+            queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
+          }
+        }
+      )
+      .subscribe();
+
+    // Also listen for new messages
+    const newMessageChannel = supabase
+      .channel('new-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `session_id=eq.${session.id}`
+        },
+        (payload) => {
+          console.log('New message received:', payload);
+          // If the message is from a user (has sender_id) and is not read
+          if (payload.new.sender_id && !payload.new.is_read) {
+            console.log('Increasing unread count for new message');
+            setUnreadCount(prev => prev + 1);
+          }
           queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
           queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
-          
-          // Update local unread count immediately
-          if (payload.new.is_read && !payload.old.is_read) {
-            console.log('Decreasing unread count');
-            setUnreadCount(prev => Math.max(0, prev - 1));
-          }
         }
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(newMessageChannel);
     };
   }, [session.id, queryClient]);
 
