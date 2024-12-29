@@ -25,20 +25,8 @@ export const AdminChat = () => {
         return false;
       }
 
-      console.log('Checking profile for user:', session.user.id);
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('isAdmin')
-        .eq('id', session.user.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return false;
-      }
-
-      console.log('Profile admin status:', profile?.isAdmin);
-      return profile?.isAdmin || false;
+      console.log('Checking user metadata for:', session.user.id);
+      return session.user.user_metadata?.is_admin || false;
     },
   });
 

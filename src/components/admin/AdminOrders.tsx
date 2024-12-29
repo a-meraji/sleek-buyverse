@@ -20,22 +20,18 @@ export function AdminOrders() {
 
       if (ordersError) throw ordersError;
 
-      // Then get profiles for these orders
-      const userIds = ordersData.map(order => order.user_id);
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, email, full_name")
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
+      // Then get user data from auth.users
+      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
+      
+      if (usersError) throw usersError;
 
       // Combine the data
-      const ordersWithProfiles = ordersData.map(order => ({
+      const ordersWithUsers = ordersData.map(order => ({
         ...order,
-        profile: profilesData.find(profile => profile.id === order.user_id)
+        user: users.find(user => user.id === order.user_id)
       }));
 
-      return ordersWithProfiles;
+      return ordersWithUsers;
     },
   });
 
@@ -57,7 +53,7 @@ export function AdminOrders() {
           <TableRow key={order.id}>
             <TableCell>{order.id.slice(0, 8)}</TableCell>
             <TableCell>
-              {order.profile?.full_name || order.profile?.email || 'Unknown User'}
+              {order.user?.email || 'Unknown User'}
             </TableCell>
             <TableCell className="capitalize">{order.status}</TableCell>
             <TableCell>${order.total_amount}</TableCell>

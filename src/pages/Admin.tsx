@@ -22,25 +22,12 @@ export default function Admin() {
         return;
       }
 
-      // Check if user is admin
-      const { data: { users }, error } = await supabase.auth.admin.listUsers({
-        filters: {
-          email: "eq.admin@admin.com"
-        }
-      });
-
-      if (error) {
-        console.error("Error checking admin status:", error);
-        return;
-      }
-
-      const adminUser = users[0];
-      if (adminUser && !adminUser.user_metadata?.is_admin) {
+      // Check if user is admin@admin.com
+      if (user.email === "admin@admin.com" && !user.user_metadata?.is_admin) {
         // Update user metadata to make them admin
-        const { error: updateError } = await supabase.auth.admin.updateUserById(
-          adminUser.id,
-          { user_metadata: { is_admin: true } }
-        );
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { is_admin: true }
+        });
 
         if (updateError) {
           console.error("Error updating admin status:", updateError);
