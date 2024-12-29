@@ -110,9 +110,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
                   {session.user_email || "Anonymous"}
                 </CardTitle>
                 {session.unread_count > 0 && (
-                  <Badge variant="destructive">
-                    {session.unread_count}
-                  </Badge>
+                  <Badge variant="destructive" />
                 )}
               </div>
               <CardDescription className="text-xs">
