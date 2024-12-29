@@ -13,10 +13,24 @@ export function AdminUsers() {
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data: { users }, error } = await supabase.auth.admin.listUsers();
+      // Get all users from auth
+      const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers();
+      if (authError) throw authError;
 
-      if (error) throw error;
-      return users || [];
+      // Get admin roles
+      const { data: adminUsers, error: adminError } = await supabase
+        .from("admin_users")
+        .select("id, role");
+
+      if (adminError) throw adminError;
+
+      // Combine the data
+      const usersWithRoles = authUsers?.map(user => ({
+        ...user,
+        role: adminUsers?.find(admin => admin.id === user.id)?.role || "user"
+      })) || [];
+
+      return usersWithRoles;
     },
   });
 
@@ -27,7 +41,7 @@ export function AdminUsers() {
       <TableHeader>
         <TableRow>
           <TableHead>Email</TableHead>
-          <TableHead>Admin Status</TableHead>
+          <TableHead>Role</TableHead>
           <TableHead>Created At</TableHead>
         </TableRow>
       </TableHeader>
@@ -35,7 +49,7 @@ export function AdminUsers() {
         {users?.map((user) => (
           <TableRow key={user.id}>
             <TableCell>{user.email}</TableCell>
-            <TableCell>{user.user_metadata?.is_admin ? "Admin" : "User"}</TableCell>
+            <TableCell className="capitalize">{user.role}</TableCell>
             <TableCell>
               {new Date(user.created_at).toLocaleDateString()}
             </TableCell>
