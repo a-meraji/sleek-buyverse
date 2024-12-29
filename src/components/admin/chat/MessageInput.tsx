@@ -23,21 +23,37 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
     setLoading(true);
     
     try {
+      // Log before getting session
+      console.log('Attempting to get current session...');
+      
       // Get the current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      // Log raw session data
+      console.log('Raw session data:', session);
       
       if (sessionError) {
         console.error('Session error:', sessionError);
         throw new Error('Authentication error');
       }
 
-      if (!session?.user?.id) {
-        console.error('No user ID found in session');
-        throw new Error('No authenticated user found');
+      if (!session) {
+        console.error('No session found');
+        throw new Error('No session found');
+      }
+
+      if (!session.user) {
+        console.error('No user object in session');
+        throw new Error('No user object found in session');
+      }
+
+      if (!session.user.id) {
+        console.error('No user ID in session user object');
+        throw new Error('No user ID found');
       }
 
       // Log the sender_id from session
-      console.log('sender_id is:', session.user.id);
+      console.log('sender_id retrieved successfully:', session.user.id);
 
       // Create message data with the sender_id from session
       const messageData = {
@@ -58,6 +74,8 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
         console.error('Error sending message:', insertError);
         throw new Error('Failed to send message');
       }
+
+      console.log('Message sent successfully with sender_id:', session.user.id);
 
       setNewMessage("");
       queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', sessionId] });
