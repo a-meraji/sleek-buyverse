@@ -27,7 +27,12 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
             {session.user_email || "Anonymous"}
           </CardTitle>
           {session.unread_count > 0 && (
-            <Badge variant="destructive" className="w-2 h-2 rounded-full p-0" />
+            <Badge 
+              variant="destructive" 
+              className="px-2 py-0.5 text-xs font-semibold"
+            >
+              {session.unread_count}
+            </Badge>
           )}
         </div>
         <CardDescription className="text-xs">
