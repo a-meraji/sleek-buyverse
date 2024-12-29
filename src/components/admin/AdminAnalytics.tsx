@@ -6,6 +6,8 @@ export function AdminAnalytics() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => {
+      console.log("Fetching admin stats...");
+      
       // Get total revenue from orders
       const { data: orders } = await supabase
         .from("orders")
@@ -23,15 +25,26 @@ export function AdminAnalytics() {
 
       if (productsError) throw productsError;
 
-      // Get total users
-      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
+      // Get total users from admin_users table
+      const { count: usersCount, error: usersError } = await supabase
+        .from("admin_users")
+        .select("*", { count: 'exact', head: true });
 
-      if (usersError) throw usersError;
+      if (usersError) {
+        console.error("Error fetching users count:", usersError);
+        throw usersError;
+      }
+
+      console.log("Stats fetched successfully:", {
+        totalRevenue,
+        totalProducts: productsCount,
+        totalUsers: usersCount
+      });
 
       return {
         totalRevenue,
         totalProducts: productsCount || 0,
-        totalUsers: users?.length || 0,
+        totalUsers: usersCount || 0,
       };
     },
   });
