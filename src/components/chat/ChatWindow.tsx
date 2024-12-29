@@ -134,46 +134,54 @@ export const ChatWindow = ({ open, onClose }: ChatWindowProps) => {
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent className="w-[400px] sm:w-[540px] flex flex-col h-full">
-        <div className="flex flex-col flex-1 gap-4">
-          <h2 className="text-lg font-semibold">Customer Service</h2>
-          <ScrollArea className="flex-1 pr-4">
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.sender_id ? "justify-end" : "justify-start"
-                  }`}
-                >
+      <SheetContent className="w-[400px] sm:w-[540px] flex flex-col h-full p-0">
+        <div className="flex flex-col h-full">
+          <div className="p-6">
+            <h2 className="text-lg font-semibold">Customer Service</h2>
+          </div>
+          
+          <div className="flex-1 overflow-hidden px-6">
+            <ScrollArea className="h-[calc(100vh-180px)]">
+              <div className="space-y-4 pr-4">
+                {messages.map((message) => (
                   <div
-                    className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                      message.sender_id
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                    key={message.id}
+                    className={`flex ${
+                      message.sender_id ? "justify-end" : "justify-start"
                     }`}
                   >
-                    {message.content}
+                    <div
+                      className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                        message.sender_id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      {message.content}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-          <form onSubmit={sendMessage} className="flex gap-2">
-            <Input
-              placeholder="Type your message..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              disabled={loading}
-            />
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Send className="size-4" />
-              )}
-            </Button>
-          </form>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+
+          <div className="p-6 mt-auto border-t">
+            <form onSubmit={sendMessage} className="flex gap-2">
+              <Input
+                placeholder="Type your message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                disabled={loading}
+              />
+              <Button type="submit" disabled={loading}>
+                {loading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Send className="size-4" />
+                )}
+              </Button>
+            </form>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
