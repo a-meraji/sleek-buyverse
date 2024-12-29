@@ -25,22 +25,32 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
         return [];
       }
 
-      // Mark all unread user messages in this session as read when admin views them
-      const { data: updateResult, error: updateError } = await supabase
-        .from('chat_messages')
-        .update({ is_read: true })
-        .eq('session_id', sessionId)
-        .eq('is_read', false)
-        .not('sender_id', 'is', null) // Only mark user messages as read
-        .select();
+      console.log('Fetched messages:', data);
 
-      if (updateError) {
-        console.error('Error marking messages as read:', updateError);
-      } else {
-        console.log('Messages marked as read:', updateResult);
+      // Only proceed with marking messages as read if we have messages
+      if (data && data.length > 0) {
+        // Find unread user messages
+        const unreadUserMessages = data.filter(
+          msg => !msg.is_read && msg.sender_id !== null
+        );
+
+        if (unreadUserMessages.length > 0) {
+          // Mark unread user messages as read
+          const { data: updateResult, error: updateError } = await supabase
+            .from('chat_messages')
+            .update({ is_read: true })
+            .eq('session_id', sessionId)
+            .in('id', unreadUserMessages.map(msg => msg.id))
+            .select();
+
+          if (updateError) {
+            console.error('Error marking messages as read:', updateError);
+          } else {
+            console.log('Messages marked as read:', updateResult);
+          }
+        }
       }
 
-      console.log('Fetched messages:', data);
       return data;
     },
     enabled: !!sessionId,
