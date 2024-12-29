@@ -3,15 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 
 export function AdminAnalytics() {
-  const { data: analytics, isLoading } = useQuery({
-    queryKey: ["admin-analytics"],
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["admin-stats"],
     queryFn: async () => {
-      // Get total revenue
-      const { data: orders, error: ordersError } = await supabase
+      // Get total revenue from orders
+      const { data: orders } = await supabase
         .from("orders")
         .select("total_amount");
-      
-      if (ordersError) throw ordersError;
+
+      const totalRevenue = orders?.reduce(
+        (sum, order) => sum + Number(order.total_amount),
+        0
+      ) || 0;
 
       // Get total products
       const { count: productsCount, error: productsError } = await supabase
@@ -24,8 +27,6 @@ export function AdminAnalytics() {
       const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
 
       if (usersError) throw usersError;
-
-      const totalRevenue = orders?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0;
 
       return {
         totalRevenue,
@@ -40,27 +41,27 @@ export function AdminAnalytics() {
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+        <CardHeader>
+          <CardTitle>Total Revenue</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">${analytics?.totalRevenue.toFixed(2)}</div>
+          <p className="text-2xl font-bold">${stats?.totalRevenue.toFixed(2)}</p>
         </CardContent>
       </Card>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Products</CardTitle>
+        <CardHeader>
+          <CardTitle>Total Products</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{analytics?.totalProducts}</div>
+          <p className="text-2xl font-bold">{stats?.totalProducts}</p>
         </CardContent>
       </Card>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+        <CardHeader>
+          <CardTitle>Total Users</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{analytics?.totalUsers}</div>
+          <p className="text-2xl font-bold">{stats?.totalUsers}</p>
         </CardContent>
       </Card>
     </div>
