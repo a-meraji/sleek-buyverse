@@ -25,7 +25,7 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
         return [];
       }
 
-      // Mark all unread messages in this session as read when admin views them
+      // Mark all unread user messages in this session as read when admin views them
       const { error: updateError } = await supabase
         .from('chat_messages')
         .update({ is_read: true })
