@@ -36,6 +36,9 @@ export const MessageInput = ({ sessionId }: MessageInputProps) => {
       return;
     }
 
+    // Log the sender_id from session
+    console.log(`sender_id is: ${session.user.id}`);
+
     // Create message data with the sender_id from session
     const messageData = {
       session_id: sessionId,
