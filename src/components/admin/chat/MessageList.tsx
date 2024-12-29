@@ -15,7 +15,7 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
       console.log('Fetching messages for session:', sessionId);
       const { data, error } = await supabase
         .from('chat_messages')
-        .select('*, sender:sender_id(email)')
+        .select('*')
         .eq('session_id', sessionId)
         .order('created_at', { ascending: true });
 
@@ -38,14 +38,14 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
           <div
             key={message.id}
             className={`flex ${
-              message.sender_id ? "justify-start" : "justify-end"
+              message.sender_id ? "justify-end" : "justify-start"
             }`}
           >
             <div
               className={`rounded-lg px-4 py-2 max-w-[80%] ${
                 message.sender_id
-                  ? "bg-muted"
-                  : "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted"
               }`}
             >
               {message.content}
