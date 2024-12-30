@@ -31,7 +31,12 @@ export function CategorySelector({ value, onChange }: CategorySelectorProps) {
 
       if (error) throw error;
 
-      const uniqueCategories = [...new Set(data.map(item => item.category))].filter(Boolean);
+      // Include the current value if it's not in the database yet
+      const uniqueCategories = [...new Set([
+        ...data.map(item => item.category),
+        ...(value && !data.some(item => item.category === value) ? [value] : [])
+      ])].filter(Boolean);
+      
       return uniqueCategories;
     },
   });
