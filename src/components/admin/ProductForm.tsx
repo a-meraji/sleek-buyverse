@@ -25,16 +25,57 @@ export function ProductForm({ onClose }: ProductFormProps) {
     sku: "",
   });
   const [showImageSelector, setShowImageSelector] = useState(false);
-
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const validateForm = (): boolean => {
+    if (!formData.name || formData.name.trim() === "") {
+      toast({
+        title: "Validation Error",
+        description: "Product name is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.price || formData.price <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Price must be greater than 0",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.image_url || formData.image_url.trim() === "") {
+      toast({
+        title: "Validation Error",
+        description: "Product image is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
   const createProduct = useMutation({
     mutationFn: async () => {
-      console.log('Creating product with data:', formData);
+      if (!validateForm()) {
+        throw new Error("Validation failed");
+      }
+
+      const productData = {
+        name: formData.name,
+        description: formData.description || "",
+        price: formData.price || 0,
+        stock: formData.stock || 0,
+        category: formData.category || "",
+        image_url: formData.image_url,
+        sku: formData.sku || "",
+      };
+
+      console.log('Creating product with data:', productData);
       const { data, error } = await supabase
         .from("products")
-        .insert([formData])
+        .insert([productData])
         .select()
         .single();
 
