@@ -33,18 +33,30 @@ export const useSessionList = () => {
         throw sessionsError;
       }
 
+      // Get all admin users to exclude their messages from unread count
+      const { data: adminUsers, error: adminError } = await supabase
+        .from('admin_users')
+        .select('id');
+
+      if (adminError) {
+        console.error('Error fetching admin users:', adminError);
+        throw adminError;
+      }
+
+      const adminIds = adminUsers.map(admin => admin.id);
+      console.log('Admin IDs:', adminIds);
+
       const sessionsWithUnreadCounts = await Promise.all(
         chatSessions.map(async (session) => {
           console.log(`Counting unread messages for session ${session.id}`);
           
-          // First, get unread messages that are not from the current admin
+          // Count unread messages that are NOT from admins
           const { count, error: countError } = await supabase
             .from('chat_messages')
             .select('*', { count: 'exact', head: true })
             .eq('session_id', session.id)
             .eq('is_read', false)
-            .neq('sender_id', currentUserId)
-            .not('sender_id', 'is', null);
+            .not('sender_id', 'in', adminIds);
 
           if (countError) {
             console.error('Error counting unread messages:', countError);
