@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,16 +11,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductForm } from "./ProductForm";
 import { EditProductDialog } from "./EditProductDialog";
 import { Product, ProductVariant } from "@/types/product";
+import { useToast } from "@/hooks/use-toast";
 
 export function AdminProducts() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: productsData, isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -54,8 +68,52 @@ export function AdminProducts() {
         variantsByProduct,
       };
     },
-    staleTime: 1000 * 60 * 5, // Data stays fresh for 5 minutes
-    gcTime: 1000 * 60 * 30, // Cache persists for 30 minutes
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+  });
+
+  const deleteProduct = useMutation({
+    mutationFn: async (productId: string) => {
+      console.log('Deleting product:', productId);
+      
+      // First delete all variants
+      const { error: variantsError } = await supabase
+        .from('product_variants')
+        .delete()
+        .eq('product_id', productId);
+
+      if (variantsError) {
+        console.error('Error deleting variants:', variantsError);
+        throw variantsError;
+      }
+
+      // Then delete the product
+      const { error: productError } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
+
+      if (productError) {
+        console.error('Error deleting product:', productError);
+        throw productError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      toast({
+        title: "Product deleted",
+        description: "The product has been successfully deleted.",
+      });
+      setProductToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Delete product error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete product. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const filteredProducts = productsData?.products.filter(product =>
@@ -91,6 +149,7 @@ export function AdminProducts() {
             <TableHead>Category</TableHead>
             <TableHead>Variants</TableHead>
             <TableHead>Total Stock</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -99,11 +158,7 @@ export function AdminProducts() {
             const totalStock = productVariants.reduce((sum, variant) => sum + variant.stock, 0);
 
             return (
-              <TableRow 
-                key={product.id}
-                className="cursor-pointer hover:bg-muted/60"
-                onClick={() => setSelectedProduct(product)}
-              >
+              <TableRow key={product.id}>
                 <TableCell>
                   <img
                     src={product.image_url}
@@ -125,6 +180,24 @@ export function AdminProducts() {
                   </div>
                 </TableCell>
                 <TableCell>{totalStock}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setProductToDelete(product)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             );
           })}
@@ -135,6 +208,27 @@ export function AdminProducts() {
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
       />
+
+      <AlertDialog open={!!productToDelete} onOpenChange={() => setProductToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the product
+              "{productToDelete?.name}" and all its variants.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => productToDelete && deleteProduct.mutate(productToDelete.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
