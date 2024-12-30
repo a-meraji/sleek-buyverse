@@ -42,10 +42,15 @@ export default {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        scrollVertical: {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(-50%)" },
+        },
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
         "scroll": "scroll 20s linear infinite",
+        "scroll-vertical": "scrollVertical 40s linear infinite",
       },
     },
   },
