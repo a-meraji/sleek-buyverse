@@ -14,16 +14,21 @@ export const AuthForm = () => {
           theme: ThemeSupa,
           style: {
             button: { 
-              background: '#33C3F0',
+              background: '#1d8757',
               color: 'white',
-              '&:hover': {
-                background: '#0FA0CE'
+              borderRadius: '4px',
+              transition: 'opacity 0.2s ease',
+              opacity: '1',
+              ':hover': {
+                opacity: '0.9'
               }
             },
             anchor: { 
-              color: '#1EAEDB',
-              '&:hover': {
-                color: '#0FA0CE'
+              color: '#1d8757',
+              transition: 'opacity 0.2s ease',
+              opacity: '1',
+              ':hover': {
+                opacity: '0.8'
               }
             },
             container: { 
@@ -31,7 +36,8 @@ export const AuthForm = () => {
             },
             input: { 
               background: 'white',
-              borderColor: '#D3E4FD'
+              borderColor: '#e2e8f0',
+              borderRadius: '4px'
             },
             label: {
               color: '#4A5568'
