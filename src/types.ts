@@ -1,3 +1,5 @@
+export type ProductSize = 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL' | '20' | '22' | '23';
+
 export interface Product {
   id: string;
   name: string;
@@ -7,5 +9,5 @@ export interface Product {
   stock?: number;
   category?: string;
   sku?: string;
-  sizes?: string[];
+  sizes?: ProductSize[];
 }

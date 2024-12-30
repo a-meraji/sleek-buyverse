@@ -3,7 +3,7 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types";
+import { Product, ProductSize } from "@/types";
 import { ImageSelector } from "./ImageSelector";
 import { ProductDetailsFields } from "./product/ProductDetailsFields";
 import { PriceStockFields } from "./product/PriceStockFields";
@@ -120,7 +120,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
             />
 
             <SizeSelector
-              selectedSizes={formData.sizes ?? []}
+              selectedSizes={formData.sizes as ProductSize[] ?? []}
               onChange={(sizes) => handleFormChange({ sizes })}
             />
 

@@ -1,15 +1,16 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { ProductSize } from "@/types";
 
 interface SizeSelectorProps {
-  selectedSizes: string[];
-  onChange: (sizes: string[]) => void;
+  selectedSizes: ProductSize[];
+  onChange: (sizes: ProductSize[]) => void;
 }
 
 export function SizeSelector({ selectedSizes, onChange }: SizeSelectorProps) {
-  const availableSizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL', '20', '22', '23'];
+  const availableSizes: ProductSize[] = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL', '20', '22', '23'];
 
-  const handleSizeToggle = (size: string) => {
+  const handleSizeToggle = (size: ProductSize) => {
     const newSizes = selectedSizes.includes(size)
       ? selectedSizes.filter(s => s !== size)
       : [...selectedSizes, size];
