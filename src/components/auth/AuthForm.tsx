@@ -13,10 +13,29 @@ export const AuthForm = () => {
         appearance={{
           theme: ThemeSupa,
           style: {
-            button: { background: 'rgb(var(--primary))', color: 'white' },
-            anchor: { color: 'rgb(var(--primary))' },
-            container: { width: '100%' },
-            input: { background: 'white' },
+            button: { 
+              background: '#33C3F0',
+              color: 'white',
+              '&:hover': {
+                background: '#0FA0CE'
+              }
+            },
+            anchor: { 
+              color: '#1EAEDB',
+              '&:hover': {
+                color: '#0FA0CE'
+              }
+            },
+            container: { 
+              width: '100%'
+            },
+            input: { 
+              background: 'white',
+              borderColor: '#D3E4FD'
+            },
+            label: {
+              color: '#4A5568'
+            }
           },
         }}
         providers={["google"]}
