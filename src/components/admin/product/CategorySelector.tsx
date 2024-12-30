@@ -56,7 +56,7 @@ export function CategorySelector({ value, onChange }: CategorySelectorProps) {
     <div className="space-y-2">
       <label htmlFor="category" className="text-sm font-medium">Category</label>
       {showNewCategory ? (
-        <div className="flex gap-2">
+        <div className="flex gap-2 bg-white">
           <Input
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
@@ -79,7 +79,7 @@ export function CategorySelector({ value, onChange }: CategorySelectorProps) {
           </Button>
         </div>
       ) : (
-        <div className="flex gap-2">
+        <div className="flex gap-2 bg-white">
           <Select 
             value={value} 
             onValueChange={handleCategoryChange}
