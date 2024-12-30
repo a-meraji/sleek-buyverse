@@ -1,4 +1,5 @@
 import { Github, Linkedin, Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
@@ -11,6 +12,9 @@ export function Footer() {
               We're dedicated to bringing you the finest quality products with
               exceptional style and comfort.
             </p>
+            <Link to="/about" className="text-[#1d8757] hover:underline">
+              Learn More
+            </Link>
           </div>
           <div className="space-y-4">
             <h3 className="font-bold text-lg">Customer Service</h3>

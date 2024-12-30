@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, LogOut, Search, X } from "lucide-react";
+import { ShoppingCart, LogOut, Search, X, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -14,13 +21,11 @@ export const Navbar = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("Initial session check:", session);
       setUser(session?.user ?? null);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log("Auth state changed:", { event: _event, session });
       setUser(session?.user ?? null);
@@ -97,6 +102,36 @@ export const Navbar = () => {
         </div>
         
         <div className="flex items-center gap-4">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Navigation</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 flex flex-col gap-2">
+                <Link to="/" className="p-2 hover:bg-accent rounded-md">
+                  Home
+                </Link>
+                <Link to="/products" className="p-2 hover:bg-accent rounded-md">
+                  Products
+                </Link>
+                <Link to="/cart" className="p-2 hover:bg-accent rounded-md">
+                  Cart
+                </Link>
+                <Link to="/about" className="p-2 hover:bg-accent rounded-md">
+                  About
+                </Link>
+                <Link to="/about" className="p-2 hover:bg-accent rounded-md">
+                  Admin Dashboard
+                </Link>
+              </div>
+            </SheetContent>
+          </Sheet>
+          
           <Button 
             variant="ghost" 
             size="icon"

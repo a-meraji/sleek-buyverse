@@ -9,6 +9,7 @@ import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import About from "./pages/About";
 import { ChatButton } from "./components/chat/ChatButton";
 import { Footer } from "./components/home/Footer";
 import * as React from 'react';
@@ -40,6 +41,7 @@ const App = () => (
                 <Route path="/product/:id" element={<Product />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/about" element={<About />} />
               </Routes>
             </div>
             <Footer />
