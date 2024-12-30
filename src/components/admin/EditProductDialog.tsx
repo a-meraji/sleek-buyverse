@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
+import { ImageSelector } from "./ImageSelector";
+import { Image } from "lucide-react";
 
 interface EditProductDialogProps {
   product: Product | null;
@@ -15,10 +17,10 @@ interface EditProductDialogProps {
 
 export function EditProductDialog({ product, onClose }: EditProductDialogProps) {
   const [formData, setFormData] = useState<Product | null>(null);
+  const [showImageSelector, setShowImageSelector] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Set initial form data when product changes
   useEffect(() => {
     if (product) {
       setFormData(product);
@@ -73,97 +75,114 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   };
 
   return (
-    <Dialog open={!!product} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Edit Product</DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">Name</label>
-            <Input
-              id="name"
-              value={formData?.name ?? ""}
-              onChange={(e) => setFormData(prev => prev ? { ...prev, name: e.target.value } : null)}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">Description</label>
-            <Textarea
-              id="description"
-              value={formData?.description ?? ""}
-              onChange={(e) => setFormData(prev => prev ? { ...prev, description: e.target.value } : null)}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+    <>
+      <Dialog open={!!product} onOpenChange={() => onClose()}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Product</DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="price" className="text-sm font-medium">Price</label>
+              <label htmlFor="name" className="text-sm font-medium">Name</label>
               <Input
-                id="price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData?.price ?? ""}
-                onChange={(e) => setFormData(prev => prev ? { ...prev, price: Number(e.target.value) } : null)}
+                id="name"
+                value={formData?.name ?? ""}
+                onChange={(e) => setFormData(prev => prev ? { ...prev, name: e.target.value } : null)}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="stock" className="text-sm font-medium">Stock</label>
-              <Input
-                id="stock"
-                type="number"
-                min="0"
-                value={formData?.stock ?? ""}
-                onChange={(e) => setFormData(prev => prev ? { ...prev, stock: Number(e.target.value) } : null)}
-                required
+              <label htmlFor="description" className="text-sm font-medium">Description</label>
+              <Textarea
+                id="description"
+                value={formData?.description ?? ""}
+                onChange={(e) => setFormData(prev => prev ? { ...prev, description: e.target.value } : null)}
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="category" className="text-sm font-medium">Category</label>
-            <Input
-              id="category"
-              value={formData?.category ?? ""}
-              onChange={(e) => setFormData(prev => prev ? { ...prev, category: e.target.value } : null)}
-            />
-          </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="price" className="text-sm font-medium">Price</label>
+                <Input
+                  id="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData?.price ?? ""}
+                  onChange={(e) => setFormData(prev => prev ? { ...prev, price: Number(e.target.value) } : null)}
+                  required
+                />
+              </div>
 
-          <div className="space-y-2">
-            <label htmlFor="image_url" className="text-sm font-medium">Image URL</label>
-            <Input
-              id="image_url"
-              value={formData?.image_url ?? ""}
-              onChange={(e) => setFormData(prev => prev ? { ...prev, image_url: e.target.value } : null)}
-              required
-            />
-          </div>
+              <div className="space-y-2">
+                <label htmlFor="stock" className="text-sm font-medium">Stock</label>
+                <Input
+                  id="stock"
+                  type="number"
+                  min="0"
+                  value={formData?.stock ?? ""}
+                  onChange={(e) => setFormData(prev => prev ? { ...prev, stock: Number(e.target.value) } : null)}
+                  required
+                />
+              </div>
+            </div>
 
-          <div className="space-y-2">
-            <label htmlFor="sku" className="text-sm font-medium">SKU</label>
-            <Input
-              id="sku"
-              value={formData?.sku ?? ""}
-              onChange={(e) => setFormData(prev => prev ? { ...prev, sku: e.target.value } : null)}
-            />
-          </div>
+            <div className="space-y-2">
+              <label htmlFor="category" className="text-sm font-medium">Category</label>
+              <Input
+                id="category"
+                value={formData?.category ?? ""}
+                onChange={(e) => setFormData(prev => prev ? { ...prev, category: e.target.value } : null)}
+              />
+            </div>
 
-          <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={updateProduct.isPending}>
-              Save Changes
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <div className="space-y-2">
+              <label htmlFor="image_url" className="text-sm font-medium">Image URL</label>
+              <div className="flex gap-2">
+                <Input
+                  id="image_url"
+                  value={formData?.image_url ?? ""}
+                  onChange={(e) => setFormData(prev => prev ? { ...prev, image_url: e.target.value } : null)}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowImageSelector(true)}
+                >
+                  <Image className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="sku" className="text-sm font-medium">SKU</label>
+              <Input
+                id="sku"
+                value={formData?.sku ?? ""}
+                onChange={(e) => setFormData(prev => prev ? { ...prev, sku: e.target.value } : null)}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={updateProduct.isPending}>
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <ImageSelector
+        open={showImageSelector}
+        onClose={() => setShowImageSelector(false)}
+        onSelect={(url) => setFormData(prev => prev ? { ...prev, image_url: url } : null)}
+      />
+    </>
   );
 }

@@ -199,27 +199,6 @@ export type Database = {
         }
         Relationships: []
       }
-      product: {
-        Row: {
-          created_at: string
-          id: number
-          name: string | null
-          varient: Json | null
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          name?: string | null
-          varient?: Json | null
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          name?: string | null
-          varient?: Json | null
-        }
-        Relationships: []
-      }
       products: {
         Row: {
           category: string | null
