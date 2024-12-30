@@ -9,6 +9,7 @@ import { ProductDetailsFields } from "./product/ProductDetailsFields";
 import { PriceStockFields } from "./product/PriceStockFields";
 import { CategorySelector } from "./product/CategorySelector";
 import { ImagePreview } from "./product/ImagePreview";
+import { SizeSelector } from "./product/SizeSelector";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -23,6 +24,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
     category: "",
     image_url: "",
     sku: "",
+    sizes: [],
   });
   const [showImageSelector, setShowImageSelector] = useState(false);
   const { toast } = useToast();
@@ -76,6 +78,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
         category: formData.category || "",
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
+        sizes: formData.sizes || [],
       };
 
       console.log('Creating product with data:', productData);
@@ -148,6 +151,11 @@ export function ProductForm({ onClose }: ProductFormProps) {
         <CategorySelector
           value={formData.category ?? ""}
           onChange={(value) => handleFormChange({ category: value })}
+        />
+
+        <SizeSelector
+          selectedSizes={formData.sizes ?? []}
+          onChange={(sizes) => handleFormChange({ sizes })}
         />
 
         <ImagePreview

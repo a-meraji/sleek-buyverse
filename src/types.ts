@@ -7,4 +7,5 @@ export interface Product {
   stock?: number;
   category?: string;
   sku?: string;
+  sizes?: string[];
 }

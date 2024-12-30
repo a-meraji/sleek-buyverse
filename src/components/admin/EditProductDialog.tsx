@@ -5,7 +5,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
 import { ImageSelector } from "./ImageSelector";
-import { ProductForm } from "./product/ProductForm";
+import { ProductDetailsFields } from "./product/ProductDetailsFields";
+import { PriceStockFields } from "./product/PriceStockFields";
+import { CategorySelector } from "./product/CategorySelector";
+import { ImagePreview } from "./product/ImagePreview";
+import { SizeSelector } from "./product/SizeSelector";
+import { Button } from "@/components/ui/button";
 
 interface EditProductDialogProps {
   product: Product | null;
@@ -28,7 +33,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     mutationFn: async () => {
       if (!formData) return;
       
-      console.log('Updating product with image URL:', formData.image_url);
+      console.log('Updating product with data:', formData);
       
       const { data, error } = await supabase
         .from("products")
@@ -40,6 +45,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
           category: formData.category,
           image_url: formData.image_url,
           sku: formData.sku,
+          sizes: formData.sizes,
         })
         .eq("id", formData.id)
         .select()
@@ -91,14 +97,48 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
             <DialogTitle>Edit Product</DialogTitle>
           </DialogHeader>
           
-          <ProductForm
-            formData={formData}
-            isSubmitting={updateProduct.isPending}
-            onSubmit={handleSubmit}
-            onChange={handleFormChange}
-            onCancel={onClose}
-            onChooseImage={() => setShowImageSelector(true)}
-          />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <ProductDetailsFields
+              name={formData.name}
+              description={formData.description ?? ""}
+              sku={formData.sku ?? ""}
+              onNameChange={(value) => handleFormChange({ name: value })}
+              onDescriptionChange={(value) => handleFormChange({ description: value })}
+              onSkuChange={(value) => handleFormChange({ sku: value })}
+            />
+
+            <PriceStockFields
+              price={formData.price}
+              stock={formData.stock ?? 0}
+              onPriceChange={(value) => handleFormChange({ price: value })}
+              onStockChange={(value) => handleFormChange({ stock: value })}
+            />
+
+            <CategorySelector
+              value={formData.category ?? ""}
+              onChange={(value) => handleFormChange({ category: value })}
+            />
+
+            <SizeSelector
+              selectedSizes={formData.sizes ?? []}
+              onChange={(sizes) => handleFormChange({ sizes })}
+            />
+
+            <ImagePreview
+              imageUrl={formData.image_url}
+              productName={formData.name}
+              onChooseImage={() => setShowImageSelector(true)}
+            />
+
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={updateProduct.isPending}>
+                Save Changes
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 

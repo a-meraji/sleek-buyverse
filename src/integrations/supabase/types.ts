@@ -208,6 +208,7 @@ export type Database = {
           image_url: string
           name: string
           price: number
+          sizes: Database["public"]["Enums"]["product_size"][] | null
           sku: string | null
           stock: number | null
         }
@@ -219,6 +220,7 @@ export type Database = {
           image_url: string
           name: string
           price: number
+          sizes?: Database["public"]["Enums"]["product_size"][] | null
           sku?: string | null
           stock?: number | null
         }
@@ -230,6 +232,7 @@ export type Database = {
           image_url?: string
           name?: string
           price?: number
+          sizes?: Database["public"]["Enums"]["product_size"][] | null
           sku?: string | null
           stock?: number | null
         }
@@ -248,6 +251,7 @@ export type Database = {
       }
     }
     Enums: {
+      product_size: "S" | "M" | "L" | "XL" | "XXL" | "XXXL" | "20" | "22" | "23"
       user_role: "user" | "admin" | "super_admin"
     }
     CompositeTypes: {

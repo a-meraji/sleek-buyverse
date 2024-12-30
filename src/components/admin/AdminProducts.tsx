@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductForm } from "./ProductForm";
 import { EditProductDialog } from "./EditProductDialog";
@@ -68,6 +69,7 @@ export function AdminProducts() {
             <TableHead>Price</TableHead>
             <TableHead>Stock</TableHead>
             <TableHead>Category</TableHead>
+            <TableHead>Sizes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -89,6 +91,15 @@ export function AdminProducts() {
               <TableCell>${product.price}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>{product.category}</TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-1">
+                  {product.sizes?.map((size) => (
+                    <Badge key={size} variant="secondary">
+                      {size}
+                    </Badge>
+                  ))}
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
