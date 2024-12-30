@@ -10,6 +10,7 @@ export const AuthForm = () => {
       </p>
       <Auth 
         supabaseClient={supabase}
+        view="sign_in"
         appearance={{
           theme: ThemeSupa,
           variables: {
@@ -23,14 +24,12 @@ export const AuthForm = () => {
         }}
         providers={["google"]}
         redirectTo={`${window.location.origin}/`}
-        options={{
-          emailRedirectTo: `${window.location.origin}/`,
-          socialLayout: 'horizontal',
-          additionalData: {
-            first_name: true,
-            last_name: true,
-          },
+        showLinks={true}
+        additionalData={{
+          first_name: true,
+          last_name: true,
         }}
+        socialLayout="horizontal"
       />
     </div>
   );
