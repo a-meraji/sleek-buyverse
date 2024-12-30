@@ -35,9 +35,7 @@ export function ProductForm({
 
       <PriceStockFields
         price={formData?.price ?? 0}
-        stock={formData?.stock ?? 0}
         onPriceChange={(value) => onChange({ price: value })}
-        onStockChange={(value) => onChange({ stock: value })}
       />
 
       <CategorySelector

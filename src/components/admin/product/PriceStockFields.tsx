@@ -1,4 +1,6 @@
 import { Input } from "@/components/ui/input";
+import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PriceStockFieldsProps {
   price: number;
@@ -11,7 +13,18 @@ export function PriceStockFields({
 }: PriceStockFieldsProps) {
   return (
     <div className="space-y-2">
-      <label htmlFor="price" className="text-sm font-medium">Price</label>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <label htmlFor="price" className="text-sm font-medium cursor-help">
+              Price ($)
+            </label>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Set the base price for this product</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <Input
         id="price"
         type="number"
