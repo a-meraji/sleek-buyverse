@@ -1,5 +1,8 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 import { ProductSize } from "@/types";
 
 interface SizeSelectorProps {
@@ -8,28 +11,54 @@ interface SizeSelectorProps {
 }
 
 export function SizeSelector({ selectedSizes, onChange }: SizeSelectorProps) {
-  const availableSizes: ProductSize[] = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL', '20', '22', '23'];
+  const [newSize, setNewSize] = useState("");
 
-  const handleSizeToggle = (size: ProductSize) => {
-    const newSizes = selectedSizes.includes(size)
-      ? selectedSizes.filter(s => s !== size)
-      : [...selectedSizes, size];
-    onChange(newSizes);
+  const handleAddSize = () => {
+    if (newSize.trim() && !selectedSizes.includes(newSize.trim())) {
+      onChange([...selectedSizes, newSize.trim()]);
+      setNewSize("");
+    }
+  };
+
+  const handleRemoveSize = (sizeToRemove: string) => {
+    onChange(selectedSizes.filter(size => size !== sizeToRemove));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddSize();
+    }
   };
 
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">Sizes</label>
-      <div className="grid grid-cols-3 gap-4">
-        {availableSizes.map((size) => (
-          <div key={size} className="flex items-center space-x-2">
-            <Checkbox
-              id={`size-${size}`}
-              checked={selectedSizes.includes(size)}
-              onCheckedChange={() => handleSizeToggle(size)}
+      <div className="flex gap-2">
+        <Input
+          value={newSize}
+          onChange={(e) => setNewSize(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="Add size (e.g., S, M, L, 42)"
+          className="flex-1"
+        />
+        <Button type="button" onClick={handleAddSize}>
+          Add Size
+        </Button>
+      </div>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {selectedSizes.map((size) => (
+          <Badge 
+            key={size} 
+            variant="secondary"
+            className="flex items-center gap-1"
+          >
+            {size}
+            <X
+              className="h-3 w-3 cursor-pointer"
+              onClick={() => handleRemoveSize(size)}
             />
-            <Label htmlFor={`size-${size}`}>{size}</Label>
-          </div>
+          </Badge>
         ))}
       </div>
     </div>

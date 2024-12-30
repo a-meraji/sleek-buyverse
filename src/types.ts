@@ -1,4 +1,4 @@
-export type ProductSize = 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL' | '20' | '22' | '23';
+export type ProductSize = string;
 
 export interface Product {
   id: string;
