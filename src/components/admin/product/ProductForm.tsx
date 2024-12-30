@@ -1,8 +1,19 @@
+import { useState } from "react";
 import { Product } from "@/types";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ImagePreview } from "./ImagePreview";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProductFormProps {
   formData: Product;
@@ -21,6 +32,41 @@ export function ProductForm({
   onCancel,
   onChooseImage,
 }: ProductFormProps) {
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+
+  const { data: categories } = useQuery({
+    queryKey: ["product-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("category")
+        .not("category", "is", null);
+
+      if (error) throw error;
+
+      // Get unique categories and remove nulls
+      const uniqueCategories = [...new Set(data.map(item => item.category))].filter(Boolean);
+      return uniqueCategories;
+    },
+  });
+
+  const handleCategoryChange = (value: string) => {
+    if (value === "new") {
+      setShowNewCategory(true);
+    } else {
+      onChange({ category: value });
+    }
+  };
+
+  const handleNewCategorySubmit = () => {
+    if (newCategory.trim()) {
+      onChange({ category: newCategory.trim() });
+      setShowNewCategory(false);
+      setNewCategory("");
+    }
+  };
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
@@ -71,11 +117,54 @@ export function ProductForm({
 
       <div className="space-y-2">
         <label htmlFor="category" className="text-sm font-medium">Category</label>
-        <Input
-          id="category"
-          value={formData?.category ?? ""}
-          onChange={(e) => onChange({ category: e.target.value })}
-        />
+        {showNewCategory ? (
+          <div className="flex gap-2">
+            <Input
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Enter new category"
+            />
+            <Button 
+              type="button" 
+              onClick={handleNewCategorySubmit}
+              className="shrink-0"
+            >
+              Add
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setShowNewCategory(false)}
+              className="shrink-0"
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Select 
+              value={formData?.category ?? ""} 
+              onValueChange={handleCategoryChange}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories?.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+                <SelectItem value="new">
+                  <span className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add new category
+                  </span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       <ImagePreview
