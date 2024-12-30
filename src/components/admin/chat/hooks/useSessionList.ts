@@ -33,7 +33,7 @@ export const useSessionList = () => {
         throw sessionsError;
       }
 
-      // Get all admin users to exclude their messages from unread count
+      // Get all admin users
       const { data: adminUsers, error: adminError } = await supabase
         .from('admin_users')
         .select('id');
@@ -50,16 +50,16 @@ export const useSessionList = () => {
         chatSessions.map(async (session) => {
           console.log(`Counting unread messages for session ${session.id}`);
           
-          // Count unread messages that are NOT from admins
-          const { count, error: countError } = await supabase
+          // Count unread messages from users (not from admins)
+          const { data: messages, error: messagesError } = await supabase
             .from('chat_messages')
-            .select('*', { count: 'exact', head: true })
+            .select('*')
             .eq('session_id', session.id)
             .eq('is_read', false)
             .not('sender_id', 'in', adminIds);
 
-          if (countError) {
-            console.error('Error counting unread messages:', countError);
+          if (messagesError) {
+            console.error('Error fetching messages:', messagesError);
             return {
               ...session,
               user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous'),
@@ -67,12 +67,17 @@ export const useSessionList = () => {
             };
           }
 
-          console.log(`Session ${session.id} has ${count} unread messages from users`);
+          // Log the messages for debugging
+          console.log(`Unread user messages:`, messages);
           
+          // Count messages that are from users (not admins) and are unread
+          const unreadCount = messages ? messages.length : 0;
+          console.log(`Updating session with unread count:`, unreadCount);
+
           return {
             ...session,
             user_email: 'User ' + (session.user_id?.slice(0, 4) || 'Anonymous'),
-            unread_count: count || 0
+            unread_count: unreadCount
           };
         })
       );
