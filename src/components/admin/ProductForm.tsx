@@ -1,40 +1,40 @@
 import { useState } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Product } from "@/types";
+import { ImageSelector } from "./ImageSelector";
+import { ProductDetailsFields } from "./product/ProductDetailsFields";
+import { PriceStockFields } from "./product/PriceStockFields";
+import { CategorySelector } from "./product/CategorySelector";
+import { ImagePreview } from "./product/ImagePreview";
 
 interface ProductFormProps {
   onClose: () => void;
 }
 
 export function ProductForm({ onClose }: ProductFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<Product>>({
     name: "",
     description: "",
-    price: "",
-    stock: "",
+    price: 0,
+    stock: 0,
     category: "",
     image_url: "",
     sku: "",
   });
+  const [showImageSelector, setShowImageSelector] = useState(false);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const createProduct = useMutation({
     mutationFn: async () => {
+      console.log('Creating product with data:', formData);
       const { data, error } = await supabase
         .from("products")
-        .insert([
-          {
-            ...formData,
-            price: Number(formData.price),
-            stock: Number(formData.stock),
-          },
-        ])
+        .insert([formData])
         .select()
         .single();
 
@@ -64,60 +64,61 @@ export function ProductForm({ onClose }: ProductFormProps) {
     createProduct.mutate();
   };
 
+  const handleFormChange = (updates: Partial<Product>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleImageSelect = (url: string) => {
+    console.log('Selected image URL:', url);
+    handleFormChange({ image_url: url });
+    setShowImageSelector(false);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-      <Input
-        placeholder="Product Name"
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        required
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+        <ProductDetailsFields
+          name={formData.name ?? ""}
+          description={formData.description ?? ""}
+          sku={formData.sku ?? ""}
+          onNameChange={(value) => handleFormChange({ name: value })}
+          onDescriptionChange={(value) => handleFormChange({ description: value })}
+          onSkuChange={(value) => handleFormChange({ sku: value })}
+        />
+
+        <PriceStockFields
+          price={formData.price ?? 0}
+          stock={formData.stock ?? 0}
+          onPriceChange={(value) => handleFormChange({ price: value })}
+          onStockChange={(value) => handleFormChange({ stock: value })}
+        />
+
+        <CategorySelector
+          value={formData.category ?? ""}
+          onChange={(value) => handleFormChange({ category: value })}
+        />
+
+        <ImagePreview
+          imageUrl={formData.image_url}
+          productName={formData.name}
+          onChooseImage={() => setShowImageSelector(true)}
+        />
+
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={createProduct.isPending}>
+            Create Product
+          </Button>
+        </div>
+      </form>
+
+      <ImageSelector
+        open={showImageSelector}
+        onClose={() => setShowImageSelector(false)}
+        onSelect={handleImageSelect}
       />
-      <Textarea
-        placeholder="Description"
-        value={formData.description}
-        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-      />
-      <Input
-        type="number"
-        placeholder="Price"
-        value={formData.price}
-        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-        required
-        min="0"
-        step="0.01"
-      />
-      <Input
-        type="number"
-        placeholder="Stock"
-        value={formData.stock}
-        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-        required
-        min="0"
-      />
-      <Input
-        placeholder="Category"
-        value={formData.category}
-        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-      />
-      <Input
-        placeholder="Image URL"
-        value={formData.image_url}
-        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-        required
-      />
-      <Input
-        placeholder="SKU"
-        value={formData.sku}
-        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-      />
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={createProduct.isPending}>
-          Create Product
-        </Button>
-      </div>
-    </form>
+    </>
   );
 }
