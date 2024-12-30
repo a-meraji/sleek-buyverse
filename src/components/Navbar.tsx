@@ -41,7 +41,7 @@ export const Navbar = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <NavigationMenu />
+         
           
           <Button 
             variant="ghost" 
@@ -58,6 +58,7 @@ export const Navbar = () => {
           </Link>
           
           <AuthButtons user={user} setUser={setUser} />
+           <NavigationMenu />
         </div>
       </div>
     </nav>
