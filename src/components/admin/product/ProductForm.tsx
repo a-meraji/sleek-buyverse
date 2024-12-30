@@ -1,9 +1,9 @@
 import { Product } from "@/types";
-import { Button } from "@/components/ui/button";
 import { ImagePreview } from "./ImagePreview";
 import { ProductDetailsFields } from "./ProductDetailsFields";
 import { PriceStockFields } from "./PriceStockFields";
 import { CategorySelector } from "./CategorySelector";
+import { FormActions } from "./FormActions";
 
 interface ProductFormProps {
   formData: Product;
@@ -23,7 +23,7 @@ export function ProductForm({
   onChooseImage,
 }: ProductFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent form from submitting automatically
+    e.preventDefault();
     onSubmit(e);
   };
 
@@ -54,14 +54,10 @@ export function ProductForm({
         onChooseImage={onChooseImage}
       />
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          Save Changes
-        </Button>
-      </div>
+      <FormActions
+        isSubmitting={isSubmitting}
+        onCancel={onCancel}
+      />
     </form>
   );
 }

@@ -113,7 +113,7 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
             onChange={(e) => setNewStock(Number(e.target.value))}
           />
 
-          <Button onClick={handleAddVariant}>
+          <Button type="button" onClick={handleAddVariant}>
             <Plus className="h-4 w-4 mr-2" />
             Add Variant
           </Button>
@@ -145,6 +145,7 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
               </TableCell>
               <TableCell>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => handleRemoveVariant(variant)}
