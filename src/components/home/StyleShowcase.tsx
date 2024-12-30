@@ -21,7 +21,7 @@ export function StyleShowcase() {
         </div>
         <div className="relative">
           <img
-            src="/showcase.jpg"
+            src="/home-page-03-hero-image-tile-05.jpg"
             alt="Style Showcase"
             className="rounded-lg shadow-xl animate-fade-in"
           />
