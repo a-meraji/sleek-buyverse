@@ -18,7 +18,7 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
   if (!products?.length) return null;
 
   return (
-    <section className="py-16 px-6">
+    <section className="py-16 px-6 overflow-x-hidden">
       <div className="max-w-7xl mx-auto relative">
         <h2 className="text-3xl font-bold mb-8 text-center">{title}</h2>
         <div className="relative group">
