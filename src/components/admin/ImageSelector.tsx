@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface ImageSelectorProps {
   open: boolean;
@@ -29,7 +29,9 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
       console.log('Loading images from storage...');
       const { data: files, error } = await supabase.storage
         .from('images')
-        .list();
+        .list('', {
+          sortBy: { column: 'name', order: 'asc' }
+        });
 
       if (error) {
         console.error('Error listing files:', error);
@@ -38,20 +40,22 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
 
       console.log('Files retrieved:', files);
 
-      // Get public URLs for all files
+      // Filter out the placeholder file and get public URLs
       const imageUrls = await Promise.all(
-        files.map(async (file) => {
-          const { data } = await supabase.storage
-            .from('images')
-            .getPublicUrl(file.name);
+        files
+          .filter(file => file.name !== '.emptyFolderPlaceholder')
+          .map(async (file) => {
+            const { data } = supabase.storage
+              .from('images')
+              .getPublicUrl(file.name);
 
-          console.log('Public URL for', file.name, ':', data.publicUrl);
-          
-          return {
-            name: file.name,
-            url: data.publicUrl
-          };
-        })
+            console.log('Public URL for', file.name, ':', data.publicUrl);
+            
+            return {
+              name: file.name,
+              url: data.publicUrl
+            };
+          })
       );
 
       console.log('Processed image URLs:', imageUrls);
@@ -134,7 +138,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
               {images.map((image) => (
                 <div
                   key={image.name}
-                  className="relative group cursor-pointer"
+                  className="relative group cursor-pointer aspect-square"
                   onClick={() => {
                     console.log('Selected image:', image.url);
                     onSelect(image.url);
@@ -144,7 +148,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
                   <img
                     src={image.url}
                     alt={image.name}
-                    className="w-full h-40 object-cover rounded-lg"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
                     <Button variant="secondary" size="sm">
