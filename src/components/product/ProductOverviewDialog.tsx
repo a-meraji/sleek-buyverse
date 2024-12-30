@@ -9,6 +9,7 @@ import { ProductImage } from "./dialog/ProductImage";
 import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelector } from "./dialog/VariantSelector";
 import { useAddToCart } from "./dialog/useAddToCart";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductOverviewDialogProps {
   isOpen: boolean;
@@ -65,6 +66,9 @@ export function ProductOverviewDialog({
   const sizes = [...new Set(variants?.map(v => v.size) || [])];
   const colors = [...new Set(variants?.map(v => v.color) || [])];
 
+  const selectedVariant = variants?.find(v => v.size === selectedSize && v.color === selectedColor);
+  const isOutOfStock = selectedVariant?.stock <= 0;
+
   const handleAddToCart = () => {
     addToCart.mutate(
       { 
@@ -95,6 +99,7 @@ export function ProductOverviewDialog({
                   options={sizes}
                   value={selectedSize}
                   onChange={setSelectedSize}
+                  variants={variants}
                 />
                 <VariantSelector
                   label="Color"
@@ -102,6 +107,11 @@ export function ProductOverviewDialog({
                   value={selectedColor}
                   onChange={setSelectedColor}
                 />
+                {isOutOfStock && (
+                  <Badge variant="destructive" className="w-fit">
+                    Out of Stock
+                  </Badge>
+                )}
               </>
             ) : (
               <p className="text-sm text-gray-500">No variants available</p>
@@ -109,7 +119,7 @@ export function ProductOverviewDialog({
 
             <Button 
               onClick={handleAddToCart}
-              disabled={addToCart.isPending || !variants?.length}
+              disabled={addToCart.isPending || !variants?.length || isOutOfStock}
             >
               Add to Cart
             </Button>

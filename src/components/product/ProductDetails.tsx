@@ -1,6 +1,8 @@
 import { Product } from "@/types";
 import { SizeSelector } from "./SizeSelector";
 import { AddToCartButton } from "./AddToCartButton";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductDetailsProps {
   product: Product;
@@ -10,6 +12,22 @@ interface ProductDetailsProps {
 }
 
 export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: ProductDetailsProps) => {
+  const { data: variants } = useQuery({
+    queryKey: ['product-variants', product.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('product_variants')
+        .select('*')
+        .eq('product_id', product.id);
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const selectedVariant = variants?.find(v => v.size === selectedSize);
+  const isOutOfStock = selectedVariant?.stock <= 0;
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">{product.name}</h1>
@@ -19,6 +37,7 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
       <SizeSelector 
         selectedSize={selectedSize} 
         onSizeSelect={onSizeSelect}
+        variants={variants}
       />
       
       <AddToCartButton
@@ -26,6 +45,7 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
         userId={userId}
         selectedSize={selectedSize}
         productName={product.name}
+        disabled={isOutOfStock}
       />
     </div>
   );

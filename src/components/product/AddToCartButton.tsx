@@ -8,9 +8,10 @@ interface AddToCartButtonProps {
   userId: string | null;
   selectedSize: string;
   productName: string;
+  disabled?: boolean;
 }
 
-export const AddToCartButton = ({ productId, userId, selectedSize, productName }: AddToCartButtonProps) => {
+export const AddToCartButton = ({ productId, userId, selectedSize, productName, disabled }: AddToCartButtonProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -103,7 +104,7 @@ export const AddToCartButton = ({ productId, userId, selectedSize, productName }
       className="w-full"
       size="lg"
       onClick={() => addToCart.mutate()}
-      disabled={addToCart.isPending}
+      disabled={disabled || addToCart.isPending}
     >
       Add to Cart
     </Button>
