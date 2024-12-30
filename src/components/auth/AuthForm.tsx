@@ -4,24 +4,20 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const AuthForm = () => {
   return (
-    <div className="bg-card p-6 rounded-lg shadow-sm">
+    <div className="w-full max-w-md mx-auto bg-card p-6 rounded-lg shadow-sm">
       <p className="text-sm text-muted-foreground mb-4">
         Please enter your details to continue.
       </p>
       <Auth 
         supabaseClient={supabase}
-        view="sign_in"
         appearance={{
           theme: ThemeSupa,
-          variables: {
-            default: {
-              colors: {
-                brand: 'rgb(var(--primary))',
-                brandAccent: 'rgb(var(--primary))',
-              },
-            },
+          style: {
+            button: { background: 'rgb(var(--primary))', color: 'white' },
+            anchor: { color: 'rgb(var(--primary))' },
+            container: { width: '100%' },
+            input: { background: 'white' },
           },
-          extend: false
         }}
         providers={["google"]}
         redirectTo={`${window.location.origin}/`}
@@ -41,16 +37,20 @@ export const AuthForm = () => {
             },
           },
         }}
-        additionalData={{
-          first_name: {
-            required: true,
+        additionalData={[
+          {
+            key: 'first_name',
             label: 'First Name',
-          },
-          last_name: {
+            type: 'text',
             required: true,
-            label: 'Last Name',
           },
-        }}
+          {
+            key: 'last_name',
+            label: 'Last Name',
+            type: 'text',
+            required: true,
+          },
+        ]}
         socialLayout="horizontal"
       />
     </div>
