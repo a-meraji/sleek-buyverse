@@ -86,7 +86,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   return (
     <>
       <Dialog open={!!product} onOpenChange={() => onClose()}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
           </DialogHeader>
