@@ -26,25 +26,35 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
 
   const loadImages = async () => {
     try {
+      console.log('Loading images from storage...');
       const { data: files, error } = await supabase.storage
         .from('images')
         .list();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error listing files:', error);
+        throw error;
+      }
 
+      console.log('Files retrieved:', files);
+
+      // Get public URLs for all files
       const imageUrls = await Promise.all(
         files.map(async (file) => {
-          const { data: { publicUrl } } = supabase.storage
+          const { data } = await supabase.storage
             .from('images')
             .getPublicUrl(file.name);
+
+          console.log('Public URL for', file.name, ':', data.publicUrl);
           
           return {
             name: file.name,
-            url: publicUrl
+            url: data.publicUrl
           };
         })
       );
 
+      console.log('Processed image URLs:', imageUrls);
       setImages(imageUrls);
     } catch (error) {
       console.error('Error loading images:', error);
@@ -64,6 +74,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
       if (!file) return;
 
       setUploading(true);
+      console.log('Uploading file:', file.name);
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
@@ -72,8 +83,12 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
         .from('images')
         .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
+      console.log('File uploaded successfully:', fileName);
       await loadImages();
       
       toast({
@@ -121,6 +136,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
                   key={image.name}
                   className="relative group cursor-pointer"
                   onClick={() => {
+                    console.log('Selected image:', image.url);
                     onSelect(image.url);
                     onClose();
                   }}
