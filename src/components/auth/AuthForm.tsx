@@ -20,15 +20,14 @@ export const AuthForm = () => {
               transition: 'opacity 0.2s ease',
               opacity: '1',
               '&:hover': {
-                opacity: '0.9'
+                background: '#176c45'
               }
             },
             anchor: { 
               color: '#1d8757',
-              transition: 'opacity 0.2s ease',
-              opacity: '1',
+              transition: 'color 0.2s ease',
               '&:hover': {
-                opacity: '0.8'
+                color: '#176c45'
               }
             },
             container: { 
