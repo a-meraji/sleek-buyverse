@@ -13,7 +13,7 @@ export function useImageList(isOpen: boolean) {
       const { data: files, error } = await supabase.storage
         .from('images')
         .list('', {
-          sortBy: { column: 'name', order: 'asc' }
+          sortBy: { column: 'name', order: 'desc' }
         });
 
       if (error) {
@@ -23,18 +23,19 @@ export function useImageList(isOpen: boolean) {
 
       console.log('Files retrieved:', files);
 
+      // Filter out the placeholder and get public URLs
       const imageUrls = files
         .filter(file => file.name !== '.emptyFolderPlaceholder')
         .map((file) => {
-          const { data } = supabase.storage
+          const { data: { publicUrl } } = supabase.storage
             .from('images')
             .getPublicUrl(file.name);
           
-          console.log('Public URL for', file.name, ':', data.publicUrl);
+          console.log('Generated public URL for', file.name, ':', publicUrl);
           
           return {
             name: file.name,
-            url: data.publicUrl
+            url: publicUrl
           };
         });
 
@@ -54,6 +55,7 @@ export function useImageList(isOpen: boolean) {
 
   useEffect(() => {
     if (isOpen) {
+      setLoading(true);
       loadImages();
     }
   }, [isOpen]);

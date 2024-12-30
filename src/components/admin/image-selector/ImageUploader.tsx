@@ -14,6 +14,7 @@ export function ImageUploader({ onUpload, isUploading }: ImageUploaderProps) {
         accept="image/*"
         onChange={onUpload}
         disabled={isUploading}
+        className="cursor-pointer"
       />
       {isUploading && <Loader2 className="h-4 w-4 animate-spin" />}
     </div>
