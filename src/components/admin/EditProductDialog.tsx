@@ -31,6 +31,8 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     mutationFn: async () => {
       if (!formData) return;
       
+      console.log('Updating product with image URL:', formData.image_url);
+      
       const { data, error } = await supabase
         .from("products")
         .update({
@@ -66,6 +68,12 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
       });
     },
   });
+
+  const handleImageSelect = (url: string) => {
+    console.log('Selected image URL:', url);
+    setFormData(prev => prev ? { ...prev, image_url: url } : null);
+    setShowImageSelector(false);
+  };
 
   if (!product) return null;
 
@@ -183,7 +191,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
       <ImageSelector
         open={showImageSelector}
         onClose={() => setShowImageSelector(false)}
-        onSelect={(url) => setFormData(prev => prev ? { ...prev, image_url: url } : null)}
+        onSelect={handleImageSelect}
       />
     </>
   );
