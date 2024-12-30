@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function HeroBanner() {
   return (
-    <div className="relative bg-white">
+    <div className="relative bg-white overflow-hidden
       <div className="mx-auto max-w-7xl">
         <div className="relative z-10 pt-14 lg:pt-20 lg:pb-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
