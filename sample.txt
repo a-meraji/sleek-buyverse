@@ -1,0 +1,14 @@
+# Supabase Configuration
+VITE_SUPABASE_URL=your-project-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_PROJECT_ID=your-project-id
+
+# Optional: Analytics (if you're using any analytics service)
+VITE_ANALYTICS_ID=your-analytics-id
+
+# Optional: External Services (if you're using any)
+VITE_API_URL=your-api-url
+VITE_STRIPE_PUBLIC_KEY=your-stripe-public-key
+
+# Note: Replace all "your-*" values with actual values from your .env file
+# Make sure to never commit the actual .env file with real values to version control
