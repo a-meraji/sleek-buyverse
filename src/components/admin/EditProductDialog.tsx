@@ -113,7 +113,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent form from submitting automatically
     updateProduct.mutate();
   };
 

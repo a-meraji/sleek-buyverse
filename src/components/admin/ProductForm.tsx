@@ -137,7 +137,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
   });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent form from submitting automatically
     createProduct.mutate();
   };
 

@@ -22,8 +22,13 @@ export function ProductForm({
   onCancel,
   onChooseImage,
 }: ProductFormProps) {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent form from submitting automatically
+    onSubmit(e);
+  };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <ProductDetailsFields
         name={formData?.name ?? ""}
         description={formData?.description ?? ""}
