@@ -45,7 +45,7 @@ export default {
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
-        "scroll": "scroll 40s linear infinite",
+        "scroll": "scroll 20s linear infinite",
       },
     },
   },
