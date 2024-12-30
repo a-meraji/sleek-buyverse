@@ -15,29 +15,50 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductForm } from "./ProductForm";
 import { EditProductDialog } from "./EditProductDialog";
-import { Product } from "@/types";
+import { Product, ProductVariant } from "@/types/product";
 
 export function AdminProducts() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { data: products, isLoading } = useQuery({
+  const { data: productsData, isLoading } = useQuery({
     queryKey: ["admin-products"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch products
+      const { data: products, error: productsError } = await supabase
         .from("products")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (productsError) throw productsError;
+
+      // Fetch variants for all products
+      const { data: variants, error: variantsError } = await supabase
+        .from("product_variants")
+        .select("*");
+
+      if (variantsError) throw variantsError;
+
+      // Group variants by product
+      const variantsByProduct = variants.reduce((acc, variant) => {
+        if (!acc[variant.product_id]) {
+          acc[variant.product_id] = [];
+        }
+        acc[variant.product_id].push(variant);
+        return acc;
+      }, {} as Record<string, ProductVariant[]>);
+
+      return {
+        products,
+        variantsByProduct,
+      };
     },
     staleTime: 1000 * 60 * 5, // Data stays fresh for 5 minutes
     gcTime: 1000 * 60 * 30, // Cache persists for 30 minutes
   });
 
-  const filteredProducts = products?.filter(product =>
+  const filteredProducts = productsData?.products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.sku?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -67,41 +88,46 @@ export function AdminProducts() {
             <TableHead>Name</TableHead>
             <TableHead>SKU</TableHead>
             <TableHead>Price</TableHead>
-            <TableHead>Stock</TableHead>
             <TableHead>Category</TableHead>
-            <TableHead>Sizes</TableHead>
+            <TableHead>Variants</TableHead>
+            <TableHead>Total Stock</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredProducts?.map((product) => (
-            <TableRow 
-              key={product.id}
-              className="cursor-pointer hover:bg-muted/60"
-              onClick={() => setSelectedProduct(product)}
-            >
-              <TableCell>
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="h-12 w-12 object-cover rounded"
-                />
-              </TableCell>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>{product.sku}</TableCell>
-              <TableCell>${product.price}</TableCell>
-              <TableCell>{product.stock}</TableCell>
-              <TableCell>{product.category}</TableCell>
-              <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {product.sizes?.map((size) => (
-                    <Badge key={size} variant="secondary">
-                      {size}
-                    </Badge>
-                  ))}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+          {filteredProducts?.map((product) => {
+            const productVariants = productsData?.variantsByProduct[product.id] || [];
+            const totalStock = productVariants.reduce((sum, variant) => sum + variant.stock, 0);
+
+            return (
+              <TableRow 
+                key={product.id}
+                className="cursor-pointer hover:bg-muted/60"
+                onClick={() => setSelectedProduct(product)}
+              >
+                <TableCell>
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="h-12 w-12 object-cover rounded"
+                  />
+                </TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.sku}</TableCell>
+                <TableCell>${product.price}</TableCell>
+                <TableCell>{product.category}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {productVariants.map((variant) => (
+                      <Badge key={`${variant.id}`} variant="secondary">
+                        {variant.color} - {variant.size} ({variant.stock})
+                      </Badge>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>{totalStock}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
 

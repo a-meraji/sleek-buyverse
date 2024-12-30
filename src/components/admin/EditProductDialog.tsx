@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductSize } from "@/types";
+import { Product, ProductVariant } from "@/types/product";
 import { ImageSelector } from "./ImageSelector";
 import { ProductDetailsFields } from "./product/ProductDetailsFields";
 import { PriceStockFields } from "./product/PriceStockFields";
 import { CategorySelector } from "./product/CategorySelector";
 import { ImagePreview } from "./product/ImagePreview";
-import { SizeSelector } from "./product/SizeSelector";
+import { VariantsManager } from "./product/VariantsManager";
 import { Button } from "@/components/ui/button";
 
 interface EditProductDialogProps {
@@ -19,40 +19,80 @@ interface EditProductDialogProps {
 
 export function EditProductDialog({ product, onClose }: EditProductDialogProps) {
   const [formData, setFormData] = useState<Product | null>(null);
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch variants for this product
+  const { data: productVariants } = useQuery({
+    queryKey: ["product-variants", product?.id],
+    queryFn: async () => {
+      if (!product?.id) return [];
+      const { data, error } = await supabase
+        .from("product_variants")
+        .select("*")
+        .eq("product_id", product.id);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!product?.id,
+  });
 
   useEffect(() => {
     if (product) {
       setFormData(product);
     }
-  }, [product]);
+    if (productVariants) {
+      setVariants(productVariants);
+    }
+  }, [product, productVariants]);
 
   const updateProduct = useMutation({
     mutationFn: async () => {
       if (!formData) return;
       
       console.log('Updating product with data:', formData);
+      console.log('Updating variants:', variants);
       
-      const { data, error } = await supabase
+      // First update the product
+      const { error: productError } = await supabase
         .from("products")
         .update({
           name: formData.name,
           description: formData.description,
           price: formData.price,
-          stock: formData.stock,
           category: formData.category,
           image_url: formData.image_url,
           sku: formData.sku,
-          sizes: formData.sizes,
         })
-        .eq("id", formData.id)
-        .select()
-        .single();
+        .eq("id", formData.id);
 
-      if (error) throw error;
-      return data;
+      if (productError) throw productError;
+
+      // Then handle variants
+      // First, delete all existing variants
+      const { error: deleteError } = await supabase
+        .from("product_variants")
+        .delete()
+        .eq("product_id", formData.id);
+
+      if (deleteError) throw deleteError;
+
+      // Then insert all current variants
+      const variantsData = variants.map(variant => ({
+        product_id: formData.id,
+        size: variant.size,
+        color: variant.color,
+        stock: variant.stock,
+      }));
+
+      const { error: variantsError } = await supabase
+        .from("product_variants")
+        .insert(variantsData);
+
+      if (variantsError) throw variantsError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
@@ -62,7 +102,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
       });
       onClose();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Error updating product:", error);
       toast({
         title: "Error",
@@ -72,12 +112,6 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     },
   });
 
-  const handleImageSelect = (url: string) => {
-    console.log('Selected image URL:', url);
-    setFormData(prev => prev ? { ...prev, image_url: url } : null);
-    setShowImageSelector(false);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProduct.mutate();
@@ -85,6 +119,12 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
 
   const handleFormChange = (updates: Partial<Product>) => {
     setFormData(prev => prev ? { ...prev, ...updates } : null);
+  };
+
+  const handleImageSelect = (url: string) => {
+    console.log('Selected image URL:', url);
+    handleFormChange({ image_url: url });
+    setShowImageSelector(false);
   };
 
   if (!product || !formData) return null;
@@ -109,9 +149,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
 
             <PriceStockFields
               price={formData.price}
-              stock={formData.stock ?? 0}
               onPriceChange={(value) => handleFormChange({ price: value })}
-              onStockChange={(value) => handleFormChange({ stock: value })}
             />
 
             <CategorySelector
@@ -119,9 +157,10 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
               onChange={(value) => handleFormChange({ category: value })}
             />
 
-            <SizeSelector
-              selectedSizes={formData.sizes as ProductSize[] ?? []}
-              onChange={(sizes) => handleFormChange({ sizes })}
+            <VariantsManager
+              variants={variants}
+              onChange={setVariants}
+              productId={formData.id}
             />
 
             <ImagePreview

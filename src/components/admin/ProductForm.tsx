@@ -3,13 +3,13 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductSize } from "@/types";
+import { Product, ProductVariant } from "@/types/product";
 import { ImageSelector } from "./ImageSelector";
 import { ProductDetailsFields } from "./product/ProductDetailsFields";
 import { PriceStockFields } from "./product/PriceStockFields";
 import { CategorySelector } from "./product/CategorySelector";
 import { ImagePreview } from "./product/ImagePreview";
-import { SizeSelector } from "./product/SizeSelector";
+import { VariantsManager } from "./product/VariantsManager";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -20,12 +20,11 @@ export function ProductForm({ onClose }: ProductFormProps) {
     name: "",
     description: "",
     price: 0,
-    stock: 0,
     category: "",
     image_url: "",
     sku: "",
-    sizes: [],
   });
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -61,6 +60,14 @@ export function ProductForm({ onClose }: ProductFormProps) {
       });
       return false;
     }
+    if (variants.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "At least one variant is required",
+        variant: "destructive",
+      });
+      return false;
+    }
     return true;
   };
 
@@ -74,27 +81,42 @@ export function ProductForm({ onClose }: ProductFormProps) {
         name: formData.name,
         description: formData.description || "",
         price: formData.price || 0,
-        stock: formData.stock || 0,
         category: formData.category || "",
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
-        sizes: formData.sizes || [],
       };
 
       console.log('Creating product with data:', productData);
-      const { data, error } = await supabase
+      
+      // First, create the product
+      const { data: product, error: productError } = await supabase
         .from("products")
         .insert([productData])
         .select()
         .single();
 
-      if (error) {
-        if (error.code === '23505' && error.message.includes('products_sku_key')) {
+      if (productError) {
+        if (productError.code === '23505' && productError.message.includes('products_sku_key')) {
           throw new Error("A product with this SKU already exists. Please use a different SKU.");
         }
-        throw error;
+        throw productError;
       }
-      return data;
+
+      // Then, create all variants for this product
+      const variantsData = variants.map(variant => ({
+        product_id: product.id,
+        size: variant.size,
+        color: variant.color,
+        stock: variant.stock,
+      }));
+
+      const { error: variantsError } = await supabase
+        .from("product_variants")
+        .insert(variantsData);
+
+      if (variantsError) throw variantsError;
+
+      return product;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
@@ -143,9 +165,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
 
         <PriceStockFields
           price={formData.price ?? 0}
-          stock={formData.stock ?? 0}
           onPriceChange={(value) => handleFormChange({ price: value })}
-          onStockChange={(value) => handleFormChange({ stock: value })}
         />
 
         <CategorySelector
@@ -153,9 +173,9 @@ export function ProductForm({ onClose }: ProductFormProps) {
           onChange={(value) => handleFormChange({ category: value })}
         />
 
-        <SizeSelector
-          selectedSizes={formData.sizes as ProductSize[] ?? []}
-          onChange={(sizes) => handleFormChange({ sizes })}
+        <VariantsManager
+          variants={variants}
+          onChange={setVariants}
         />
 
         <ImagePreview
