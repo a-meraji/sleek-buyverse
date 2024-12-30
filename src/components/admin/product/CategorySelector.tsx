@@ -81,13 +81,14 @@ export function CategorySelector({ value, onChange }: CategorySelectorProps) {
       ) : (
         <div className="flex gap-2 bg-white">
           <Select 
+            className="bg-white"
             value={value} 
             onValueChange={handleCategoryChange}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-white">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {categories?.map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
