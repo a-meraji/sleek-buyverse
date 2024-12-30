@@ -50,11 +50,11 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <div className="absolute inset-y-0 left-0 flex items-center">
-              <CarouselPrevious className="relative -left-4 lg:-left-8 bg-white shadow-lg opacity-80 hover:opacity-100" />
+            <div className="absolute top-1/2 -translate-y-1/2 left-0 md:-left-4">
+              <CarouselPrevious className="relative bg-white shadow-lg opacity-80 hover:opacity-100" />
             </div>
-            <div className="absolute inset-y-0 right-0 flex items-center">
-              <CarouselNext className="relative -right-4 lg:-right-8 bg-white shadow-lg opacity-80 hover:opacity-100" />
+            <div className="absolute top-1/2 -translate-y-1/2 right-0 md:-right-4">
+              <CarouselNext className="relative bg-white shadow-lg opacity-80 hover:opacity-100" />
             </div>
           </Carousel>
         </div>
