@@ -95,7 +95,9 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
       if (variantsError) throw variantsError;
     },
     onSuccess: () => {
+      // Invalidate both the products list and the specific product variants query
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["product-variants", product?.id] });
       toast({
         title: "Success",
         description: "Product updated successfully",
@@ -113,7 +115,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent form from submitting automatically
+    e.preventDefault();
     updateProduct.mutate();
   };
 
