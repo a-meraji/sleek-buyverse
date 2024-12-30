@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductVariant } from "@/types/product";
@@ -78,40 +79,42 @@ export function ProductOverviewDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Product Overview</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <ProductImage image={productImage} name={productName} />
-          <ProductInfo name={productName} price={productPrice} />
-          
-          {variants && variants.length > 0 ? (
-            <>
-              <VariantSelector
-                label="Size"
-                options={sizes}
-                value={selectedSize}
-                onChange={setSelectedSize}
-              />
-              <VariantSelector
-                label="Color"
-                options={colors}
-                value={selectedColor}
-                onChange={setSelectedColor}
-              />
-            </>
-          ) : (
-            <p className="text-sm text-gray-500">No variants available</p>
-          )}
+        <ScrollArea className="h-full max-h-[calc(90vh-120px)]">
+          <div className="grid gap-4 py-4 px-1">
+            <ProductImage image={productImage} name={productName} />
+            <ProductInfo name={productName} price={productPrice} />
+            
+            {variants && variants.length > 0 ? (
+              <>
+                <VariantSelector
+                  label="Size"
+                  options={sizes}
+                  value={selectedSize}
+                  onChange={setSelectedSize}
+                />
+                <VariantSelector
+                  label="Color"
+                  options={colors}
+                  value={selectedColor}
+                  onChange={setSelectedColor}
+                />
+              </>
+            ) : (
+              <p className="text-sm text-gray-500">No variants available</p>
+            )}
 
-          <Button 
-            onClick={handleAddToCart}
-            disabled={addToCart.isPending || !variants?.length}
-          >
-            Add to Cart
-          </Button>
-        </div>
+            <Button 
+              onClick={handleAddToCart}
+              disabled={addToCart.isPending || !variants?.length}
+            >
+              Add to Cart
+            </Button>
+          </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
