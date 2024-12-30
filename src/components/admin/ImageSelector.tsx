@@ -94,7 +94,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
 
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Select Image</DialogTitle>
         </DialogHeader>

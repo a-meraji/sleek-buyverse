@@ -139,20 +139,22 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="image_url" className="text-sm font-medium">Image URL</label>
-              <div className="flex gap-2">
-                <Input
-                  id="image_url"
-                  value={formData?.image_url ?? ""}
-                  onChange={(e) => setFormData(prev => prev ? { ...prev, image_url: e.target.value } : null)}
-                  required
-                />
+              <label className="text-sm font-medium">Product Image</label>
+              <div className="flex items-center gap-4">
+                {formData?.image_url && (
+                  <img
+                    src={formData.image_url}
+                    alt={formData.name}
+                    className="h-20 w-20 object-cover rounded-lg"
+                  />
+                )}
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setShowImageSelector(true)}
                 >
-                  <Image className="h-4 w-4" />
+                  <Image className="h-4 w-4 mr-2" />
+                  Choose Image
                 </Button>
               </div>
             </div>
