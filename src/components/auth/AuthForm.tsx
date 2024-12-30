@@ -19,14 +19,14 @@ export const AuthForm = () => {
               borderRadius: '4px',
               transition: 'opacity 0.2s ease',
               opacity: '1',
-              '&:hover': {
+              ':hover': {
                 background: '#176c45'
               }
             },
             anchor: { 
               color: '#1d8757',
               transition: 'color 0.2s ease',
-              '&:hover': {
+              ':hover': {
                 color: '#176c45'
               }
             },

@@ -4,7 +4,7 @@ import { Loader2, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
-import { HeroBanner } from "@/components/home/HeroBanner";
+import HeroBanner from "@/components/home/HeroBanner";
 import { ProductCarousel } from "@/components/home/ProductCarousel";
 import { StyleShowcase } from "@/components/home/StyleShowcase";
 import { ReviewsScroll } from "@/components/home/ReviewsScroll";
