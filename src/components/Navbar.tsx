@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, LogOut, Search } from "lucide-react";
+import { ShoppingCart, LogOut, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 export const Navbar = () => {
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -55,6 +56,7 @@ export const Navbar = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchExpanded(false);
     }
   };
 
@@ -65,14 +67,29 @@ export const Navbar = () => {
           <Link to="/" className="text-xl font-semibold">
             Store
           </Link>
-          <form onSubmit={handleSearch} className="hidden md:flex items-center gap-2">
+          <form 
+            onSubmit={handleSearch} 
+            className={`${
+              isSearchExpanded ? 'fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4' : 'hidden md:flex'
+            } items-center gap-2`}
+          >
             <Input
               type="search"
               placeholder="Search products..."
-              className="w-[300px]"
+              className={`${isSearchExpanded ? 'w-full max-w-md' : 'w-[300px]'}`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            {isSearchExpanded && (
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsSearchExpanded(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            )}
             <Button type="submit" variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
@@ -80,6 +97,14 @@ export const Navbar = () => {
         </div>
         
         <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsSearchExpanded(true)}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
           <Link to="/cart">
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
