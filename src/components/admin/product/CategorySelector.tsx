@@ -1,16 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CategoryDropdown } from "./CategoryDropdown";
+import { NewCategoryForm } from "./NewCategoryForm";
 
 interface CategorySelectorProps {
   value: string;
@@ -61,52 +53,19 @@ export function CategorySelector({ value, onChange }: CategorySelectorProps) {
     <div className="space-y-2">
       <label htmlFor="category" className="text-sm font-medium">Category</label>
       {showNewCategory ? (
-        <div className="flex gap-2 bg-white">
-          <Input
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            placeholder="Enter new category"
-          />
-          <Button 
-            type="button" 
-            onClick={handleNewCategorySubmit}
-            className="shrink-0"
-          >
-            Add
-          </Button>
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => setShowNewCategory(false)}
-            className="shrink-0"
-          >
-            Cancel
-          </Button>
-        </div>
+        <NewCategoryForm
+          value={newCategory}
+          onChange={setNewCategory}
+          onSubmit={handleNewCategorySubmit}
+          onCancel={() => setShowNewCategory(false)}
+        />
       ) : (
         <div className="flex gap-2 bg-white">
-          <Select 
-            className="bg-white"
-            value={value} 
+          <CategoryDropdown
+            value={value}
+            categories={categories || []}
             onValueChange={handleCategoryChange}
-          >
-            <SelectTrigger className="w-full bg-white">
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              {categories?.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-              <SelectItem value="new">
-                <span className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add new category
-                </span>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          />
         </div>
       )}
     </div>
