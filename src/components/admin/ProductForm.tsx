@@ -28,6 +28,12 @@ export function ProductForm({ onClose }: ProductFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const generateSKU = (name: string): string => {
+    const timestamp = Date.now().toString().slice(-4);
+    const namePrefix = name.slice(0, 3).toUpperCase();
+    return `${namePrefix}-${timestamp}`;
+  };
+
   const validateForm = (): boolean => {
     if (!formData.name || formData.name.trim() === "") {
       toast({
@@ -69,7 +75,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
         stock: formData.stock || 0,
         category: formData.category || "",
         image_url: formData.image_url,
-        sku: formData.sku || "",
+        sku: formData.sku?.trim() || generateSKU(formData.name),
       };
 
       console.log('Creating product with data:', productData);
@@ -79,7 +85,12 @@ export function ProductForm({ onClose }: ProductFormProps) {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505' && error.message.includes('products_sku_key')) {
+          throw new Error("A product with this SKU already exists. Please use a different SKU.");
+        }
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -90,11 +101,11 @@ export function ProductForm({ onClose }: ProductFormProps) {
       });
       onClose();
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error("Error creating product:", error);
       toast({
         title: "Error",
-        description: "Failed to create product. Please try again.",
+        description: error.message || "Failed to create product. Please try again.",
         variant: "destructive",
       });
     },
