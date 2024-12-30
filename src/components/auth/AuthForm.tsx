@@ -19,7 +19,7 @@ export const AuthForm = () => {
               borderRadius: '4px',
               transition: 'opacity 0.2s ease',
               opacity: '1',
-              ':hover': {
+              '&:hover': {
                 opacity: '0.9'
               }
             },
@@ -27,7 +27,7 @@ export const AuthForm = () => {
               color: '#1d8757',
               transition: 'opacity 0.2s ease',
               opacity: '1',
-              ':hover': {
+              '&:hover': {
                 opacity: '0.8'
               }
             },
