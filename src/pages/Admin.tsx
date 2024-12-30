@@ -16,8 +16,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (!isLoading && !adminStatus?.isAdmin) {
-      console.log("Access denied - not an admin");
-      navigate("/");
+      // navigate("/");
       toast({
         title: "Access Denied",
         description: "You don't have permission to access this page",
@@ -31,7 +30,7 @@ export default function Admin() {
   }
 
   if (!adminStatus?.isAdmin) {
-    return null;
+    return <>?</>;
   }
 
   return (
