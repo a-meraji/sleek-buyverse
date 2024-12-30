@@ -1,24 +1,15 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, LogOut, Search, X, Menu } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ShoppingCart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { SearchBar } from "./navbar/SearchBar";
+import { NavigationMenu } from "./navbar/NavigationMenu";
+import { AuthButtons } from "./navbar/AuthButtons";
 
 export const Navbar = () => {
   const [user, setUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -36,35 +27,6 @@ export const Navbar = () => {
     };
   }, []);
 
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Error signing out:", error);
-      toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    console.log("User signed out successfully");
-    setUser(null);
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
-    });
-    navigate("/");
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setIsSearchExpanded(false);
-    }
-  };
-
   return (
     <nav className="border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -72,65 +34,14 @@ export const Navbar = () => {
           <Link to="/" className="text-xl font-semibold">
             Store
           </Link>
-          <form 
-            onSubmit={handleSearch} 
-            className={`${
-              isSearchExpanded ? 'fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4' : 'hidden md:flex'
-            } items-center gap-2`}
-          >
-            <Input
-              type="search"
-              placeholder="Search products..."
-              className={`${isSearchExpanded ? 'w-full max-w-md' : 'w-[300px]'}`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {isSearchExpanded && (
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setIsSearchExpanded(false)}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            )}
-            <Button type="submit" variant="ghost" size="icon">
-              <Search className="h-5 w-5" />
-            </Button>
-          </form>
+          <SearchBar 
+            isExpanded={isSearchExpanded}
+            setIsExpanded={setIsSearchExpanded}
+          />
         </div>
         
         <div className="flex items-center gap-4">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Navigation</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4 flex flex-col gap-2">
-                <Link to="/" className="p-2 hover:bg-accent rounded-md">
-                  Home
-                </Link>
-                <Link to="/products" className="p-2 hover:bg-accent rounded-md">
-                  Products
-                </Link>
-                <Link to="/cart" className="p-2 hover:bg-accent rounded-md">
-                  Cart
-                </Link>
-                <Link to="/about" className="p-2 hover:bg-accent rounded-md">
-                  About
-                </Link>
-                <Link to="/about" className="p-2 hover:bg-accent rounded-md">
-                  Admin Dashboard
-                </Link>
-              </div>
-            </SheetContent>
-          </Sheet>
+          <NavigationMenu />
           
           <Button 
             variant="ghost" 
@@ -146,16 +57,7 @@ export const Navbar = () => {
             </Button>
           </Link>
           
-          {user ? (
-            <Button variant="outline" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </Button>
-          ) : (
-            <Link to="/auth">
-              <Button variant="outline">Sign In</Button>
-            </Link>
-          )}
+          <AuthButtons user={user} setUser={setUser} />
         </div>
       </div>
     </nav>
