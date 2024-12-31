@@ -28,5 +28,4 @@ export interface CartContextType {
   addToCart: (userId: string | null, item: Omit<CartItem, 'id'>) => Promise<void>;
   updateQuantity: (userId: string | null, id: string, quantity: number) => Promise<void>;
   removeItem: (userId: string | null, id: string) => Promise<void>;
-  loadCartItems: () => Promise<void>;
 }

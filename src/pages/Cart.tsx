@@ -6,34 +6,44 @@ import { supabase } from "@/integrations/supabase/client";
 import { CartItem } from "@/components/cart/CartItem";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { EmptyCart } from "@/components/cart/EmptyCart";
+import { useQuery } from "@tanstack/react-query";
 
 const Cart = () => {
-  const { state: { items, isLoading }, updateQuantity, removeItem, loadCartItems } = useCart();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const { state: { items }, updateQuantity, removeItem } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Memoize auth check to prevent unnecessary re-renders
-  const checkAuth = useCallback(async () => {
-    try {
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      console.log("Cart - Auth check:", session?.user?.id || "Not authenticated");
-      setIsAuthenticated(!!session);
-      setUserId(session?.user?.id || null);
-    } catch (error) {
-      console.error("Cart - Auth check error:", error);
-    }
-  }, []);
+      return session;
+    },
+  });
+
+  const { data: cartItems, isLoading } = useQuery({
+    queryKey: ['cart', session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user?.id) return [];
+      console.log("Fetching cart items for user:", session.user.id);
+      const { data, error } = await supabase
+        .from('cart_items')
+        .select(`
+          *,
+          product:products(*)
+        `)
+        .eq('user_id', session.user.id);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!session?.user?.id,
+  });
 
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  useEffect(() => {
-    console.log("Cart - Loading items, isAuthenticated:", isAuthenticated);
-    if (isAuthenticated) {
-      loadCartItems();
+    if (session?.user?.id) {
+      setUserId(session.user.id);
     }
-  }, [isAuthenticated, loadCartItems]);
+  }, [session?.user?.id]);
 
   const handleQuantityChange = async (id: string, currentQuantity: number, delta: number) => {
     const newQuantity = currentQuantity + delta;
@@ -45,7 +55,7 @@ const Cart = () => {
     await removeItem(userId, id);
   };
 
-  const total = items?.reduce((sum, item) => {
+  const total = cartItems?.reduce((sum, item) => {
     return sum + (item.product?.price ?? 0) * item.quantity;
   }, 0) ?? 0;
 
@@ -70,10 +80,10 @@ const Cart = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
-            {items?.length === 0 ? (
+            {!cartItems?.length ? (
               <EmptyCart />
             ) : (
-              items?.map((item) => (
+              cartItems.map((item) => (
                 <CartItem
                   key={item.id}
                   item={item}
@@ -88,8 +98,8 @@ const Cart = () => {
           <div className="lg:col-span-1">
             <CartSummary
               total={total}
-              isAuthenticated={isAuthenticated}
-              itemsExist={items?.length > 0}
+              isAuthenticated={!!session}
+              itemsExist={!!cartItems?.length}
             />
           </div>
         </div>
