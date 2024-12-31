@@ -31,7 +31,9 @@ export const AdminChat = () => {
         />
       </div>
 
-      <div className="col-span-8 relative">
+      <div className="relative">
+      
+      <div className="col-span-8 overflow-auto">
         <Card className="h-full flex flex-col">
           <CardHeader className="flex-none">
             <CardTitle>Customer Service Chat</CardTitle>
@@ -45,6 +47,7 @@ export const AdminChat = () => {
             </div>
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );
