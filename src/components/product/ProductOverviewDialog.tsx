@@ -31,7 +31,7 @@ export function ProductOverviewDialog({
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
 
-  const { data: variants, isLoading: isLoadingVariants } = useQuery({
+  const { data: variants, isLoading: isLoadingVariants, error } = useQuery({
     queryKey: ['product-variants', productId],
     queryFn: async () => {
       console.log('Fetching variants for product:', productId);
@@ -46,9 +46,9 @@ export function ProductOverviewDialog({
       }
 
       console.log('Variants fetched:', data);
-      return data;
+      return data || []; // Ensure we always return an array
     },
-    enabled: isOpen, // Only fetch when dialog is open
+    enabled: isOpen && !!productId, // Only fetch when dialog is open and we have a productId
   });
 
   // Reset selections when dialog opens
@@ -83,6 +83,8 @@ export function ProductOverviewDialog({
             
             {isLoadingVariants ? (
               <p className="text-sm text-gray-500">Loading variants...</p>
+            ) : error ? (
+              <p className="text-sm text-red-500">Error loading variants. Please try again.</p>
             ) : variants && variants.length > 0 ? (
               <>
                 <VariantSelector
@@ -105,7 +107,7 @@ export function ProductOverviewDialog({
                 )}
               </>
             ) : (
-              <p className="text-sm text-gray-500">No variants available</p>
+              <p className="text-sm text-gray-500">No variants available for this product</p>
             )}
 
             <AddToCartButton 
