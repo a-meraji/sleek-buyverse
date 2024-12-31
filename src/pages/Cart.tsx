@@ -27,7 +27,6 @@ const Cart = () => {
     queryKey: ['cart', session?.user?.id],
     queryFn: async () => {
       if (!session?.user?.id) {
-        // For unauthenticated users, get items from context state
         console.log("Using local cart items from context:", state.items);
         return state.items;
       }
@@ -44,7 +43,7 @@ const Cart = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: true, // Always enabled to handle both authenticated and unauthenticated cases
+    enabled: true,
   });
 
   useEffect(() => {
@@ -59,7 +58,14 @@ const Cart = () => {
     
     try {
       await updateQuantity(userId, id, newQuantity);
-      await queryClient.invalidateQueries({ queryKey: ['cart', session?.user?.id] });
+      // Force refetch for authenticated users
+      if (session?.user?.id) {
+        await queryClient.invalidateQueries({ queryKey: ['cart', session.user.id] });
+      } else {
+        // For unauthenticated users, immediately update the UI using the cart context state
+        queryClient.setQueryData(['cart', null], state.items);
+      }
+      
       toast({
         title: "Cart updated",
         description: "Item quantity has been updated",
@@ -77,7 +83,14 @@ const Cart = () => {
   const handleRemoveItem = async (id: string) => {
     try {
       await removeItem(userId, id);
-      await queryClient.invalidateQueries({ queryKey: ['cart', session?.user?.id] });
+      // Force refetch for authenticated users
+      if (session?.user?.id) {
+        await queryClient.invalidateQueries({ queryKey: ['cart', session.user.id] });
+      } else {
+        // For unauthenticated users, immediately update the UI using the cart context state
+        queryClient.setQueryData(['cart', null], state.items);
+      }
+      
       toast({
         title: "Item removed",
         description: "Item has been removed from cart",
