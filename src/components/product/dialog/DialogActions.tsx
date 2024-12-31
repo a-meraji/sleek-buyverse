@@ -1,11 +1,13 @@
-import { AddToCartButton } from "../AddToCartButton";
+import { AddToCartButton } from "@/components/product/AddToCartButton";
+import { ProductVariant } from "@/types";
 
 interface DialogActionsProps {
   productId: string;
   userId: string | null;
   selectedSize: string;
   productName: string;
-  disabled: boolean;
+  disabled?: boolean;
+  variants?: ProductVariant[];
 }
 
 export function DialogActions({
@@ -13,7 +15,8 @@ export function DialogActions({
   userId,
   selectedSize,
   productName,
-  disabled
+  disabled,
+  variants
 }: DialogActionsProps) {
   return (
     <div className="mt-4">
@@ -23,6 +26,7 @@ export function DialogActions({
         selectedSize={selectedSize}
         productName={productName}
         disabled={disabled}
+        variants={variants}
       />
     </div>
   );

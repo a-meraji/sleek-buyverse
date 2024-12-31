@@ -36,6 +36,8 @@ export function ProductCard({ id, name, image, product_variants }: ProductCardPr
     };
   }, []);
 
+  console.log('ProductCard variants:', product_variants);
+
   return (
     <div className="group relative rounded-lg border p-4 hover:shadow-lg transition-shadow">
       <Link to={`/product/${id}`} className="block">

@@ -4,7 +4,7 @@ import { ProductImage } from "./dialog/ProductImage";
 import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelectionPanel } from "./dialog/VariantSelectionPanel";
 import { DialogActions } from "./dialog/DialogActions";
-import { ProductVariant } from "@/types/variant";
+import { ProductVariant } from "@/types";
 import { useState } from "react";
 
 interface ProductOverviewDialogProps {
@@ -28,6 +28,9 @@ export function ProductOverviewDialog({
 }: ProductOverviewDialogProps) {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+
+  console.log('ProductOverviewDialog variants:', variants);
+  console.log('Selected size:', selectedSize);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -54,6 +57,7 @@ export function ProductOverviewDialog({
               selectedSize={selectedSize}
               productName={productName}
               disabled={!selectedSize || !selectedColor}
+              variants={variants}
             />
           </div>
         </ScrollArea>
