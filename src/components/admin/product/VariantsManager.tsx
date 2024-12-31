@@ -10,13 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ProductVariant } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { VariantPriceField } from "./VariantPriceField";
 
 interface VariantsManagerProps {
   variants: ProductVariant[];
@@ -28,6 +29,7 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
   const [newSize, setNewSize] = useState("");
   const [newColor, setNewColor] = useState("");
   const [newStock, setNewStock] = useState(0);
+  const [newPrice, setNewPrice] = useState(0);
 
   const handleAddVariant = () => {
     if (!newSize || !newColor) return;
@@ -44,27 +46,29 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
     }
 
     const newVariant: ProductVariant = {
-      id: `temp-${Date.now()}`, // Will be replaced with real ID from database
+      id: `temp-${Date.now()}`,
       product_id: productId || "",
       size: newSize,
       color: newColor,
-      stock: newStock
+      stock: newStock,
+      price: newPrice
     };
 
     onChange([...variants, newVariant]);
     setNewSize("");
     setNewColor("");
     setNewStock(0);
+    setNewPrice(0);
   };
 
   const handleRemoveVariant = (variantToRemove: ProductVariant) => {
     onChange(variants.filter(v => v.id !== variantToRemove.id));
   };
 
-  const handleUpdateStock = (variantId: string, newStock: number) => {
+  const handleUpdateVariant = (variantId: string, updates: Partial<ProductVariant>) => {
     onChange(
       variants.map(v => 
-        v.id === variantId ? { ...v, stock: newStock } : v
+        v.id === variantId ? { ...v, ...updates } : v
       )
     );
   };
@@ -74,7 +78,7 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-medium">Product Variants</h3>
         
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-5 gap-4">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -113,6 +117,15 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
             onChange={(e) => setNewStock(Number(e.target.value))}
           />
 
+          <Input
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Price"
+            value={newPrice}
+            onChange={(e) => setNewPrice(Number(e.target.value))}
+          />
+
           <Button type="button" onClick={handleAddVariant}>
             <Plus className="h-4 w-4 mr-2" />
             Add Variant
@@ -126,6 +139,7 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
             <TableHead>Size</TableHead>
             <TableHead>Color</TableHead>
             <TableHead>Stock</TableHead>
+            <TableHead>Price</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -139,7 +153,17 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
                   type="number"
                   min="0"
                   value={variant.stock}
-                  onChange={(e) => handleUpdateStock(variant.id, Number(e.target.value))}
+                  onChange={(e) => handleUpdateVariant(variant.id, { stock: Number(e.target.value) })}
+                  className="w-24"
+                />
+              </TableCell>
+              <TableCell>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={variant.price}
+                  onChange={(e) => handleUpdateVariant(variant.id, { price: Number(e.target.value) })}
                   className="w-24"
                 />
               </TableCell>

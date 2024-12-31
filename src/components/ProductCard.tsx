@@ -3,19 +3,23 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductOverviewDialog } from "./product/ProductOverviewDialog";
-import { ProductVariant } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 
 interface ProductCardProps {
   id: string;
   name: string;
-  price: number;
   image: string;
   variants?: ProductVariant[];
 }
 
-export function ProductCard({ id, name, price, image, variants }: ProductCardProps) {
+export function ProductCard({ id, name, image, variants }: ProductCardProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Calculate the minimum price from variants
+  const minPrice = variants?.length 
+    ? Math.min(...variants.map(v => v.price))
+    : 0;
 
   useEffect(() => {
     // Get initial session
@@ -46,7 +50,13 @@ export function ProductCard({ id, name, price, image, variants }: ProductCardPro
         </div>
         <div className="mt-4">
           <h3 className="text-lg font-medium">{name}</h3>
-          <p className="mt-1 text-sm text-gray-500">${price.toFixed(2)}</p>
+          <p className="mt-1 text-sm text-gray-500">
+            {variants?.length ? (
+              <>From ${minPrice.toFixed(2)}</>
+            ) : (
+              "Price not available"
+            )}
+          </p>
         </div>
       </Link>
       <div className="mt-4">
@@ -64,7 +74,6 @@ export function ProductCard({ id, name, price, image, variants }: ProductCardPro
         productId={id}
         productName={name}
         productImage={image}
-        productPrice={price}
         userId={userId}
         variants={variants}
       />

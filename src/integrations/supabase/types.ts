@@ -204,6 +204,7 @@ export type Database = {
           color: string
           created_at: string
           id: string
+          price: number
           product_id: string
           size: string
           stock: number
@@ -212,6 +213,7 @@ export type Database = {
           color: string
           created_at?: string
           id?: string
+          price?: number
           product_id: string
           size: string
           stock?: number
@@ -220,6 +222,7 @@ export type Database = {
           color?: string
           created_at?: string
           id?: string
+          price?: number
           product_id?: string
           size?: string
           stock?: number
@@ -242,7 +245,6 @@ export type Database = {
           id: string
           image_url: string
           name: string
-          price: number
           sku: string | null
         }
         Insert: {
@@ -252,7 +254,6 @@ export type Database = {
           id?: string
           image_url: string
           name: string
-          price: number
           sku?: string | null
         }
         Update: {
@@ -262,7 +263,6 @@ export type Database = {
           id?: string
           image_url?: string
           name?: string
-          price?: number
           sku?: string | null
         }
         Relationships: []
