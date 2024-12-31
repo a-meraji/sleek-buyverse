@@ -33,33 +33,59 @@ export function ProductOverviewDialog({
 
   console.log('ProductOverviewDialog render - productId:', productId, 'isOpen:', isOpen);
 
+  // Debug query configuration
+  console.log('Query configuration:', {
+    isEnabled: isOpen && !!productId,
+    productId: productId
+  });
+
   const { data: variants, isLoading: isLoadingVariants, error, refetch } = useQuery({
     queryKey: ['product-variants', productId],
     queryFn: async () => {
-      console.log('Fetching variants for product:', productId);
-      const { data, error } = await supabase
-        .from('product_variants')
-        .select('*')
-        .eq('product_id', productId);
-
-      if (error) {
-        console.error('Error fetching variants:', error);
-        throw error;
-      }
-
-      console.log('Raw variants response:', data); // Added to see exact response
-      console.log('Number of variants found:', data?.length || 0); // Added to check array length
+      console.log('Starting variant fetch for product:', productId);
       
-      if (!data || data.length === 0) {
-        console.log('No variants found for product:', productId);
-      }
+      try {
+        const { data, error } = await supabase
+          .from('product_variants')
+          .select('*')
+          .eq('product_id', productId);
 
-      return data || []; // Ensure we always return an array
+        if (error) {
+          console.error('Supabase error fetching variants:', error);
+          throw error;
+        }
+
+        console.log('Supabase response:', {
+          success: !error,
+          dataReceived: !!data,
+          variantsCount: data?.length || 0,
+          rawData: data
+        });
+
+        if (!data || data.length === 0) {
+          console.log('No variants found in database for product:', productId);
+          return [];
+        }
+
+        return data;
+      } catch (err) {
+        console.error('Error in queryFn:', err);
+        throw err;
+      }
     },
     enabled: isOpen && !!productId,
     retry: 2,
     staleTime: 1000 * 60 * 5,
   });
+
+  // Debug variants state after query
+  useEffect(() => {
+    console.log('Variants state updated:', {
+      hasVariants: !!variants && variants.length > 0,
+      variantsCount: variants?.length || 0,
+      variants: variants
+    });
+  }, [variants]);
 
   // Reset selections when dialog opens
   useEffect(() => {
@@ -102,7 +128,7 @@ export function ProductOverviewDialog({
               <p className="text-sm text-gray-500">Loading variants...</p>
             ) : error ? (
               <div>
-                <p className="text-sm text-red-500">Error loading variants. Please try again.</p>
+                <p className="text-sm text-red-500">Error loading variants: {error.message}</p>
                 <button 
                   onClick={() => refetch()} 
                   className="text-sm text-blue-500 hover:underline mt-2"
