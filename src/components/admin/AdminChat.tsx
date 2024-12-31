@@ -31,13 +31,13 @@ export const AdminChat = () => {
         />
       </div>
 
-      <div className="col-span-8 overflow-auto relative">
+      <div className="col-span-8 relative">
         <Card className="h-full flex flex-col">
           <CardHeader className="flex-none">
             <CardTitle>Customer Service Chat</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col p-0">
-            <div className="flex-1 overflow-y-auto px-6">
+            <div className="flex-1 px-6 overflow-auto">
               <MessageList sessionId={selectedSession} />
             </div>
             <div className="flex-none p-6 pt-4 border-t bg-background absolute left-0 bottom-0 right-0 ">
