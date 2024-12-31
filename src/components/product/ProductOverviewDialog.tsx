@@ -47,12 +47,18 @@ export function ProductOverviewDialog({
         throw error;
       }
 
-      console.log('Variants fetched:', data);
+      console.log('Raw variants response:', data); // Added to see exact response
+      console.log('Number of variants found:', data?.length || 0); // Added to check array length
+      
+      if (!data || data.length === 0) {
+        console.log('No variants found for product:', productId);
+      }
+
       return data || []; // Ensure we always return an array
     },
-    enabled: isOpen && !!productId, // Only fetch when dialog is open and we have a productId
-    retry: 2, // Retry failed requests up to 2 times
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    enabled: isOpen && !!productId,
+    retry: 2,
+    staleTime: 1000 * 60 * 5,
   });
 
   // Reset selections when dialog opens
@@ -126,7 +132,10 @@ export function ProductOverviewDialog({
                 )}
               </>
             ) : (
-              <p className="text-sm text-gray-500">No variants available for this product (ID: {productId})</p>
+              <p className="text-sm text-gray-500">
+                No variants found in database for product ID: {productId}. 
+                This might mean the product hasn't been configured with size and color options yet.
+              </p>
             )}
 
             <AddToCartButton 
