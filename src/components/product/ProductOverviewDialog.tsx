@@ -9,7 +9,7 @@ import { ProductImage } from "./dialog/ProductImage";
 import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelector } from "./dialog/VariantSelector";
 import { Badge } from "@/components/ui/badge";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/cart/CartContext";
 
 interface ProductOverviewDialogProps {
   isOpen: boolean;
