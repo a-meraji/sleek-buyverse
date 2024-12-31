@@ -18,14 +18,17 @@ export function useProductUpdate() {
         .from("products")
         .update({
           name: formData.name,
-          description: formData.description,
-          category: formData.category,
+          description: formData.description || "",
+          category: formData.category || "",
           image_url: formData.image_url,
-          sku: formData.sku,
+          sku: formData.sku || "",
         })
         .eq("id", formData.id);
 
-      if (productError) throw productError;
+      if (productError) {
+        console.error('Error updating product:', productError);
+        throw productError;
+      }
 
       // Then handle variants
       // First, delete all existing variants
@@ -34,22 +37,30 @@ export function useProductUpdate() {
         .delete()
         .eq("product_id", formData.id);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('Error deleting variants:', deleteError);
+        throw deleteError;
+      }
 
       // Then insert all current variants
       const variantsData = variants.map(variant => ({
         product_id: formData.id,
         size: variant.size,
         color: variant.color,
-        stock: variant.stock,
-        price: variant.price
+        stock: variant.stock || 0,
+        price: variant.price || 0
       }));
 
-      const { error: variantsError } = await supabase
-        .from("product_variants")
-        .insert(variantsData);
+      if (variantsData.length > 0) {
+        const { error: variantsError } = await supabase
+          .from("product_variants")
+          .insert(variantsData);
 
-      if (variantsError) throw variantsError;
+        if (variantsError) {
+          console.error('Error inserting variants:', variantsError);
+          throw variantsError;
+        }
+      }
     },
     onSuccess: (_, { formData }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
@@ -63,7 +74,7 @@ export function useProductUpdate() {
       console.error("Error updating product:", error);
       toast({
         title: "Error",
-        description: "Failed to update product. Please try again.",
+        description: error.message || "Failed to update product. Please try again.",
         variant: "destructive",
       });
     },
