@@ -23,7 +23,7 @@ export const AdminChat = () => {
   }
 
   return (
-    <div className="grid grid-cols-12 gap-4 h-[calc(100vh-16rem)]">
+    <div className="grid grid-cols-12 gap-4 h-[calc(100vh-12rem)]">
       <div className="col-span-4 overflow-hidden">
         <SessionList
           selectedSession={selectedSession}
@@ -36,7 +36,7 @@ export const AdminChat = () => {
           <CardHeader className="flex-none">
             <CardTitle>Customer Service Chat</CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col p-0 ">
+          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
             <div className="flex-1 overflow-y-auto px-6 h-[calc(100vh-21rem)]">
               <MessageList sessionId={selectedSession} />
             </div>
