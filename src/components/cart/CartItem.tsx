@@ -11,8 +11,17 @@ interface CartItemProps {
 }
 
 export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemProps) => {
+  // Get the first variant's price or default to 0
   const variantPrice = item.product?.product_variants?.[0]?.price ?? 0;
   const subtotal = variantPrice * item.quantity;
+
+  console.log('Rendering cart item:', {
+    itemId: item.id,
+    productName: item.product?.name,
+    variantPrice,
+    quantity: item.quantity,
+    subtotal
+  });
 
   return (
     <div className="flex gap-6 p-4 bg-secondary rounded-lg">

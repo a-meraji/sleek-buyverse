@@ -7,6 +7,8 @@ interface CartSummaryProps {
 }
 
 export const CartSummary = ({ total, isAuthenticated, itemsExist }: CartSummaryProps) => {
+  console.log('Rendering cart summary with total:', total);
+  
   return (
     <div className="bg-secondary p-6 rounded-lg space-y-4">
       <h2 className="text-xl font-semibold">Order Summary</h2>

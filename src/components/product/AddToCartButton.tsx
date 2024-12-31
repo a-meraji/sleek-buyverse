@@ -35,6 +35,12 @@ export const AddToCartButton = ({
         return;
       }
 
+      console.log('Adding to cart:', {
+        productId,
+        selectedSize,
+        userId
+      });
+
       await addToCart(userId, {
         product_id: productId,
         quantity: 1,
@@ -55,6 +61,7 @@ export const AddToCartButton = ({
         return;
       }
       
+      console.error('Error adding to cart:', error);
       toast({
         title: "Error",
         description: "Failed to add item to cart. Please try again.",

@@ -34,6 +34,12 @@ const Cart = () => {
     return sum + (variantPrice * item.quantity);
   }, 0) ?? 0;
 
+  console.log('Cart page render:', {
+    isAuthenticated: !!session?.user?.id,
+    cartItemsCount: cartItems?.length,
+    total
+  });
+
   if (isSessionLoading || isLoading) {
     return (
       <div className="min-h-screen bg-background">
