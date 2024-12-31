@@ -13,15 +13,17 @@ export const useCartSync = (
     const syncCart = async () => {
       try {
         const { data: session } = await supabase.auth.getSession();
+        console.log('Syncing cart for session:', session?.session?.user?.id);
         
-        // Handle unauthenticated users
         if (!session.session) {
+          // Handle unauthenticated users
           console.log('Syncing local cart for unauthenticated user');
           const localCart = localStorage.getItem('cart');
           if (localCart) {
             const parsedCart = JSON.parse(localCart);
             // Fetch product details for local cart items
             const productIds = parsedCart.map((item: CartItem) => item.product_id);
+            
             if (productIds.length > 0) {
               const { data: products } = await supabase
                 .from('products')
@@ -38,6 +40,8 @@ export const useCartSync = (
             } else {
               dispatch({ type: 'SET_ITEMS', payload: parsedCart });
             }
+          } else {
+            dispatch({ type: 'SET_ITEMS', payload: [] });
           }
           return;
         }
@@ -52,7 +56,7 @@ export const useCartSync = (
           `);
 
         if (error) throw error;
-        dispatch({ type: 'SET_ITEMS', payload: cartData });
+        dispatch({ type: 'SET_ITEMS', payload: cartData || [] });
         console.log('Server cart synced:', cartData);
       } catch (error) {
         console.error('Error syncing cart:', error);
@@ -69,7 +73,13 @@ export const useCartSync = (
 
   // Save to localStorage whenever items change
   useEffect(() => {
-    console.log('Saving cart to localStorage:', items);
-    localStorage.setItem('cart', JSON.stringify(items));
+    const { data: { session } } = supabase.auth.getSession();
+    
+    // Only save to localStorage for unauthenticated users
+    if (!session) {
+      const localItems = items.filter(item => item.id.startsWith('local-'));
+      console.log('Saving local cart to localStorage:', localItems);
+      localStorage.setItem('cart', JSON.stringify(localItems));
+    }
   }, [items]);
 };
