@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/ProductCard";
-import { Product } from "@/types/product";
+import { Product } from "@/types";
 
 interface ProductCarouselProps {
   title: string;
@@ -44,7 +44,7 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
                           id={product.id}
                           name={product.name}
                           image={product.image_url}
-                          variants={product.product_variants}
+                          product_variants={product.product_variants}
                         />
                       </CardContent>
                     </Card>
