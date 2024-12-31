@@ -24,7 +24,10 @@ const Products = () => {
       
       let query = supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          product_variants (*)
+        `)
         .gte('price', priceRange[0])
         .lte('price', priceRange[1])
         .order('price', { ascending: sortOrder === 'asc' });

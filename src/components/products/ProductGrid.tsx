@@ -1,11 +1,5 @@
 import { ProductCard } from "@/components/ProductCard";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  image_url: string;
-}
+import { Product } from "@/types";
 
 interface ProductGridProps {
   products: Product[] | null | undefined;
@@ -21,6 +15,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
           name={product.name}
           price={Number(product.price)}
           image={product.image_url}
+          variants={product.product_variants}
         />
       ))}
     </div>
