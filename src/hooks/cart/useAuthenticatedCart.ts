@@ -25,7 +25,7 @@ export const useAuthenticatedCart = (userId: string) => {
     },
     enabled: !!userId,
     staleTime: 0, // Always fetch fresh data
-    cacheTime: 0, // Don't cache the results
+    gcTime: 0 // Don't cache the results
   });
 
   const updateQuantity = async (itemId: string, quantity: number) => {

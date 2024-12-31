@@ -17,7 +17,7 @@ const Cart = () => {
       return session;
     },
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0
   });
 
   // Use the appropriate cart hook based on authentication status
@@ -33,7 +33,7 @@ const Cart = () => {
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
   const total = cartItems?.reduce((sum, item) => {
-    return sum + (item.product?.price ?? 0) * item.quantity;
+    return sum + ((item.product?.price ?? 0) * item.quantity);
   }, 0) ?? 0;
 
   if (isSessionLoading || isLoading) {
