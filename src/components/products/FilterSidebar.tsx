@@ -3,30 +3,32 @@ import { CategoryFilter } from "./filters/CategoryFilter";
 import { Dispatch, SetStateAction } from "react";
 
 interface FilterSidebarProps {
-  priceRange: number[];
+  priceRange: [number, number];
   setPriceRange: Dispatch<SetStateAction<[number, number]>>;
-  selectedCategory: string | null;
-  setSelectedCategory: (category: string | null) => void;
-  categories: string[] | undefined;
+  selectedCategories: string[];
+  setSelectedCategories: (categories: string[]) => void;
+  categories?: string[];
+  className?: string;
 }
 
 export const FilterSidebar = ({
   priceRange,
   setPriceRange,
-  selectedCategory,
-  setSelectedCategory,
+  selectedCategories,
+  setSelectedCategories,
   categories,
+  className,
 }: FilterSidebarProps) => {
   return (
-    <form className="hidden lg:block">
+    <form className={`hidden lg:block ${className}`}>
       <div className="space-y-6">
         <PriceRangeFilter 
           priceRange={priceRange}
           setPriceRange={setPriceRange}
         />
         <CategoryFilter
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
+          selectedCategories={selectedCategories}
+          setSelectedCategories={setSelectedCategories}
           categories={categories}
         />
       </div>

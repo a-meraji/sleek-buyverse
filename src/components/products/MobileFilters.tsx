@@ -7,11 +7,11 @@ import { Dispatch, SetStateAction } from "react";
 interface MobileFiltersProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  priceRange: number[];
+  priceRange: [number, number];
   setPriceRange: Dispatch<SetStateAction<[number, number]>>;
-  selectedCategory: string | null;
-  setSelectedCategory: (category: string | null) => void;
-  categories: string[] | undefined;
+  selectedCategories: string[];
+  setSelectedCategories: (categories: string[]) => void;
+  categories?: string[];
 }
 
 export const MobileFilters = ({
@@ -19,8 +19,8 @@ export const MobileFilters = ({
   setOpen,
   priceRange,
   setPriceRange,
-  selectedCategory,
-  setSelectedCategory,
+  selectedCategories,
+  setSelectedCategories,
   categories,
 }: MobileFiltersProps) => {
   return (
@@ -48,8 +48,8 @@ export const MobileFilters = ({
               isMobile
             />
             <CategoryFilter
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
               categories={categories}
               isMobile
             />

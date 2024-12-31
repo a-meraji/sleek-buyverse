@@ -1,12 +1,20 @@
 import { Menu } from "@headlessui/react";
 import { ChevronDown, Filter, Grid } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 
 interface ProductsHeaderProps {
   setSortOrder: (order: 'asc' | 'desc') => void;
   setMobileFiltersOpen: (open: boolean) => void;
+  searchQuery: string;
+  setSearchQuery: Dispatch<SetStateAction<string>>;
 }
 
-export const ProductsHeader = ({ setSortOrder, setMobileFiltersOpen }: ProductsHeaderProps) => {
+export const ProductsHeader = ({ 
+  setSortOrder, 
+  setMobileFiltersOpen,
+  searchQuery,
+  setSearchQuery 
+}: ProductsHeaderProps) => {
   const sortOptions = [
     { name: "Price: Low to High", value: "asc" },
     { name: "Price: High to Low", value: "desc" },

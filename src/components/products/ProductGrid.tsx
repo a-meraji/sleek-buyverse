@@ -3,9 +3,19 @@ import { Product } from "@/types";
 
 interface ProductGridProps {
   products: Product[] | null | undefined;
+  isLoading: boolean;
+  error: Error | null;
 }
 
-export const ProductGrid = ({ products }: ProductGridProps) => {
+export const ProductGrid = ({ products, isLoading, error }: ProductGridProps) => {
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {products?.map((product) => (
