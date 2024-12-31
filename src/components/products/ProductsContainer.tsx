@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ProductGrid } from "./ProductGrid";
 import { FilterSidebar } from "./FilterSidebar";
 import { MobileFilters } from "./MobileFilters";
@@ -10,6 +11,7 @@ import { useFilters } from "./hooks/useFilters";
 export const ProductsContainer = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const navigate = useNavigate();
   
   const {
     products,
@@ -22,14 +24,13 @@ export const ProductsContainer = () => {
     searchQuery,
     selectedCategories,
     priceRange,
-    setSearchQuery,
     setSelectedCategories,
     setPriceRange,
     filteredProducts
   } = useFilters(products);
 
   const handleClearFilters = () => {
-    setSearchQuery("");
+    navigate('/products');
     setSelectedCategories([]);
     setPriceRange([0, 1000]);
   };
@@ -42,7 +43,6 @@ export const ProductsContainer = () => {
     <div className="container mx-auto px-4 py-8">
       <ProductsHeader 
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
         setSortOrder={setSortOrder}
         setMobileFiltersOpen={setMobileFiltersOpen}
       />

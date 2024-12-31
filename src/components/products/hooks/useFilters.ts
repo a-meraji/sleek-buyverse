@@ -1,14 +1,17 @@
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export const useFilters = (products: any[] = []) => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const urlSearchQuery = searchParams.get('search') || '';
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 
   const filteredProducts = useMemo(() => {
     return products?.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = urlSearchQuery ? 
+        (product.name.toLowerCase().includes(urlSearchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(urlSearchQuery.toLowerCase())) : true;
       
       const matchesCategory = selectedCategories.length === 0 || 
         selectedCategories.includes(product.category);
@@ -18,13 +21,12 @@ export const useFilters = (products: any[] = []) => {
 
       return matchesSearch && matchesCategory && matchesPrice;
     }) || [];
-  }, [products, searchQuery, selectedCategories, priceRange]);
+  }, [products, urlSearchQuery, selectedCategories, priceRange]);
 
   return {
-    searchQuery,
+    searchQuery: urlSearchQuery,
     selectedCategories,
     priceRange,
-    setSearchQuery,
     setSelectedCategories,
     setPriceRange,
     filteredProducts
