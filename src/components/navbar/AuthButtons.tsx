@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +10,6 @@ interface AuthButtonsProps {
 }
 
 export const AuthButtons = ({ user, setUser }: AuthButtonsProps) => {
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -29,7 +28,7 @@ export const AuthButtons = ({ user, setUser }: AuthButtonsProps) => {
       }
       
       // Clear local storage
-      localStorage.removeItem('cart');
+      localStorage.clear();
       
       console.log("User signed out successfully");
       setUser(null);
@@ -38,8 +37,8 @@ export const AuthButtons = ({ user, setUser }: AuthButtonsProps) => {
         description: "You have been successfully signed out.",
       });
       
-      // Force reload to clear all state
-      window.location.href = '/';
+      // Use window.location.replace to prevent history stack issues
+      window.location.replace('/');
     } catch (err) {
       console.error("Unexpected error during sign out:", err);
       toast({
