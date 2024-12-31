@@ -48,18 +48,24 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
   }, [refetch]);
 
   return (
-    <div className="space-y-4">
-      <SessionHeader />
-      <ScrollArea className="h-[calc(100vh-14rem)]">
-        {sessions.map((session) => (
-          <SessionCard
-            key={session.id}
-            session={session}
-            isSelected={selectedSession === session.id}
-            onSelect={onSelectSession}
-          />
-        ))}
-      </ScrollArea>
+    <div className="flex flex-col h-full">
+      <div className="flex-none pb-4">
+        <SessionHeader />
+      </div>
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="pr-4">
+            {sessions.map((session) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                isSelected={selectedSession === session.id}
+                onSelect={onSelectSession}
+              />
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 };

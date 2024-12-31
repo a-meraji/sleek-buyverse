@@ -19,14 +19,12 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
     if (!sessionId || !messages.length) return;
     
     markMessagesAsRead(messages, sessionId).then((updatedMessages) => {
-      // Get the count of remaining unread messages from users
       const unreadCount = updatedMessages.filter(
         msg => !msg.is_read && msg.sender_id !== null
       ).length;
       
       console.log('Updating session with unread count:', unreadCount);
       
-      // Update the sessions cache with new unread count
       queryClient.setQueryData(['chat-sessions'], (oldData: any) => {
         if (!oldData) return oldData;
         return oldData.map((session: any) => {
@@ -67,8 +65,8 @@ export const MessageList = ({ sessionId }: MessageListProps) => {
   }, [sessionId, refetch]);
 
   return (
-    <ScrollArea className="h-full w-full">
-      <div className="space-y-4">
+    <ScrollArea className="h-full pr-4">
+      <div className="space-y-4 min-h-full">
         {messages.map((message) => (
           <Message key={message.id} message={message} />
         ))}
