@@ -12,7 +12,7 @@ import Admin from "./pages/Admin";
 import About from "./pages/About";
 import { ChatButton } from "./components/chat/ChatButton";
 import { Footer } from "./components/home/Footer";
-import { CartProvider } from "./contexts/CartContext";
+import { CartProvider } from "./contexts/cart/CartContext";
 import * as React from 'react';
 
 const queryClient = new QueryClient({
@@ -47,9 +47,9 @@ const App = () => (
               <Footer />
             </div>
             <ChatButton />
+            <Toaster />
+            <Sonner />
           </BrowserRouter>
-          <Toaster />
-          <Sonner />
         </CartProvider>
       </TooltipProvider>
     </QueryClientProvider>
