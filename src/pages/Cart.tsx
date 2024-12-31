@@ -10,7 +10,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
-  const { updateQuantity, removeItem } = useCart();
+  const { state, updateQuantity, removeItem } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -26,7 +26,12 @@ const Cart = () => {
   const { data: cartItems, isLoading } = useQuery({
     queryKey: ['cart', session?.user?.id],
     queryFn: async () => {
-      if (!session?.user?.id) return [];
+      if (!session?.user?.id) {
+        // For unauthenticated users, get items from context state
+        console.log("Using local cart items from context:", state.items);
+        return state.items;
+      }
+      
       console.log("Fetching cart items for user:", session.user.id);
       const { data, error } = await supabase
         .from('cart_items')
@@ -39,7 +44,7 @@ const Cart = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!session?.user?.id,
+    enabled: true, // Always enabled to handle both authenticated and unauthenticated cases
   });
 
   useEffect(() => {
