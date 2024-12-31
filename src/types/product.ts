@@ -1,3 +1,5 @@
+import { ProductVariant } from "./variant";
+
 export interface Product {
   id: string;
   name: string;
@@ -9,5 +11,5 @@ export interface Product {
 }
 
 export interface ProductFormData extends Omit<Product, 'id'> {
-  variants: ProductVariant[];
+  product_variants: ProductVariant[];
 }

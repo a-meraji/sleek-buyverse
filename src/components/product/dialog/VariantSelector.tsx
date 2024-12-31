@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ProductVariant } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 
 interface VariantSelectorProps {
   label: string;

@@ -3,10 +3,10 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductVariant } from "@/types/product";
+import { Product } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 import { ImageSelector } from "./ImageSelector";
 import { ProductDetailsFields } from "./product/ProductDetailsFields";
-import { PriceStockFields } from "./product/PriceStockFields";
 import { CategorySelector } from "./product/CategorySelector";
 import { ImagePreview } from "./product/ImagePreview";
 import { VariantsManager } from "./product/VariantsManager";
@@ -19,7 +19,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
   const [formData, setFormData] = useState<Partial<Product>>({
     name: "",
     description: "",
-    price: 0,
     category: "",
     image_url: "",
     sku: "",
@@ -40,14 +39,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
       toast({
         title: "Validation Error",
         description: "Product name is required",
-        variant: "destructive",
-      });
-      return false;
-    }
-    if (!formData.price || formData.price <= 0) {
-      toast({
-        title: "Validation Error",
-        description: "Price must be greater than 0",
         variant: "destructive",
       });
       return false;
@@ -80,7 +71,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
       const productData = {
         name: formData.name,
         description: formData.description || "",
-        price: formData.price || 0,
         category: formData.category || "",
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
@@ -88,7 +78,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
 
       console.log('Creating product with data:', productData);
       
-      // First, create the product
       const { data: product, error: productError } = await supabase
         .from("products")
         .insert([productData])
@@ -102,12 +91,12 @@ export function ProductForm({ onClose }: ProductFormProps) {
         throw productError;
       }
 
-      // Then, create all variants for this product
       const variantsData = variants.map(variant => ({
         product_id: product.id,
         size: variant.size,
         color: variant.color,
         stock: variant.stock,
+        price: variant.price
       }));
 
       const { error: variantsError } = await supabase
@@ -137,7 +126,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
   });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent form from submitting automatically
+    e.preventDefault();
     createProduct.mutate();
   };
 
@@ -161,11 +150,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
           onNameChange={(value) => handleFormChange({ name: value })}
           onDescriptionChange={(value) => handleFormChange({ description: value })}
           onSkuChange={(value) => handleFormChange({ sku: value })}
-        />
-
-        <PriceStockFields
-          price={formData.price ?? 0}
-          onPriceChange={(value) => handleFormChange({ price: value })}
         />
 
         <CategorySelector

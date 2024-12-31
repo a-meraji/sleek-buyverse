@@ -1,4 +1,4 @@
-import { ProductVariant } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 import { VariantSelector } from "./VariantSelector";
 import { Badge } from "@/components/ui/badge";
 
