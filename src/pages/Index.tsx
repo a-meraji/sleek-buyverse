@@ -9,15 +9,19 @@ import { ProductCarousel } from "@/components/home/ProductCarousel";
 import { StyleShowcase } from "@/components/home/StyleShowcase";
 import { ReviewsScroll } from "@/components/home/ReviewsScroll";
 import { Footer } from "@/components/home/Footer";
+import { Product } from "@/types";
 
 const Index = () => {
-  const { data: products, isLoading, error } = useQuery({
+  const { data: products, isLoading, error } = useQuery<Product[]>({
     queryKey: ['products'],
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          product_variants (*)
+        `)
         .limit(8)
         .order('created_at', { ascending: false });
       
