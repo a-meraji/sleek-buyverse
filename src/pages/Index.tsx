@@ -8,6 +8,7 @@ import HeroBanner from "@/components/home/HeroBanner";
 import { ProductCarousel } from "@/components/home/ProductCarousel";
 import { StyleShowcase } from "@/components/home/StyleShowcase";
 import { ReviewsScroll } from "@/components/home/ReviewsScroll";
+import { Footer } from "@/components/home/Footer";
 
 const Index = () => {
   const { data: products, isLoading, error } = useQuery({
@@ -36,11 +37,12 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4">
+        <main className="flex-1">
           <div className="flex items-center justify-center h-[50vh]">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         </main>
+        <Footer />
       </div>
     );
   }
@@ -49,30 +51,33 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-destructive mb-4">
-              Error loading products
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              Please try refreshing the page
-            </p>
-            <Button 
-              onClick={() => window.location.reload()}
-              variant="outline"
-            >
-              Refresh Page
-            </Button>
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-destructive mb-4">
+                Error loading products
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Please try refreshing the page
+              </p>
+              <Button 
+                onClick={() => window.location.reload()}
+                variant="outline"
+              >
+                Refresh Page
+              </Button>
+            </div>
           </div>
         </main>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main>
+      <main className="flex-1">
         <HeroBanner />
         {products && products.length > 0 ? (
           <>
@@ -95,6 +100,7 @@ const Index = () => {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 };

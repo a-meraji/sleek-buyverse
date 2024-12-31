@@ -14,24 +14,35 @@ export const AuthButtons = ({ user, setUser }: AuthButtonsProps) => {
   const { toast } = useToast();
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Error signing out:", error);
+    try {
+      console.log("Attempting to sign out...");
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Error signing out:", error);
+        toast({
+          title: "Error",
+          description: "Failed to sign out. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      console.log("User signed out successfully");
+      setUser(null);
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+      navigate("/");
+    } catch (err) {
+      console.error("Unexpected error during sign out:", err);
       toast({
         title: "Error",
-        description: "Failed to sign out. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
-      return;
     }
-    
-    console.log("User signed out successfully");
-    setUser(null);
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
-    });
-    navigate("/");
   };
 
   return user ? (
