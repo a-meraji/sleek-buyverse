@@ -23,38 +23,22 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     queryKey: ["product-variants", product?.id],
     queryFn: async () => {
       if (!product?.id) return [];
-      console.log('Fetching variants for product:', product.id);
-      
       const { data, error } = await supabase
         .from("product_variants")
         .select("*")
         .eq("product_id", product.id);
 
-      if (error) {
-        console.error('Error fetching variants:', error);
-        throw error;
-      }
-      
-      console.log('Fetched variants:', data);
-      return data || [];
+      if (error) throw error;
+      return data;
     },
     enabled: !!product?.id,
   });
 
   useEffect(() => {
     if (product) {
-      // Ensure all required fields are present
-      const normalizedProduct = {
-        ...product,
-        description: product.description || "",
-        category: product.category || "",
-        sku: product.sku || "",
-      };
-      console.log('Setting form data:', normalizedProduct);
-      setFormData(normalizedProduct);
+      setFormData(product);
     }
     if (productVariants) {
-      console.log('Setting variants:', productVariants);
       setVariants(productVariants);
     }
   }, [product, productVariants]);
@@ -62,8 +46,6 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
-    console.log('Submitting form with data:', formData);
-    console.log('Submitting variants:', variants);
     updateProduct.mutate({ formData, variants }, {
       onSuccess: () => onClose(),
     });
