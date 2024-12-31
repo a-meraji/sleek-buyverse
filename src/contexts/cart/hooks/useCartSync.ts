@@ -16,7 +16,24 @@ export const useCartSync = (
         if (!session.session) {
           const localCart = localStorage.getItem('cart');
           if (localCart) {
-            dispatch({ type: 'SET_ITEMS', payload: JSON.parse(localCart) });
+            const parsedCart = JSON.parse(localCart);
+            // Fetch product details for local cart items
+            const productIds = parsedCart.map((item: CartItem) => item.product_id);
+            if (productIds.length > 0) {
+              const { data: products } = await supabase
+                .from('products')
+                .select('*')
+                .in('id', productIds);
+              
+              const cartWithProducts = parsedCart.map((item: CartItem) => ({
+                ...item,
+                product: products?.find(p => p.id === item.product_id)
+              }));
+              
+              dispatch({ type: 'SET_ITEMS', payload: cartWithProducts });
+            } else {
+              dispatch({ type: 'SET_ITEMS', payload: parsedCart });
+            }
           }
           return;
         }
