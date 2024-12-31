@@ -36,8 +36,8 @@ export const AdminChat = () => {
           <CardHeader className="flex-none">
             <CardTitle>Customer Service Chat</CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col p-0 overflow-y-scroll">
-            <div className="flex-1 overflow-y-auto px-6 h-[calc(100vh-19rem)]">
+          <CardContent className="flex-1 flex flex-col p-0 ">
+            <div className="flex-1 overflow-y-auto px-6 h-[calc(100vh-30rem)] overflow-y-scroll">
               <MessageList sessionId={selectedSession} />
             </div>
             <div className="flex-none p-6 pt-4 border-t bg-background sticky bottom-0">
