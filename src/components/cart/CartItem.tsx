@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, X } from "lucide-react";
 import { CartItem as CartItemType } from "@/contexts/cart/types";
+import { Product } from "@/types/product";
 
 interface CartItemProps {
-  item: CartItemType;
+  item: CartItemType & { product?: Product };
   userId: string | null;
   onQuantityChange: (id: string, currentQuantity: number, delta: number) => void;
   onRemove: (id: string) => void;
 }
 
 export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemProps) => {
-  // Get the variant price from the first variant (temporary solution)
   const variantPrice = item.product?.product_variants?.[0]?.price ?? 0;
   const subtotal = variantPrice * item.quantity;
 

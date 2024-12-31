@@ -1,5 +1,5 @@
 import { ProductCard } from "@/components/ProductCard";
-import { Product } from "@/types";
+import { Product } from "@/types/product";
 
 interface ProductGridProps {
   products: Product[] | null | undefined;
@@ -23,11 +23,10 @@ export const ProductGrid = ({ products, isLoading, error }: ProductGridProps) =>
           key={product.id}
           id={product.id}
           name={product.name}
-          price={Number(product.price)}
           image={product.image_url}
           variants={product.product_variants}
         />
       ))}
     </div>
   );
-};
+}

@@ -1,7 +1,6 @@
 import { Product } from "@/types";
 import { ImagePreview } from "./ImagePreview";
 import { ProductDetailsFields } from "./ProductDetailsFields";
-import { PriceStockFields } from "./PriceStockFields";
 import { CategorySelector } from "./CategorySelector";
 import { FormActions } from "./FormActions";
 
@@ -36,11 +35,6 @@ export function ProductForm({
         onNameChange={(value) => onChange({ name: value })}
         onDescriptionChange={(value) => onChange({ description: value })}
         onSkuChange={(value) => onChange({ sku: value })}
-      />
-
-      <PriceStockFields
-        price={formData?.price ?? 0}
-        onPriceChange={(value) => onChange({ price: value })}
       />
 
       <CategorySelector

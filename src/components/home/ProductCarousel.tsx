@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/ProductCard";
-import { Product } from "@/types";
+import { Product } from "@/types/product";
 
 interface ProductCarouselProps {
   title: string;
@@ -43,7 +43,6 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
                         <ProductCard
                           id={product.id}
                           name={product.name}
-                          price={Number(product.price)}
                           image={product.image_url}
                           variants={product.product_variants}
                         />

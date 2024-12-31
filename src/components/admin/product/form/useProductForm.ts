@@ -9,9 +9,10 @@ export function useProductForm(initialData?: Partial<ProductFormData>) {
     category: "",
     image_url: "",
     sku: "",
+    product_variants: [],
     ...initialData
   });
-  const [variants, setVariants] = useState<ProductVariant[]>(initialData?.variants || []);
+  const [variants, setVariants] = useState<ProductVariant[]>(initialData?.product_variants || []);
 
   const handleFormChange = (updates: Partial<ProductFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
