@@ -12,6 +12,61 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const transferLocalCartToServer = async (userId: string) => {
+    try {
+      console.log('Checking for local cart items to transfer...');
+      const localCart = localStorage.getItem('cart');
+      
+      if (!localCart) {
+        console.log('No local cart items found');
+        return;
+      }
+
+      const localCartItems = JSON.parse(localCart);
+      
+      if (!Array.isArray(localCartItems) || localCartItems.length === 0) {
+        console.log('Local cart is empty');
+        return;
+      }
+
+      console.log('Found local cart items:', localCartItems);
+
+      // Transfer each item to the server
+      for (const item of localCartItems) {
+        const { error } = await supabase
+          .from('cart_items')
+          .insert({
+            user_id: userId,
+            product_id: item.product.id,
+            quantity: item.quantity
+          });
+
+        if (error) {
+          console.error('Error transferring cart item:', error);
+          throw error;
+        }
+      }
+
+      console.log('Successfully transferred cart items to server');
+      
+      // Clear local cart after successful transfer
+      localStorage.removeItem('cart');
+      console.log('Cleared local cart storage');
+
+      toast({
+        title: "Cart Synchronized",
+        description: "Your cart items have been saved to your account.",
+      });
+    } catch (error) {
+      console.error('Error during cart transfer:', error);
+      toast({
+        title: "Cart Sync Error",
+        description: "Failed to sync your cart items. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -25,6 +80,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
 
         if (session) {
           console.log("User already logged in:", session.user);
+          await transferLocalCartToServer(session.user.id);
           navigate("/");
         }
       } catch (err) {
@@ -40,6 +96,9 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
       
       if (event === "SIGNED_IN") {
         console.log("User signed in successfully:", session?.user);
+        if (session?.user) {
+          await transferLocalCartToServer(session.user.id);
+        }
         toast({
           title: "Welcome back!",
           description: "You have successfully signed in.",
