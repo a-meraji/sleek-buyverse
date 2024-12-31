@@ -53,6 +53,11 @@ export const AddToCartButton = ({
         userId
       });
 
+      if (!userId) {
+        navigate('/auth');
+        return;
+      }
+
       await addToCart(userId, {
         product_id: productId,
         variant_id: variantId,
@@ -60,20 +65,13 @@ export const AddToCartButton = ({
       });
 
       // Invalidate the cart query to trigger a refetch
-      if (userId) {
-        await queryClient.invalidateQueries({ queryKey: ['cart', userId] });
-      }
+      await queryClient.invalidateQueries({ queryKey: ['cart', userId] });
 
       toast({
         title: "Added to cart",
         description: `${productName} (${selectedSize}) has been added to your cart.`,
       });
     } catch (error) {
-      if (!userId) {
-        navigate('/auth');
-        return;
-      }
-      
       console.error('Error adding to cart:', error);
       toast({
         title: "Error",
