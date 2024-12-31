@@ -8,14 +8,40 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/ProductCard";
 import { Product } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductCarouselProps {
   title: string;
-  products: Product[] | null | undefined;
+  products?: Product[] | null;
 }
 
-export function ProductCarousel({ title, products }: ProductCarouselProps) {
-  if (!products?.length) return null;
+export function ProductCarousel({ title }: ProductCarouselProps) {
+  const { data: products, isLoading } = useQuery({
+    queryKey: ['products-with-variants'],
+    queryFn: async () => {
+      console.log('Fetching products with variants...');
+      const { data: products, error: productsError } = await supabase
+        .from('products')
+        .select(`
+          *,
+          product_variants (*)
+        `)
+        .limit(8)
+        .order('created_at', { ascending: false });
+
+      if (productsError) {
+        console.error('Error fetching products:', productsError);
+        throw productsError;
+      }
+
+      console.log('Products with variants fetched:', products);
+      return products;
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  if (isLoading || !products?.length) return null;
 
   return (
     <section className="py-16 px-6 overflow-x-hidden">
@@ -43,6 +69,7 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
                           name={product.name}
                           price={Number(product.price)}
                           image={product.image_url}
+                          variants={product.product_variants}
                         />
                       </CardContent>
                     </Card>

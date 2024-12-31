@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { ProductImage } from "./dialog/ProductImage";
 import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelector } from "./dialog/VariantSelector";
 import { Badge } from "@/components/ui/badge";
 import { AddToCartButton } from "./AddToCartButton";
+import { ProductVariant } from "@/types/product";
 
 interface ProductOverviewDialogProps {
   isOpen: boolean;
@@ -17,6 +16,7 @@ interface ProductOverviewDialogProps {
   productImage: string;
   productPrice: number;
   userId: string | null;
+  variants?: ProductVariant[];
 }
 
 export function ProductOverviewDialog({
@@ -26,89 +26,34 @@ export function ProductOverviewDialog({
   productName,
   productImage,
   productPrice,
-  userId
+  userId,
+  variants = []
 }: ProductOverviewDialogProps) {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
 
-  console.log('ProductOverviewDialog render - productId:', productId, 'isOpen:', isOpen);
-
-  // Debug query configuration
-  console.log('Query configuration:', {
-    isEnabled: isOpen && !!productId,
-    productId: productId
+  console.log('ProductOverviewDialog render:', {
+    productId,
+    variants,
+    selectedSize,
+    selectedColor
   });
-
-  const { data: variants, isLoading: isLoadingVariants, error, refetch } = useQuery({
-    queryKey: ['product-variants', productId],
-    queryFn: async () => {
-      console.log('Starting variant fetch for product:', productId);
-      
-      try {
-        const { data, error } = await supabase
-          .from('product_variants')
-          .select('*')
-          .eq('product_id', productId);
-
-        if (error) {
-          console.error('Supabase error fetching variants:', error);
-          throw error;
-        }
-
-        console.log('Supabase response:', {
-          success: !error,
-          dataReceived: !!data,
-          variantsCount: data?.length || 0,
-          rawData: data
-        });
-
-        if (!data || data.length === 0) {
-          console.log('No variants found in database for product:', productId);
-          return [];
-        }
-
-        return data;
-      } catch (err) {
-        console.error('Error in queryFn:', err);
-        throw err;
-      }
-    },
-    enabled: isOpen && !!productId,
-    retry: 2,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  // Debug variants state after query
-  useEffect(() => {
-    console.log('Variants state updated:', {
-      hasVariants: !!variants && variants.length > 0,
-      variantsCount: variants?.length || 0,
-      variants: variants
-    });
-  }, [variants]);
 
   // Reset selections when dialog opens
   useEffect(() => {
-    if (isOpen) {
-      console.log('Dialog opened, resetting selections. Current variants:', variants);
-      if (variants && variants.length > 0) {
-        const availableVariant = variants.find(v => v.stock > 0);
-        if (availableVariant) {
-          setSelectedSize(availableVariant.size);
-          setSelectedColor(availableVariant.color);
-          console.log('Selected variant:', availableVariant);
-        }
+    if (isOpen && variants.length > 0) {
+      const availableVariant = variants.find(v => v.stock > 0);
+      if (availableVariant) {
+        setSelectedSize(availableVariant.size);
+        setSelectedColor(availableVariant.color);
       }
     }
   }, [isOpen, variants]);
 
-  const sizes = [...new Set(variants?.map(v => v.size) || [])];
-  const colors = [...new Set(variants?.map(v => v.color) || [])];
+  const sizes = [...new Set(variants.map(v => v.size))];
+  const colors = [...new Set(variants.map(v => v.color))];
 
-  console.log('Current sizes:', sizes);
-  console.log('Current colors:', colors);
-
-  const selectedVariant = variants?.find(v => 
+  const selectedVariant = variants.find(v => 
     v.size === selectedSize && v.color === selectedColor
   );
   const isOutOfStock = selectedVariant?.stock <= 0;
@@ -124,19 +69,7 @@ export function ProductOverviewDialog({
             <ProductImage image={productImage} name={productName} />
             <ProductInfo name={productName} price={productPrice} />
             
-            {isLoadingVariants ? (
-              <p className="text-sm text-gray-500">Loading variants...</p>
-            ) : error ? (
-              <div>
-                <p className="text-sm text-red-500">Error loading variants: {error.message}</p>
-                <button 
-                  onClick={() => refetch()} 
-                  className="text-sm text-blue-500 hover:underline mt-2"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : variants && variants.length > 0 ? (
+            {variants.length > 0 ? (
               <>
                 <VariantSelector
                   label="Size"
@@ -159,8 +92,7 @@ export function ProductOverviewDialog({
               </>
             ) : (
               <p className="text-sm text-gray-500">
-                No variants found in database for product ID: {productId}. 
-                This might mean the product hasn't been configured with size and color options yet.
+                No variants available for this product.
               </p>
             )}
 
@@ -169,7 +101,7 @@ export function ProductOverviewDialog({
               userId={userId}
               selectedSize={selectedSize}
               productName={productName}
-              disabled={!variants?.length || isOutOfStock}
+              disabled={!variants.length || isOutOfStock}
             />
           </div>
         </ScrollArea>

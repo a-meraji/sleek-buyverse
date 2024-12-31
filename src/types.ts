@@ -1,5 +1,13 @@
 export type ProductSize = string;
 
+export interface ProductVariant {
+  id: string;
+  product_id: string;
+  size: string;
+  color: string;
+  stock: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -9,5 +17,5 @@ export interface Product {
   stock?: number;
   category?: string;
   sku?: string;
-  sizes?: ProductSize[];
+  product_variants?: ProductVariant[];
 }

@@ -3,15 +3,17 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductOverviewDialog } from "./product/ProductOverviewDialog";
+import { ProductVariant } from "@/types/product";
 
 interface ProductCardProps {
   id: string;
   name: string;
   price: number;
   image: string;
+  variants?: ProductVariant[];
 }
 
-export function ProductCard({ id, name, price, image }: ProductCardProps) {
+export function ProductCard({ id, name, price, image, variants }: ProductCardProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -64,6 +66,7 @@ export function ProductCard({ id, name, price, image }: ProductCardProps) {
         productImage={image}
         productPrice={price}
         userId={userId}
+        variants={variants}
       />
     </div>
   );
