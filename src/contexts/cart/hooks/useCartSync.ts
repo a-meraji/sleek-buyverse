@@ -47,7 +47,6 @@ export const useCartSync = (
         }
 
         // Handle authenticated users
-        console.log('Syncing cart for authenticated user:', sessionData.session.user.id);
         const { data: cartData, error } = await supabase
           .from('cart_items')
           .select(`
@@ -76,7 +75,6 @@ export const useCartSync = (
     const syncLocalStorage = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
-      // Only save to localStorage for unauthenticated users
       if (!session) {
         const localItems = items.filter(item => item.id.startsWith('local-'));
         console.log('Saving local cart to localStorage:', localItems);
