@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/cart/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AddToCartButtonProps {
   productId: string;
@@ -21,6 +22,7 @@ export const AddToCartButton = ({
   const { toast } = useToast();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const queryClient = useQueryClient();
 
   const handleAddToCart = async () => {
     try {
@@ -37,6 +39,11 @@ export const AddToCartButton = ({
         product_id: productId,
         quantity: 1,
       });
+
+      // Invalidate the cart query to trigger a refetch
+      if (userId) {
+        await queryClient.invalidateQueries({ queryKey: ['cart', userId] });
+      }
 
       toast({
         title: "Added to cart",

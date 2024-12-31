@@ -24,6 +24,8 @@ export const useAuthenticatedCart = (userId: string) => {
       return data || [];
     },
     enabled: !!userId,
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0, // Don't cache the results
   });
 
   const updateQuantity = async (itemId: string, quantity: number) => {
@@ -36,13 +38,8 @@ export const useAuthenticatedCart = (userId: string) => {
 
       if (error) throw error;
 
-      // Immediately update the cache
-      queryClient.setQueryData(['cart', userId], (oldData: CartItem[] | undefined) => {
-        if (!oldData) return [];
-        return oldData.map(item => 
-          item.id === itemId ? { ...item, quantity } : item
-        );
-      });
+      // Immediately update the cache and trigger a refetch
+      await queryClient.invalidateQueries({ queryKey: ['cart', userId] });
 
       toast({
         title: "Cart updated",
@@ -68,11 +65,8 @@ export const useAuthenticatedCart = (userId: string) => {
 
       if (error) throw error;
 
-      // Immediately update the cache
-      queryClient.setQueryData(['cart', userId], (oldData: CartItem[] | undefined) => {
-        if (!oldData) return [];
-        return oldData.filter(item => item.id !== itemId);
-      });
+      // Immediately update the cache and trigger a refetch
+      await queryClient.invalidateQueries({ queryKey: ['cart', userId] });
 
       toast({
         title: "Item removed",

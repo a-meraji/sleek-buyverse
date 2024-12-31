@@ -9,13 +9,15 @@ import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
 import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
 
 const Cart = () => {
-  // Get current session
-  const { data: session } = useQuery({
+  // Get current session with no caching
+  const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       return session;
     },
+    staleTime: 0,
+    cacheTime: 0,
   });
 
   // Use the appropriate cart hook based on authentication status
@@ -34,7 +36,7 @@ const Cart = () => {
     return sum + (item.product?.price ?? 0) * item.quantity;
   }, 0) ?? 0;
 
-  if (isLoading) {
+  if (isSessionLoading || isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
