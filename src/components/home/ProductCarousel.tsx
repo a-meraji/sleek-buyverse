@@ -13,7 +13,6 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface ProductCarouselProps {
   title: string;
-  products?: Product[] | null;
 }
 
 export function ProductCarousel({ title }: ProductCarouselProps) {
@@ -21,7 +20,7 @@ export function ProductCarousel({ title }: ProductCarouselProps) {
     queryKey: ['products-with-variants'],
     queryFn: async () => {
       console.log('Fetching products with variants...');
-      const { data: products, error: productsError } = await supabase
+      const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select(`
           *,
@@ -35,10 +34,9 @@ export function ProductCarousel({ title }: ProductCarouselProps) {
         throw productsError;
       }
 
-      console.log('Products with variants fetched:', products);
-      return products;
+      console.log('Products with variants fetched:', productsData);
+      return productsData;
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   if (isLoading || !products?.length) return null;
@@ -80,7 +78,7 @@ export function ProductCarousel({ title }: ProductCarouselProps) {
             <div className="absolute top-1/2 -translate-y-1/2 left-4">
               <CarouselPrevious className="relative bg-white shadow-lg opacity-80 hover:opacity-100" />
             </div>
-            <div className="absolute top-1/2 -translate-y-1/2 right-4 ">
+            <div className="absolute top-1/2 -translate-y-1/2 right-4">
               <CarouselNext className="relative bg-white shadow-lg opacity-80 hover:opacity-100" />
             </div>
           </Carousel>

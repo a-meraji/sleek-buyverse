@@ -3,9 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProductImage } from "./dialog/ProductImage";
 import { ProductInfo } from "./dialog/ProductInfo";
-import { VariantSelector } from "./dialog/VariantSelector";
-import { Badge } from "@/components/ui/badge";
-import { AddToCartButton } from "./AddToCartButton";
+import { VariantSelectionPanel } from "./dialog/VariantSelectionPanel";
+import { DialogActions } from "./dialog/DialogActions";
 import { ProductVariant } from "@/types/product";
 
 interface ProductOverviewDialogProps {
@@ -32,14 +31,6 @@ export function ProductOverviewDialog({
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
 
-  console.log('ProductOverviewDialog render:', {
-    productId,
-    variants,
-    selectedSize,
-    selectedColor
-  });
-
-  // Reset selections when dialog opens
   useEffect(() => {
     if (isOpen && variants.length > 0) {
       const availableVariant = variants.find(v => v.stock > 0);
@@ -49,9 +40,6 @@ export function ProductOverviewDialog({
       }
     }
   }, [isOpen, variants]);
-
-  const sizes = [...new Set(variants.map(v => v.size))];
-  const colors = [...new Set(variants.map(v => v.color))];
 
   const selectedVariant = variants.find(v => 
     v.size === selectedSize && v.color === selectedColor
@@ -69,34 +57,15 @@ export function ProductOverviewDialog({
             <ProductImage image={productImage} name={productName} />
             <ProductInfo name={productName} price={productPrice} />
             
-            {variants.length > 0 ? (
-              <>
-                <VariantSelector
-                  label="Size"
-                  options={sizes}
-                  value={selectedSize}
-                  onChange={setSelectedSize}
-                  variants={variants}
-                />
-                <VariantSelector
-                  label="Color"
-                  options={colors}
-                  value={selectedColor}
-                  onChange={setSelectedColor}
-                />
-                {isOutOfStock && (
-                  <Badge variant="destructive" className="w-fit">
-                    Out of Stock
-                  </Badge>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-gray-500">
-                No variants available for this product.
-              </p>
-            )}
+            <VariantSelectionPanel
+              variants={variants}
+              selectedSize={selectedSize}
+              selectedColor={selectedColor}
+              onSizeChange={setSelectedSize}
+              onColorChange={setSelectedColor}
+            />
 
-            <AddToCartButton 
+            <DialogActions
               productId={productId}
               userId={userId}
               selectedSize={selectedSize}
