@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { FilterSidebar } from "./FilterSidebar";
 import { MobileFilters } from "./MobileFilters";
@@ -7,6 +7,9 @@ import { useProducts } from "./hooks/useProducts";
 import { useFilters } from "./hooks/useFilters";
 
 export const ProductsContainer = () => {
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
   const {
     products,
     isLoading,
@@ -28,6 +31,8 @@ export const ProductsContainer = () => {
       <ProductsHeader 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        setSortOrder={setSortOrder}
+        setMobileFiltersOpen={setMobileFiltersOpen}
       />
       
       <div className="flex gap-8 items-start">
@@ -41,6 +46,8 @@ export const ProductsContainer = () => {
         
         <div className="flex-1">
           <MobileFilters
+            open={mobileFiltersOpen}
+            setOpen={setMobileFiltersOpen}
             selectedCategories={selectedCategories}
             setSelectedCategories={setSelectedCategories}
             priceRange={priceRange}

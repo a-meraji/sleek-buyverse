@@ -2,15 +2,15 @@ import { Disclosure } from "@headlessui/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface CategoryFilterProps {
-  selectedCategory: string | null;
-  setSelectedCategory: (category: string | null) => void;
+  selectedCategories: string[];
+  setSelectedCategories: (categories: string[]) => void;
   categories: string[] | undefined;
   isMobile?: boolean;
 }
 
 export const CategoryFilter = ({
-  selectedCategory,
-  setSelectedCategory,
+  selectedCategories,
+  setSelectedCategories,
   categories,
   isMobile = false,
 }: CategoryFilterProps) => {
@@ -25,10 +25,14 @@ export const CategoryFilter = ({
             name="category"
             value={category}
             type="checkbox"
-            checked={selectedCategory === category}
-            onChange={(e) => 
-              setSelectedCategory(e.target.checked ? category : null)
-            }
+            checked={selectedCategories.includes(category)}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedCategories([...selectedCategories, category]);
+              } else {
+                setSelectedCategories(selectedCategories.filter(c => c !== category));
+              }
+            }}
             className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
           />
           <label
