@@ -23,7 +23,7 @@ export const AdminChat = () => {
   }
 
   return (
-    <div className="grid grid-cols-12 gap-4 h-[calc(100vh-12rem)] bg-blue-500 relative">
+    <div className="grid grid-cols-12 gap-4 h-[calc(100vh-12rem)] bg-blue-500 relative overflow-auto">
       <div className="col-span-4 overflow-hidden">
         <SessionList
           selectedSession={selectedSession}
