@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ProductVariant } from "@/types/product";
 import { ProductImage } from "./dialog/ProductImage";
 import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelector } from "./dialog/VariantSelector";
 import { Badge } from "@/components/ui/badge";
-import { useCart } from "@/contexts/cart/CartContext";
 import { AddToCartButton } from "./AddToCartButton";
 
 interface ProductOverviewDialogProps {
@@ -34,7 +31,6 @@ export function ProductOverviewDialog({
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
 
-  // Fetch product variants
   const { data: variants, isLoading: isLoadingVariants } = useQuery({
     queryKey: ['product-variants', productId],
     queryFn: async () => {
@@ -50,33 +46,32 @@ export function ProductOverviewDialog({
       }
 
       console.log('Variants fetched:', data);
-      return data as ProductVariant[];
-    }
+      return data;
+    },
+    enabled: isOpen, // Only fetch when dialog is open
   });
 
-  // Set default color and size when variants are loaded
+  // Reset selections when dialog opens
   useEffect(() => {
-    if (variants && variants.length > 0) {
+    if (isOpen && variants && variants.length > 0) {
       const availableVariant = variants.find(v => v.stock > 0);
       if (availableVariant) {
-        setSelectedColor(availableVariant.color);
         setSelectedSize(availableVariant.size);
-      } else {
-        setSelectedColor(variants[0].color);
-        setSelectedSize(variants[0].size);
+        setSelectedColor(availableVariant.color);
       }
     }
-  }, [variants]);
+  }, [isOpen, variants]);
 
-  // Group variants by size and color
   const sizes = [...new Set(variants?.map(v => v.size) || [])];
   const colors = [...new Set(variants?.map(v => v.color) || [])];
 
-  const selectedVariant = variants?.find(v => v.size === selectedSize && v.color === selectedColor);
+  const selectedVariant = variants?.find(v => 
+    v.size === selectedSize && v.color === selectedColor
+  );
   const isOutOfStock = selectedVariant?.stock <= 0;
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => onClose()}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Product Overview</DialogTitle>

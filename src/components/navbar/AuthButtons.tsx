@@ -28,13 +28,18 @@ export const AuthButtons = ({ user, setUser }: AuthButtonsProps) => {
         return;
       }
       
+      // Clear local storage
+      localStorage.removeItem('cart');
+      
       console.log("User signed out successfully");
       setUser(null);
       toast({
         title: "Signed out",
         description: "You have been successfully signed out.",
       });
-      navigate("/");
+      
+      // Force reload to clear all state
+      window.location.href = '/';
     } catch (err) {
       console.error("Unexpected error during sign out:", err);
       toast({
