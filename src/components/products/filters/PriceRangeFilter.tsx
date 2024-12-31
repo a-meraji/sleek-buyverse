@@ -1,11 +1,11 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface PriceRangeFilterProps {
   priceRange: number[];
-  setPriceRange: (range: number[]) => void;
+  setPriceRange: Dispatch<SetStateAction<[number, number]>>;
   isMobile?: boolean;
 }
 
@@ -23,7 +23,7 @@ export const PriceRangeFilter = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       if (localPriceRange[0] !== priceRange[0] || localPriceRange[1] !== priceRange[1]) {
-        setPriceRange(localPriceRange);
+        setPriceRange([localPriceRange[0], localPriceRange[1]] as [number, number]);
       }
     }, 500);
 
