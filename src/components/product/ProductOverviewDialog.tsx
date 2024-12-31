@@ -10,6 +10,7 @@ import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelector } from "./dialog/VariantSelector";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/cart/CartContext";
+import { AddToCartButton } from "./AddToCartButton";
 
 interface ProductOverviewDialogProps {
   isOpen: boolean;
@@ -32,10 +33,9 @@ export function ProductOverviewDialog({
 }: ProductOverviewDialogProps) {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
-  const { addToCart } = useCart();
 
   // Fetch product variants
-  const { data: variants } = useQuery({
+  const { data: variants, isLoading: isLoadingVariants } = useQuery({
     queryKey: ['product-variants', productId],
     queryFn: async () => {
       console.log('Fetching variants for product:', productId);
@@ -54,11 +54,17 @@ export function ProductOverviewDialog({
     }
   });
 
-  // Set default color when variants are loaded
+  // Set default color and size when variants are loaded
   useEffect(() => {
     if (variants && variants.length > 0) {
-      setSelectedColor(variants[0].color);
-      setSelectedSize(variants[0].size);
+      const availableVariant = variants.find(v => v.stock > 0);
+      if (availableVariant) {
+        setSelectedColor(availableVariant.color);
+        setSelectedSize(availableVariant.size);
+      } else {
+        setSelectedColor(variants[0].color);
+        setSelectedSize(variants[0].size);
+      }
     }
   }, [variants]);
 
@@ -68,20 +74,6 @@ export function ProductOverviewDialog({
 
   const selectedVariant = variants?.find(v => v.size === selectedSize && v.color === selectedColor);
   const isOutOfStock = selectedVariant?.stock <= 0;
-
-  const handleAddToCart = async () => {
-    await addToCart({
-      product_id: productId,
-      quantity: 1,
-      product: {
-        id: productId,
-        name: productName,
-        price: productPrice,
-        image_url: productImage,
-      },
-    });
-    onClose();
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -94,7 +86,9 @@ export function ProductOverviewDialog({
             <ProductImage image={productImage} name={productName} />
             <ProductInfo name={productName} price={productPrice} />
             
-            {variants && variants.length > 0 ? (
+            {isLoadingVariants ? (
+              <p className="text-sm text-gray-500">Loading variants...</p>
+            ) : variants && variants.length > 0 ? (
               <>
                 <VariantSelector
                   label="Size"
@@ -119,12 +113,13 @@ export function ProductOverviewDialog({
               <p className="text-sm text-gray-500">No variants available</p>
             )}
 
-            <Button 
-              onClick={handleAddToCart}
+            <AddToCartButton 
+              productId={productId}
+              userId={userId}
+              selectedSize={selectedSize}
+              productName={productName}
               disabled={!variants?.length || isOutOfStock}
-            >
-              Add to Cart
-            </Button>
+            />
           </div>
         </ScrollArea>
       </DialogContent>

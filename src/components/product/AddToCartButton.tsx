@@ -17,13 +17,19 @@ export const AddToCartButton = ({ productId, userId, selectedSize, productName, 
 
   const addToCart = useMutation({
     mutationFn: async () => {
-      console.log('Adding to cart from product detail:', { productId });
+      console.log('Adding to cart:', { productId, userId, selectedSize });
       
       if (!userId) {
+        window.location.href = '/auth';
         throw new Error('User not authenticated');
       }
 
       if (!selectedSize) {
+        toast({
+          title: "Please select a size",
+          description: "You need to select a size before adding to cart.",
+          variant: "destructive",
+        });
         throw new Error('Size not selected');
       }
 
@@ -76,19 +82,14 @@ export const AddToCartButton = ({ productId, userId, selectedSize, productName, 
         description: `${productName} (${selectedSize}) has been added to your cart.`,
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Error adding to cart:', error);
       if (error.message === 'User not authenticated') {
-        toast({
-          title: "Please sign in",
-          description: "You need to be signed in to add items to cart.",
-          variant: "destructive",
-        });
+        // Don't show toast since we're redirecting
+        return;
       } else if (error.message === 'Size not selected') {
-        toast({
-          title: "Please select a size",
-          variant: "destructive",
-        });
+        // Toast is already shown in mutationFn
+        return;
       } else {
         toast({
           title: "Error",
@@ -106,7 +107,7 @@ export const AddToCartButton = ({ productId, userId, selectedSize, productName, 
       onClick={() => addToCart.mutate()}
       disabled={disabled || addToCart.isPending}
     >
-      Add to Cart
+      {addToCart.isPending ? "Adding..." : "Add to Cart"}
     </Button>
   );
 };
