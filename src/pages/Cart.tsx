@@ -9,7 +9,6 @@ import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
 import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
 
 const Cart = () => {
-  // Get current session with no caching
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -20,11 +19,9 @@ const Cart = () => {
     gcTime: 0
   });
 
-  // Use the appropriate cart hook based on authentication status
   const authenticatedCart = useAuthenticatedCart(session?.user?.id || '');
   const unauthenticatedCart = useUnauthenticatedCart();
 
-  // Determine which cart data and operations to use
   const {
     cartItems,
     isLoading,
@@ -33,7 +30,8 @@ const Cart = () => {
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
   const total = cartItems?.reduce((sum, item) => {
-    return sum + ((item.product?.price ?? 0) * item.quantity);
+    const variantPrice = item.product?.product_variants?.[0]?.price ?? 0;
+    return sum + (variantPrice * item.quantity);
   }, 0) ?? 0;
 
   if (isSessionLoading || isLoading) {

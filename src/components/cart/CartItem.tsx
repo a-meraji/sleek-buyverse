@@ -10,6 +10,10 @@ interface CartItemProps {
 }
 
 export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemProps) => {
+  // Get the variant price from the first variant (temporary solution)
+  const variantPrice = item.product?.product_variants?.[0]?.price ?? 0;
+  const subtotal = variantPrice * item.quantity;
+
   return (
     <div className="flex gap-6 p-4 bg-secondary rounded-lg">
       <img
@@ -31,7 +35,7 @@ export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemP
         </div>
         
         <p className="text-sm text-muted-foreground">{item.product?.description}</p>
-        <p>${item.product?.price?.toFixed(2)}</p>
+        <p>${variantPrice.toFixed(2)} × {item.quantity} = ${subtotal.toFixed(2)}</p>
         
         <div className="flex items-center gap-2">
           <Button 
