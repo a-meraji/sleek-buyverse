@@ -1,16 +1,29 @@
 import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, X, ShoppingCart } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/cart/CartContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 const Cart = () => {
   const { state: { items, isLoading }, updateQuantity, removeItem, loadCartItems } = useCart();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    loadCartItems();
-  }, [loadCartItems]);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadCartItems();
+    }
+  }, [loadCartItems, isAuthenticated]);
 
   const handleQuantityChange = (id: string, currentQuantity: number, delta: number) => {
     const newQuantity = currentQuantity + delta;
@@ -35,6 +48,17 @@ const Cart = () => {
     );
   }
 
+  const EmptyCartMessage = () => (
+    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+      <ShoppingCart className="h-16 w-16 text-muted-foreground" />
+      <h2 className="text-xl font-semibold">Your cart is empty</h2>
+      <p className="text-muted-foreground">Add some items to your cart to get started</p>
+      <Button variant="outline" onClick={() => window.location.href = '/products'}>
+        Continue Shopping
+      </Button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -44,7 +68,7 @@ const Cart = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
             {items?.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Your cart is empty</p>
+              <EmptyCartMessage />
             ) : (
               items?.map((item) => (
                 <div key={item.id} className="flex gap-6 p-4 bg-secondary rounded-lg">
@@ -105,8 +129,13 @@ const Cart = () => {
                 className="w-full" 
                 size="lg"
                 disabled={!items?.length}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    window.location.href = '/auth';
+                  }
+                }}
               >
-                Proceed to Checkout
+                {isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
               </Button>
             </div>
           </div>
