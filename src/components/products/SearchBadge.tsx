@@ -4,12 +4,18 @@ import { Badge } from "@/components/ui/badge";
 
 interface SearchBadgeProps {
   searchQuery: string;
-  selectedCategory: string | null;
+  selectedCategories: string[];
   onClear: () => void;
+  onClearCategory?: (category: string) => void;
 }
 
-export const SearchBadge = ({ searchQuery, selectedCategory, onClear }: SearchBadgeProps) => {
-  if (!searchQuery && !selectedCategory) return null;
+export const SearchBadge = ({ 
+  searchQuery, 
+  selectedCategories, 
+  onClear,
+  onClearCategory 
+}: SearchBadgeProps) => {
+  if (!searchQuery && selectedCategories.length === 0) return null;
 
   return (
     <div className="flex items-center gap-2 mt-4 flex-wrap">
@@ -27,19 +33,19 @@ export const SearchBadge = ({ searchQuery, selectedCategory, onClear }: SearchBa
         </Badge>
       )}
       
-      {selectedCategory && (
-        <Badge variant="outline" className="text-sm flex items-center">
-          {selectedCategory}
+      {selectedCategories.map((category) => (
+        <Badge key={category} variant="outline" className="text-sm flex items-center">
+          {category}
           <Button
             variant="ghost"
             size="sm"
             className="h-4 w-4 p-0 ml-2 hover:bg-transparent"
-            onClick={onClear}
+            onClick={() => onClearCategory?.(category)}
           >
             <X className="h-3 w-3" />
           </Button>
         </Badge>
-      )}
+      ))}
     </div>
   );
 };

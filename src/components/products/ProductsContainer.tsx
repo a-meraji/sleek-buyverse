@@ -34,6 +34,10 @@ export const ProductsContainer = () => {
     setPriceRange([0, 1000]);
   };
 
+  const handleClearCategory = (categoryToRemove: string) => {
+    setSelectedCategories(selectedCategories.filter(cat => cat !== categoryToRemove));
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <ProductsHeader 
@@ -43,13 +47,12 @@ export const ProductsContainer = () => {
         setMobileFiltersOpen={setMobileFiltersOpen}
       />
       
-      {(searchQuery || selectedCategories.length > 0) && (
-        <SearchBadge
-          searchQuery={searchQuery}
-          selectedCategory={selectedCategories[0] || null}
-          onClear={handleClearFilters}
-        />
-      )}
+      <SearchBadge
+        searchQuery={searchQuery}
+        selectedCategories={selectedCategories}
+        onClear={handleClearFilters}
+        onClearCategory={handleClearCategory}
+      />
       
       <div className="flex gap-8 items-start mt-4">
         <FilterSidebar
