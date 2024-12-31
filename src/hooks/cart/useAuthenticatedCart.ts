@@ -15,7 +15,10 @@ export const useAuthenticatedCart = (userId: string) => {
         .from('cart_items')
         .select(`
           *,
-          product:products(*)
+          product:products(
+            *,
+            product_variants(*)
+          )
         `)
         .eq('user_id', userId);
 

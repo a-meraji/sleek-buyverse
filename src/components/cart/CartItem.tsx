@@ -11,9 +11,8 @@ interface CartItemProps {
 }
 
 export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemProps) => {
-  // Find the selected variant or default to the first one
-  const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id) 
-    || item.product?.product_variants?.[0];
+  // Find the selected variant
+  const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
   
   const variantPrice = selectedVariant?.price ?? 0;
   const subtotal = variantPrice * item.quantity;
@@ -24,7 +23,8 @@ export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemP
     variantId: item.variant_id,
     variantPrice,
     quantity: item.quantity,
-    subtotal
+    subtotal,
+    selectedVariant
   });
 
   return (
