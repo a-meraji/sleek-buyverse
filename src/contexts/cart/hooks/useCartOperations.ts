@@ -11,6 +11,8 @@ export const useCartOperations = () => {
     operation: 'add' | 'update' | 'remove',
     data: any
   ) => {
+    console.log(`Handling ${operation} operation for authenticated user:`, userId);
+    
     switch (operation) {
       case 'add':
         const { data: insertData, error: insertError } = await supabase
@@ -27,6 +29,7 @@ export const useCartOperations = () => {
           .single();
 
         if (insertError) throw insertError;
+        console.log('Added item to server cart:', insertData);
         return insertData;
 
       case 'update':
@@ -36,6 +39,7 @@ export const useCartOperations = () => {
           .eq('id', data.id);
 
         if (updateError) throw updateError;
+        console.log('Updated server cart item quantity:', data.id, data.quantity);
         break;
 
       case 'remove':
@@ -45,6 +49,7 @@ export const useCartOperations = () => {
           .eq('id', data.id);
 
         if (deleteError) throw deleteError;
+        console.log('Removed item from server cart:', data.id);
         break;
     }
   };
@@ -53,6 +58,8 @@ export const useCartOperations = () => {
     operation: 'add' | 'update' | 'remove',
     data: any
   ) => {
+    console.log(`Handling ${operation} operation for unauthenticated user`);
+    
     const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
 
     switch (operation) {
@@ -71,6 +78,7 @@ export const useCartOperations = () => {
         
         localCart.push(newItem);
         localStorage.setItem('cart', JSON.stringify(localCart));
+        console.log('Added item to local cart:', newItem);
         return newItem;
       }
 
@@ -79,12 +87,14 @@ export const useCartOperations = () => {
           item.id === data.id ? { ...item, quantity: data.quantity } : item
         );
         localStorage.setItem('cart', JSON.stringify(updatedCart));
+        console.log('Updated local cart item quantity:', data.id, data.quantity);
         break;
       }
 
       case 'remove': {
         const filteredCart = localCart.filter((item: CartItem) => item.id !== data.id);
         localStorage.setItem('cart', JSON.stringify(filteredCart));
+        console.log('Removed item from local cart:', data.id);
         break;
       }
     }

@@ -8,6 +8,7 @@ import { CartSummary } from "@/components/cart/CartSummary";
 import { EmptyCart } from "@/components/cart/EmptyCart";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { CartItem as CartItemType } from "@/contexts/cart/types";
 
 const Cart = () => {
   const { state, updateQuantity, removeItem } = useCart();
@@ -15,6 +16,7 @@ const Cart = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // Get current session
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -23,12 +25,17 @@ const Cart = () => {
     },
   });
 
+  // Fetch cart items based on authentication status
   const { data: cartItems, isLoading } = useQuery({
     queryKey: ['cart', session?.user?.id],
     queryFn: async () => {
+      console.log('Fetching cart items for user:', session?.user?.id);
+      
       if (!session?.user?.id) {
-        // For unauthenticated users, return items from context
-        return state.items;
+        // For unauthenticated users, get items from localStorage
+        const localCart = localStorage.getItem('cart');
+        console.log('Loading cart from localStorage:', localCart);
+        return localCart ? JSON.parse(localCart) : [];
       }
       
       // For authenticated users, fetch from Supabase
@@ -40,7 +47,12 @@ const Cart = () => {
         `)
         .eq('user_id', session.user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching cart items:', error);
+        throw error;
+      }
+      
+      console.log('Fetched cart items from server:', data);
       return data || [];
     },
     enabled: true,
@@ -59,11 +71,15 @@ const Cart = () => {
     try {
       await updateQuantity(userId, id, newQuantity);
       
-      // Immediately update UI
       if (session?.user?.id) {
+        // For authenticated users, invalidate query to refetch from server
         await queryClient.invalidateQueries({ queryKey: ['cart', session.user.id] });
       } else {
-        queryClient.setQueryData(['cart', null], state.items);
+        // For unauthenticated users, update local cart immediately
+        const updatedCart = (cartItems as CartItemType[]).map(item =>
+          item.id === id ? { ...item, quantity: newQuantity } : item
+        );
+        queryClient.setQueryData(['cart', null], updatedCart);
       }
       
       toast({
@@ -84,11 +100,13 @@ const Cart = () => {
     try {
       await removeItem(userId, id);
       
-      // Immediately update UI
       if (session?.user?.id) {
+        // For authenticated users, invalidate query to refetch from server
         await queryClient.invalidateQueries({ queryKey: ['cart', session.user.id] });
       } else {
-        queryClient.setQueryData(['cart', null], state.items);
+        // For unauthenticated users, update local cart immediately
+        const updatedCart = (cartItems as CartItemType[]).filter(item => item.id !== id);
+        queryClient.setQueryData(['cart', null], updatedCart);
       }
       
       toast({

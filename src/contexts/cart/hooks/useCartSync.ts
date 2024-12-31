@@ -14,6 +14,7 @@ export const useCartSync = (
     const syncCart = async () => {
       try {
         const { data: sessionData } = await supabase.auth.getSession();
+        console.log('Syncing cart for session:', sessionData.session);
         
         if (!sessionData.session) {
           // Handle unauthenticated users - sync from localStorage
@@ -60,6 +61,7 @@ export const useCartSync = (
       if (!session) {
         const localItems = items.filter(item => item.id.startsWith('local-'));
         localStorage.setItem('cart', JSON.stringify(localItems));
+        console.log('Updated localStorage cart:', localItems);
       }
     };
 
