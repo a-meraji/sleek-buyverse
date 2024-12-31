@@ -42,7 +42,7 @@ export const AddToCartButton = ({
       if (!selectedVariant) {
         toast({
           title: "Error",
-          description: "No variant selected for this size.",
+          description: "Please select a valid size variant.",
           variant: "destructive",
         });
         return;
@@ -52,7 +52,8 @@ export const AddToCartButton = ({
         productId,
         variantId: selectedVariant.id,
         selectedSize,
-        userId
+        userId,
+        price: selectedVariant.price
       });
 
       await addToCart(userId, {

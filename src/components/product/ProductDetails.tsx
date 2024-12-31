@@ -66,18 +66,19 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
               )}
             </div>
           )}
+
+          <AddToCartButton
+            productId={product.id}
+            userId={userId}
+            selectedSize={selectedSize}
+            productName={product.name}
+            variants={variants}
+            disabled={!variants?.length || isOutOfStock}
+          />
         </>
       ) : (
         <p className="text-sm text-gray-500">No variants available</p>
       )}
-      
-      <AddToCartButton
-        productId={product.id}
-        userId={userId}
-        selectedSize={selectedSize}
-        productName={product.name}
-        disabled={!variants?.length || isOutOfStock}
-      />
     </div>
   );
 };
