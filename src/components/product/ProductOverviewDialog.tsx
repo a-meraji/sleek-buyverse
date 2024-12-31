@@ -8,8 +8,8 @@ import { ProductVariant } from "@/types/product";
 import { ProductImage } from "./dialog/ProductImage";
 import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelector } from "./dialog/VariantSelector";
-import { useAddToCart } from "./dialog/useAddToCart";
 import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductOverviewDialogProps {
   isOpen: boolean;
@@ -32,7 +32,7 @@ export function ProductOverviewDialog({
 }: ProductOverviewDialogProps) {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
-  const addToCart = useAddToCart();
+  const { addToCart } = useCart();
 
   // Fetch product variants
   const { data: variants } = useQuery({
@@ -69,16 +69,18 @@ export function ProductOverviewDialog({
   const selectedVariant = variants?.find(v => v.size === selectedSize && v.color === selectedColor);
   const isOutOfStock = selectedVariant?.stock <= 0;
 
-  const handleAddToCart = () => {
-    addToCart.mutate(
-      { 
-        userId, 
-        productId,
-        onSuccess: () => {
-          onClose();
-        }
-      }
-    );
+  const handleAddToCart = async () => {
+    await addToCart({
+      product_id: productId,
+      quantity: 1,
+      product: {
+        id: productId,
+        name: productName,
+        price: productPrice,
+        image_url: productImage,
+      },
+    });
+    onClose();
   };
 
   return (
@@ -119,7 +121,7 @@ export function ProductOverviewDialog({
 
             <Button 
               onClick={handleAddToCart}
-              disabled={addToCart.isPending || !variants?.length || isOutOfStock}
+              disabled={!variants?.length || isOutOfStock}
             >
               Add to Cart
             </Button>

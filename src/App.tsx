@@ -12,6 +12,7 @@ import Admin from "./pages/Admin";
 import About from "./pages/About";
 import { ChatButton } from "./components/chat/ChatButton";
 import { Footer } from "./components/home/Footer";
+import { CartProvider } from "./contexts/CartContext";
 import * as React from 'react';
 
 const queryClient = new QueryClient({
@@ -29,25 +30,27 @@ const App = () => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="flex min-h-screen flex-col">
-            <div className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/product/:id" element={<Product />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/about" element={<About />} />
-              </Routes>
+        <CartProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="flex min-h-screen flex-col">
+              <div className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/product/:id" element={<Product />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/about" element={<About />} />
+                </Routes>
+              </div>
+              <Footer />
             </div>
-            <Footer />
-          </div>
-          <ChatButton />
-        </BrowserRouter>
+            <ChatButton />
+          </BrowserRouter>
+        </CartProvider>
       </TooltipProvider>
     </QueryClientProvider>
   </React.StrictMode>
