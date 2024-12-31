@@ -12,10 +12,10 @@ export const useCartSync = (
   useEffect(() => {
     const syncCart = async () => {
       try {
-        const { data: session } = await supabase.auth.getSession();
-        console.log('Syncing cart for session:', session?.session?.user?.id);
+        const { data: sessionData } = await supabase.auth.getSession();
+        console.log('Syncing cart for session:', sessionData?.session?.user?.id);
         
-        if (!session.session) {
+        if (!sessionData.session) {
           // Handle unauthenticated users
           console.log('Syncing local cart for unauthenticated user');
           const localCart = localStorage.getItem('cart');
@@ -47,7 +47,7 @@ export const useCartSync = (
         }
 
         // Handle authenticated users
-        console.log('Syncing cart for authenticated user:', session.session.user.id);
+        console.log('Syncing cart for authenticated user:', sessionData.session.user.id);
         const { data: cartData, error } = await supabase
           .from('cart_items')
           .select(`
@@ -73,13 +73,17 @@ export const useCartSync = (
 
   // Save to localStorage whenever items change
   useEffect(() => {
-    const { data: { session } } = supabase.auth.getSession();
-    
-    // Only save to localStorage for unauthenticated users
-    if (!session) {
-      const localItems = items.filter(item => item.id.startsWith('local-'));
-      console.log('Saving local cart to localStorage:', localItems);
-      localStorage.setItem('cart', JSON.stringify(localItems));
-    }
+    const syncLocalStorage = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Only save to localStorage for unauthenticated users
+      if (!session) {
+        const localItems = items.filter(item => item.id.startsWith('local-'));
+        console.log('Saving local cart to localStorage:', localItems);
+        localStorage.setItem('cart', JSON.stringify(localItems));
+      }
+    };
+
+    syncLocalStorage();
   }, [items]);
 };
