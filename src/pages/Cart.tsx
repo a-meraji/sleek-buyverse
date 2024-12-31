@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/cart/CartContext";
@@ -6,11 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { CartItem } from "@/components/cart/CartItem";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { EmptyCart } from "@/components/cart/EmptyCart";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
-  const { state: { items }, updateQuantity, removeItem } = useCart();
+  const { updateQuantity, removeItem } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -48,11 +51,40 @@ const Cart = () => {
   const handleQuantityChange = async (id: string, currentQuantity: number, delta: number) => {
     const newQuantity = currentQuantity + delta;
     if (newQuantity < 1) return;
-    await updateQuantity(userId, id, newQuantity);
+    
+    try {
+      await updateQuantity(userId, id, newQuantity);
+      await queryClient.invalidateQueries({ queryKey: ['cart', session?.user?.id] });
+      toast({
+        title: "Cart updated",
+        description: "Item quantity has been updated",
+      });
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update quantity",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleRemoveItem = async (id: string) => {
-    await removeItem(userId, id);
+    try {
+      await removeItem(userId, id);
+      await queryClient.invalidateQueries({ queryKey: ['cart', session?.user?.id] });
+      toast({
+        title: "Item removed",
+        description: "Item has been removed from cart",
+      });
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove item",
+        variant: "destructive",
+      });
+    }
   };
 
   const total = cartItems?.reduce((sum, item) => {
