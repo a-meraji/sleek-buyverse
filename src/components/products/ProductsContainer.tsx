@@ -3,6 +3,7 @@ import { ProductGrid } from "./ProductGrid";
 import { FilterSidebar } from "./FilterSidebar";
 import { MobileFilters } from "./MobileFilters";
 import { ProductsHeader } from "./ProductsHeader";
+import { SearchBadge } from "./SearchBadge";
 import { useProducts } from "./hooks/useProducts";
 import { useFilters } from "./hooks/useFilters";
 
@@ -13,7 +14,8 @@ export const ProductsContainer = () => {
   const {
     products,
     isLoading,
-    error
+    error,
+    categories
   } = useProducts();
 
   const {
@@ -26,6 +28,12 @@ export const ProductsContainer = () => {
     filteredProducts
   } = useFilters(products);
 
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategories([]);
+    setPriceRange([0, 1000]);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <ProductsHeader 
@@ -35,12 +43,21 @@ export const ProductsContainer = () => {
         setMobileFiltersOpen={setMobileFiltersOpen}
       />
       
-      <div className="flex gap-8 items-start">
+      {(searchQuery || selectedCategories.length > 0) && (
+        <SearchBadge
+          searchQuery={searchQuery}
+          selectedCategory={selectedCategories[0] || null}
+          onClear={handleClearFilters}
+        />
+      )}
+      
+      <div className="flex gap-8 items-start mt-4">
         <FilterSidebar
           selectedCategories={selectedCategories}
           setSelectedCategories={setSelectedCategories}
           priceRange={priceRange}
           setPriceRange={setPriceRange}
+          categories={categories}
           className="hidden lg:block sticky top-8"
         />
         
@@ -52,6 +69,7 @@ export const ProductsContainer = () => {
             setSelectedCategories={setSelectedCategories}
             priceRange={priceRange}
             setPriceRange={setPriceRange}
+            categories={categories}
           />
           
           <ProductGrid 

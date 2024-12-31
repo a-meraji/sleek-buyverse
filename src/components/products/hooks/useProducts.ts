@@ -34,9 +34,15 @@ export const useProducts = () => {
     refetchOnWindowFocus: false
   });
 
+  // Extract unique categories from products
+  const categories = products 
+    ? [...new Set(products.filter(p => p.category).map(p => p.category!))]
+    : [];
+
   return {
     products,
     isLoading,
-    error
+    error,
+    categories
   };
 };
