@@ -31,7 +31,9 @@ export function ProductOverviewDialog({
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
 
-  const { data: variants, isLoading: isLoadingVariants, error } = useQuery({
+  console.log('ProductOverviewDialog render - productId:', productId, 'isOpen:', isOpen);
+
+  const { data: variants, isLoading: isLoadingVariants, error, refetch } = useQuery({
     queryKey: ['product-variants', productId],
     queryFn: async () => {
       console.log('Fetching variants for product:', productId);
@@ -49,21 +51,30 @@ export function ProductOverviewDialog({
       return data || []; // Ensure we always return an array
     },
     enabled: isOpen && !!productId, // Only fetch when dialog is open and we have a productId
+    retry: 2, // Retry failed requests up to 2 times
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
   // Reset selections when dialog opens
   useEffect(() => {
-    if (isOpen && variants && variants.length > 0) {
-      const availableVariant = variants.find(v => v.stock > 0);
-      if (availableVariant) {
-        setSelectedSize(availableVariant.size);
-        setSelectedColor(availableVariant.color);
+    if (isOpen) {
+      console.log('Dialog opened, resetting selections. Current variants:', variants);
+      if (variants && variants.length > 0) {
+        const availableVariant = variants.find(v => v.stock > 0);
+        if (availableVariant) {
+          setSelectedSize(availableVariant.size);
+          setSelectedColor(availableVariant.color);
+          console.log('Selected variant:', availableVariant);
+        }
       }
     }
   }, [isOpen, variants]);
 
   const sizes = [...new Set(variants?.map(v => v.size) || [])];
   const colors = [...new Set(variants?.map(v => v.color) || [])];
+
+  console.log('Current sizes:', sizes);
+  console.log('Current colors:', colors);
 
   const selectedVariant = variants?.find(v => 
     v.size === selectedSize && v.color === selectedColor
@@ -84,7 +95,15 @@ export function ProductOverviewDialog({
             {isLoadingVariants ? (
               <p className="text-sm text-gray-500">Loading variants...</p>
             ) : error ? (
-              <p className="text-sm text-red-500">Error loading variants. Please try again.</p>
+              <div>
+                <p className="text-sm text-red-500">Error loading variants. Please try again.</p>
+                <button 
+                  onClick={() => refetch()} 
+                  className="text-sm text-blue-500 hover:underline mt-2"
+                >
+                  Retry
+                </button>
+              </div>
             ) : variants && variants.length > 0 ? (
               <>
                 <VariantSelector
@@ -107,7 +126,7 @@ export function ProductOverviewDialog({
                 )}
               </>
             ) : (
-              <p className="text-sm text-gray-500">No variants available for this product</p>
+              <p className="text-sm text-gray-500">No variants available for this product (ID: {productId})</p>
             )}
 
             <AddToCartButton 
