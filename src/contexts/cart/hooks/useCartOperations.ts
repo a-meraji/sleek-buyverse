@@ -31,7 +31,10 @@ export const useCartOperations = () => {
             .eq('id', existingItem.id)
             .select(`
               *,
-              product:products(*)
+              product:products(
+                *,
+                product_variants(*)
+              )
             `)
             .single();
 
@@ -48,7 +51,10 @@ export const useCartOperations = () => {
             })
             .select(`
               *,
-              product:products(*)
+              product:products(
+                *,
+                product_variants(*)
+              )
             `)
             .single();
 

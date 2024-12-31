@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductVariant } from "@/types/product";
+import { Product } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 import { useToast } from "@/hooks/use-toast";
 
 export function useProductUpdate() {
@@ -18,7 +19,6 @@ export function useProductUpdate() {
         .update({
           name: formData.name,
           description: formData.description,
-          price: formData.price,
           category: formData.category,
           image_url: formData.image_url,
           sku: formData.sku,
@@ -42,6 +42,7 @@ export function useProductUpdate() {
         size: variant.size,
         color: variant.color,
         stock: variant.stock,
+        price: variant.price
       }));
 
       const { error: variantsError } = await supabase

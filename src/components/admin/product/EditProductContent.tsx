@@ -1,6 +1,6 @@
-import { Product, ProductVariant } from "@/types/product";
+import { Product } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 import { ProductDetailsFields } from "./ProductDetailsFields";
-import { PriceStockFields } from "./PriceStockFields";
 import { CategorySelector } from "./CategorySelector";
 import { VariantsManager } from "./VariantsManager";
 import { ImagePreview } from "./ImagePreview";
@@ -36,11 +36,6 @@ export function EditProductContent({
         onNameChange={(value) => onFormChange({ name: value })}
         onDescriptionChange={(value) => onFormChange({ description: value })}
         onSkuChange={(value) => onFormChange({ sku: value })}
-      />
-
-      <PriceStockFields
-        price={formData.price}
-        onPriceChange={(value) => onFormChange({ price: value })}
       />
 
       <CategorySelector

@@ -1,5 +1,3 @@
-import { ProductVariant } from "./variant";
-
 export interface Product {
   id: string;
   name: string;
