@@ -29,8 +29,8 @@ const queryClient = new QueryClient({
 const App = () => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <CartProvider>
+      <CartProvider>
+        <TooltipProvider>
           <BrowserRouter>
             <div className="flex min-h-screen flex-col">
               <div className="flex-1">
@@ -50,8 +50,8 @@ const App = () => (
             <Toaster />
             <Sonner />
           </BrowserRouter>
-        </CartProvider>
-      </TooltipProvider>
+        </TooltipProvider>
+      </CartProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );
