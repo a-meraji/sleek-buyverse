@@ -25,8 +25,8 @@ export type CartAction =
 
 export interface CartContextType {
   state: CartState;
-  addToCart: (item: Omit<CartItem, 'id'>) => Promise<void>;
-  updateQuantity: (id: string, quantity: number) => Promise<void>;
-  removeItem: (id: string) => Promise<void>;
+  addToCart: (userId: string | null, item: Omit<CartItem, 'id'>) => Promise<void>;
+  updateQuantity: (userId: string | null, id: string, quantity: number) => Promise<void>;
+  removeItem: (userId: string | null, id: string) => Promise<void>;
   loadCartItems: () => Promise<void>;
 }

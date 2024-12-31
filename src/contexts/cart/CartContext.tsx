@@ -3,6 +3,7 @@ import { CartContextType } from './types';
 import { useCartState } from './hooks/useCartState';
 import { useCartOperations } from './hooks/useCartOperations';
 import { useCartSync } from './hooks/useCartSync';
+import { supabase } from "@/integrations/supabase/client";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -18,7 +19,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadCartItems: async () => {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
-        const { data: session } = await supabase.auth.getSession();
         const { data: cartData, error } = await supabase
           .from('cart_items')
           .select(`
