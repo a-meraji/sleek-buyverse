@@ -2,12 +2,13 @@ import { Dialog } from "@headlessui/react";
 import { X } from "lucide-react";
 import { PriceRangeFilter } from "./filters/PriceRangeFilter";
 import { CategoryFilter } from "./filters/CategoryFilter";
+import { Dispatch, SetStateAction } from "react";
 
 interface MobileFiltersProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   priceRange: number[];
-  setPriceRange: (range: number[]) => void;
+  setPriceRange: Dispatch<SetStateAction<[number, number]>>;
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
   categories: string[] | undefined;

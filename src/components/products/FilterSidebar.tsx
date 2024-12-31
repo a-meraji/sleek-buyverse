@@ -1,9 +1,10 @@
 import { PriceRangeFilter } from "./filters/PriceRangeFilter";
 import { CategoryFilter } from "./filters/CategoryFilter";
+import { Dispatch, SetStateAction } from "react";
 
 interface FilterSidebarProps {
   priceRange: number[];
-  setPriceRange: (range: number[]) => void;
+  setPriceRange: Dispatch<SetStateAction<[number, number]>>;
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
   categories: string[] | undefined;
