@@ -2,6 +2,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CartItem } from '../types';
 import { useAuthenticatedCart } from './useAuthenticatedCart';
 import { useUnauthenticatedCartOperations } from './useUnauthenticatedCartOperations';
+import { supabase } from "@/integrations/supabase/client";
 
 export const useCartOperations = () => {
   const { toast } = useToast();
