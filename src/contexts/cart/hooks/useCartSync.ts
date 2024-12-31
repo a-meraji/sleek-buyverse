@@ -9,44 +9,26 @@ export const useCartSync = (
 ) => {
   const { toast } = useToast();
 
+  // Sync cart data from the appropriate source (Supabase or localStorage)
   useEffect(() => {
     const syncCart = async () => {
       try {
         const { data: sessionData } = await supabase.auth.getSession();
-        console.log('Syncing cart for session:', sessionData?.session?.user?.id);
         
         if (!sessionData.session) {
-          // Handle unauthenticated users
-          console.log('Syncing local cart for unauthenticated user');
+          // Handle unauthenticated users - sync from localStorage
           const localCart = localStorage.getItem('cart');
           if (localCart) {
             const parsedCart = JSON.parse(localCart);
-            // Fetch product details for local cart items
-            const productIds = parsedCart.map((item: CartItem) => item.product_id);
-            
-            if (productIds.length > 0) {
-              const { data: products } = await supabase
-                .from('products')
-                .select('*')
-                .in('id', productIds);
-              
-              const cartWithProducts = parsedCart.map((item: CartItem) => ({
-                ...item,
-                product: products?.find(p => p.id === item.product_id)
-              }));
-              
-              dispatch({ type: 'SET_ITEMS', payload: cartWithProducts });
-              console.log('Local cart synced with products:', cartWithProducts);
-            } else {
-              dispatch({ type: 'SET_ITEMS', payload: parsedCart });
-            }
+            dispatch({ type: 'SET_ITEMS', payload: parsedCart });
+            console.log('Local cart synced:', parsedCart);
           } else {
             dispatch({ type: 'SET_ITEMS', payload: [] });
           }
           return;
         }
 
-        // Handle authenticated users
+        // Handle authenticated users - sync from Supabase
         const { data: cartData, error } = await supabase
           .from('cart_items')
           .select(`
@@ -70,14 +52,13 @@ export const useCartSync = (
     syncCart();
   }, [dispatch, toast]);
 
-  // Save to localStorage whenever items change
+  // Keep localStorage in sync for unauthenticated users
   useEffect(() => {
     const syncLocalStorage = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
         const localItems = items.filter(item => item.id.startsWith('local-'));
-        console.log('Saving local cart to localStorage:', localItems);
         localStorage.setItem('cart', JSON.stringify(localItems));
       }
     };

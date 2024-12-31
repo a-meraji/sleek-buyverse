@@ -6,17 +6,18 @@ import { useCallback } from 'react';
 export const useCartOperations = () => {
   const { toast } = useToast();
 
-  const addToCart = async (userId: string | null, item: Omit<CartItem, 'id'>) => {
-    try {
-      console.log('Adding to cart for user:', userId);
-      
-      if (userId) {
-        // For authenticated users, add to Supabase
-        const { data, error } = await supabase
+  const handleAuthenticatedCart = async (
+    userId: string,
+    operation: 'add' | 'update' | 'remove',
+    data: any
+  ) => {
+    switch (operation) {
+      case 'add':
+        const { data: insertData, error: insertError } = await supabase
           .from('cart_items')
           .insert({
-            product_id: item.product_id,
-            quantity: item.quantity,
+            product_id: data.product_id,
+            quantity: data.quantity,
             user_id: userId,
           })
           .select(`
@@ -25,30 +26,78 @@ export const useCartOperations = () => {
           `)
           .single();
 
-        if (error) throw error;
-        console.log('Added item to Supabase cart:', data);
-        return data;
-      } else {
-        // For unauthenticated users, add to localStorage
-        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const newItem = {
-          ...item,
-          id: `local-${Date.now()}`,
-        };
-        
-        // Fetch product details
+        if (insertError) throw insertError;
+        return insertData;
+
+      case 'update':
+        const { error: updateError } = await supabase
+          .from('cart_items')
+          .update({ quantity: data.quantity })
+          .eq('id', data.id);
+
+        if (updateError) throw updateError;
+        break;
+
+      case 'remove':
+        const { error: deleteError } = await supabase
+          .from('cart_items')
+          .delete()
+          .eq('id', data.id);
+
+        if (deleteError) throw deleteError;
+        break;
+    }
+  };
+
+  const handleUnauthenticatedCart = async (
+    operation: 'add' | 'update' | 'remove',
+    data: any
+  ) => {
+    const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    switch (operation) {
+      case 'add': {
         const { data: product } = await supabase
           .from('products')
           .select('*')
-          .eq('id', item.product_id)
+          .eq('id', data.product_id)
           .single();
-        
-        newItem.product = product;
+
+        const newItem = {
+          ...data,
+          id: `local-${Date.now()}`,
+          product
+        };
         
         localCart.push(newItem);
         localStorage.setItem('cart', JSON.stringify(localCart));
-        console.log('Added item to local cart:', newItem);
         return newItem;
+      }
+
+      case 'update': {
+        const updatedCart = localCart.map((item: CartItem) =>
+          item.id === data.id ? { ...item, quantity: data.quantity } : item
+        );
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        break;
+      }
+
+      case 'remove': {
+        const filteredCart = localCart.filter((item: CartItem) => item.id !== data.id);
+        localStorage.setItem('cart', JSON.stringify(filteredCart));
+        break;
+      }
+    }
+  };
+
+  const addToCart = async (userId: string | null, item: Omit<CartItem, 'id'>) => {
+    try {
+      console.log('Adding to cart for user:', userId);
+      
+      if (userId) {
+        return await handleAuthenticatedCart(userId, 'add', item);
+      } else {
+        return await handleUnauthenticatedCart('add', item);
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -66,20 +115,9 @@ export const useCartOperations = () => {
       console.log('Updating quantity for item:', id, 'user:', userId);
       
       if (userId && !id.startsWith('local-')) {
-        const { error } = await supabase
-          .from('cart_items')
-          .update({ quantity })
-          .eq('id', id);
-
-        if (error) throw error;
+        await handleAuthenticatedCart(userId, 'update', { id, quantity });
       } else {
-        // Update localStorage
-        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const updatedCart = localCart.map((item: CartItem) =>
-          item.id === id ? { ...item, quantity } : item
-        );
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
-        console.log('Updated local cart item quantity:', id, quantity);
+        await handleUnauthenticatedCart('update', { id, quantity });
       }
     } catch (error) {
       console.error('Error updating quantity:', error);
@@ -97,18 +135,9 @@ export const useCartOperations = () => {
       console.log('Removing item:', id, 'for user:', userId);
       
       if (userId && !id.startsWith('local-')) {
-        const { error } = await supabase
-          .from('cart_items')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
+        await handleAuthenticatedCart(userId, 'remove', { id });
       } else {
-        // Remove from localStorage
-        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const updatedCart = localCart.filter((item: CartItem) => item.id !== id);
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
-        console.log('Removed item from local cart:', id);
+        await handleUnauthenticatedCart('remove', { id });
       }
     } catch (error) {
       console.error('Error removing item:', error);

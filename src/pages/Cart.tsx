@@ -27,11 +27,11 @@ const Cart = () => {
     queryKey: ['cart', session?.user?.id],
     queryFn: async () => {
       if (!session?.user?.id) {
-        console.log("Using local cart items from context:", state.items);
+        // For unauthenticated users, return items from context
         return state.items;
       }
       
-      console.log("Fetching cart items for user:", session.user.id);
+      // For authenticated users, fetch from Supabase
       const { data, error } = await supabase
         .from('cart_items')
         .select(`
@@ -58,11 +58,11 @@ const Cart = () => {
     
     try {
       await updateQuantity(userId, id, newQuantity);
-      // Force refetch for authenticated users
+      
+      // Immediately update UI
       if (session?.user?.id) {
         await queryClient.invalidateQueries({ queryKey: ['cart', session.user.id] });
       } else {
-        // For unauthenticated users, immediately update the UI using the cart context state
         queryClient.setQueryData(['cart', null], state.items);
       }
       
@@ -83,11 +83,11 @@ const Cart = () => {
   const handleRemoveItem = async (id: string) => {
     try {
       await removeItem(userId, id);
-      // Force refetch for authenticated users
+      
+      // Immediately update UI
       if (session?.user?.id) {
         await queryClient.invalidateQueries({ queryKey: ['cart', session.user.id] });
       } else {
-        // For unauthenticated users, immediately update the UI using the cart context state
         queryClient.setQueryData(['cart', null], state.items);
       }
       
