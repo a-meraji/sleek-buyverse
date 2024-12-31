@@ -6,6 +6,7 @@ export interface ProductVariant {
   size: string;
   color: string;
   stock: number;
+  price: number;
 }
 
 export interface Product {
