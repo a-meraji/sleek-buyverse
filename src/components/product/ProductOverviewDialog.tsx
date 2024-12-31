@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProductImage } from "./dialog/ProductImage";
 import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelectionPanel } from "./dialog/VariantSelectionPanel";
 import { DialogActions } from "./dialog/DialogActions";
-import { ProductVariant } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 
 interface ProductOverviewDialogProps {
   isOpen: boolean;
@@ -13,7 +12,6 @@ interface ProductOverviewDialogProps {
   productId: string;
   productName: string;
   productImage: string;
-  productPrice: number;
   userId: string | null;
   variants?: ProductVariant[];
 }
@@ -24,28 +22,9 @@ export function ProductOverviewDialog({
   productId,
   productName,
   productImage,
-  productPrice,
   userId,
   variants = []
 }: ProductOverviewDialogProps) {
-  const [selectedSize, setSelectedSize] = useState<string>("");
-  const [selectedColor, setSelectedColor] = useState<string>("");
-
-  useEffect(() => {
-    if (isOpen && variants.length > 0) {
-      const availableVariant = variants.find(v => v.stock > 0);
-      if (availableVariant) {
-        setSelectedSize(availableVariant.size);
-        setSelectedColor(availableVariant.color);
-      }
-    }
-  }, [isOpen, variants]);
-
-  const selectedVariant = variants.find(v => 
-    v.size === selectedSize && v.color === selectedColor
-  );
-  const isOutOfStock = selectedVariant?.stock <= 0;
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
@@ -55,22 +34,22 @@ export function ProductOverviewDialog({
         <ScrollArea className="h-full max-h-[calc(90vh-120px)]">
           <div className="grid gap-4 py-4 px-1">
             <ProductImage image={productImage} name={productName} />
-            <ProductInfo name={productName} price={productPrice} />
+            <ProductInfo name={productName} variants={variants} />
             
             <VariantSelectionPanel
               variants={variants}
-              selectedSize={selectedSize}
-              selectedColor={selectedColor}
-              onSizeChange={setSelectedSize}
-              onColorChange={setSelectedColor}
+              selectedSize=""
+              selectedColor=""
+              onSizeChange={() => {}}
+              onColorChange={() => {}}
             />
 
             <DialogActions
               productId={productId}
               userId={userId}
-              selectedSize={selectedSize}
+              selectedSize=""
               productName={productName}
-              disabled={!variants.length || isOutOfStock}
+              disabled={!variants.length}
             />
           </div>
         </ScrollArea>

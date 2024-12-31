@@ -14,25 +14,50 @@ export const useCartOperations = () => {
     console.log(`Handling ${operation} operation for authenticated user:`, userId);
     
     switch (operation) {
-      case 'add':
-        const { data: insertData, error: insertError } = await supabase
+      case 'add': {
+        // First check if the item exists
+        const { data: existingItem } = await supabase
           .from('cart_items')
-          .insert({
-            product_id: data.product_id,
-            quantity: data.quantity,
-            user_id: userId,
-          })
-          .select(`
-            *,
-            product:products(*)
-          `)
+          .select('*')
+          .eq('user_id', userId)
+          .eq('product_id', data.product_id)
           .single();
 
-        if (insertError) throw insertError;
-        console.log('Added item to server cart:', insertData);
-        return insertData;
+        if (existingItem) {
+          // Update quantity if item exists
+          const { data: updatedItem, error: updateError } = await supabase
+            .from('cart_items')
+            .update({ quantity: existingItem.quantity + 1 })
+            .eq('id', existingItem.id)
+            .select(`
+              *,
+              product:products(*)
+            `)
+            .single();
 
-      case 'update':
+          if (updateError) throw updateError;
+          return updatedItem;
+        } else {
+          // Insert new item if it doesn't exist
+          const { data: insertData, error: insertError } = await supabase
+            .from('cart_items')
+            .insert({
+              product_id: data.product_id,
+              quantity: data.quantity,
+              user_id: userId,
+            })
+            .select(`
+              *,
+              product:products(*)
+            `)
+            .single();
+
+          if (insertError) throw insertError;
+          return insertData;
+        }
+      }
+
+      case 'update': {
         const { error: updateError } = await supabase
           .from('cart_items')
           .update({ quantity: data.quantity })
@@ -41,8 +66,9 @@ export const useCartOperations = () => {
         if (updateError) throw updateError;
         console.log('Updated server cart item quantity:', data.id, data.quantity);
         break;
+      }
 
-      case 'remove':
+      case 'remove': {
         const { error: deleteError } = await supabase
           .from('cart_items')
           .delete()
@@ -51,6 +77,7 @@ export const useCartOperations = () => {
         if (deleteError) throw deleteError;
         console.log('Removed item from server cart:', data.id);
         break;
+      }
     }
   };
 

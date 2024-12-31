@@ -1,13 +1,21 @@
+import { ProductVariant } from "@/types/variant";
+
 interface ProductInfoProps {
   name: string;
-  price: number;
+  variants?: ProductVariant[];
 }
 
-export function ProductInfo({ name, price }: ProductInfoProps) {
+export function ProductInfo({ name, variants }: ProductInfoProps) {
+  const minPrice = variants?.length 
+    ? Math.min(...variants.map(v => v.price))
+    : null;
+
   return (
     <>
       <h3 className="text-lg font-medium">{name}</h3>
-      <p className="text-sm text-gray-500">${price.toFixed(2)}</p>
+      {minPrice !== null && (
+        <p className="text-sm text-gray-500">From ${minPrice.toFixed(2)}</p>
+      )}
     </>
   );
 }

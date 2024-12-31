@@ -22,12 +22,10 @@ export function ProductCard({ id, name, image, variants }: ProductCardProps) {
     : 0;
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id ?? null);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('ProductCard auth state changed:', event, session);
       setUserId(session?.user?.id ?? null);
