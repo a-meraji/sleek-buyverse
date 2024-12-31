@@ -44,20 +44,13 @@ export const useCartOperations = () => {
   const updateQuantity = async (userId: string | null, id: string, quantity: number) => {
     try {
       if (userId && !id.startsWith('local-')) {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('cart_items')
           .update({ quantity })
-          .eq('id', id)
-          .select(`
-            *,
-            product:products(*)
-          `)
-          .single();
+          .eq('id', id);
 
         if (error) throw error;
-        return data;
       }
-      return { id, quantity };
     } catch (error) {
       console.error('Error updating quantity:', error);
       toast({
@@ -79,7 +72,6 @@ export const useCartOperations = () => {
 
         if (error) throw error;
       }
-      return id;
     } catch (error) {
       console.error('Error removing item:', error);
       toast({

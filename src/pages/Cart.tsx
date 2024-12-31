@@ -10,11 +10,13 @@ import { useState } from "react";
 const Cart = () => {
   const { state: { items, isLoading }, updateQuantity, removeItem, loadCartItems } = useCart();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
+      setUserId(session?.user?.id || null);
     };
     checkAuth();
   }, []);
@@ -25,10 +27,10 @@ const Cart = () => {
     }
   }, [loadCartItems, isAuthenticated]);
 
-  const handleQuantityChange = (id: string, currentQuantity: number, delta: number) => {
+  const handleQuantityChange = async (id: string, currentQuantity: number, delta: number) => {
     const newQuantity = currentQuantity + delta;
     if (newQuantity < 1) return;
-    updateQuantity(id, newQuantity);
+    await updateQuantity(userId, id, newQuantity);
   };
 
   const total = items?.reduce((sum, item) => {
@@ -84,7 +86,7 @@ const Cart = () => {
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(userId, item.id)}
                       >
                         <X className="h-4 w-4" />
                       </Button>
