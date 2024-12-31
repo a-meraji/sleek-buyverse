@@ -13,7 +13,10 @@ export const useCartSync = (
     const syncCart = async () => {
       try {
         const { data: session } = await supabase.auth.getSession();
+        
+        // Handle unauthenticated users
         if (!session.session) {
+          console.log('Syncing local cart for unauthenticated user');
           const localCart = localStorage.getItem('cart');
           if (localCart) {
             const parsedCart = JSON.parse(localCart);
@@ -31,6 +34,7 @@ export const useCartSync = (
               }));
               
               dispatch({ type: 'SET_ITEMS', payload: cartWithProducts });
+              console.log('Local cart synced with products:', cartWithProducts);
             } else {
               dispatch({ type: 'SET_ITEMS', payload: parsedCart });
             }
@@ -38,6 +42,8 @@ export const useCartSync = (
           return;
         }
 
+        // Handle authenticated users
+        console.log('Syncing cart for authenticated user:', session.session.user.id);
         const { data: cartData, error } = await supabase
           .from('cart_items')
           .select(`
@@ -47,6 +53,7 @@ export const useCartSync = (
 
         if (error) throw error;
         dispatch({ type: 'SET_ITEMS', payload: cartData });
+        console.log('Server cart synced:', cartData);
       } catch (error) {
         console.error('Error syncing cart:', error);
         toast({
@@ -62,6 +69,7 @@ export const useCartSync = (
 
   // Save to localStorage whenever items change
   useEffect(() => {
+    console.log('Saving cart to localStorage:', items);
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
 };

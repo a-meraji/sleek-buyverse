@@ -18,6 +18,7 @@ export const SearchBar = ({ isExpanded, setIsExpanded }: SearchBarProps) => {
     if (searchQuery.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
       setIsExpanded(false);
+      setSearchQuery(""); // Clear search after submitting
     }
   };
 

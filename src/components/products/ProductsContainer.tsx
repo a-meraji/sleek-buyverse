@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,13 +7,24 @@ import { ProductsHeader } from "./ProductsHeader";
 import { FilterSidebar } from "./FilterSidebar";
 import { MobileFilters } from "./MobileFilters";
 import { SearchBadge } from "./SearchBadge";
+import { useSearchParams } from "react-router-dom";
 
 export const ProductsContainer = () => {
+  const [searchParams] = useSearchParams();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Sync search query from URL params
+  useEffect(() => {
+    const search = searchParams.get('search');
+    if (search) {
+      setSearchQuery(search);
+      console.log('Search query from URL:', search);
+    }
+  }, [searchParams]);
 
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['products', priceRange, selectedCategory, searchQuery],
@@ -105,7 +116,7 @@ export const ProductsContainer = () => {
         <div className="hidden lg:block w-64">
           <FilterSidebar
             priceRange={priceRange}
-            setPriceRange={(range: [number, number]) => setPriceRange(range)}
+            setPriceRange={setPriceRange}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             categories={Array.from(new Set(products?.map(p => p.category)))}
@@ -116,7 +127,7 @@ export const ProductsContainer = () => {
             open={mobileFiltersOpen}
             setOpen={setMobileFiltersOpen}
             priceRange={priceRange}
-            setPriceRange={(range: [number, number]) => setPriceRange(range)}
+            setPriceRange={setPriceRange}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             categories={Array.from(new Set(products?.map(p => p.category)))}
