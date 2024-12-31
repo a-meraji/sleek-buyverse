@@ -9,3 +9,7 @@ export interface Product {
   sku?: string;
   product_variants?: ProductVariant[];
 }
+
+export interface ProductFormData extends Omit<Product, 'id'> {
+  variants: ProductVariant[];
+}

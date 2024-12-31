@@ -34,11 +34,14 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
 
   const selectedVariant = variants?.find(v => v.size === selectedSize);
   const isOutOfStock = selectedVariant?.stock <= 0;
+  const minPrice = variants?.length 
+    ? Math.min(...variants.map(v => v.price))
+    : 0;
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">{product.name}</h1>
-      <p className="text-xl">${product.price.toFixed(2)}</p>
+      <p className="text-xl">From ${minPrice.toFixed(2)}</p>
       <p className="text-gray-600">{product.description}</p>
       
       {isLoadingVariants ? (
@@ -51,10 +54,17 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
             variants={variants}
           />
           
-          {isOutOfStock && (
-            <Badge variant="destructive" className="w-fit">
-              Out of Stock
-            </Badge>
+          {selectedVariant && (
+            <div className="space-y-2">
+              <p className="text-lg font-medium">
+                Selected variant: ${selectedVariant.price.toFixed(2)}
+              </p>
+              {isOutOfStock && (
+                <Badge variant="destructive" className="w-fit">
+                  Out of Stock
+                </Badge>
+              )}
+            </div>
           )}
         </>
       ) : (

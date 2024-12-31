@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Trash2 } from "lucide-react";
-import { Product, ProductVariant } from "@/types/product";
+import { Product } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 
 interface ProductTableRowProps {
   product: Product;
@@ -17,6 +18,9 @@ export function ProductTableRow({
   onEdit, 
   onDelete 
 }: ProductTableRowProps) {
+  const minPrice = variants.length 
+    ? Math.min(...variants.map(v => v.price))
+    : 0;
   const totalStock = variants.reduce((sum, variant) => sum + variant.stock, 0);
 
   return (
@@ -30,13 +34,13 @@ export function ProductTableRow({
       </TableCell>
       <TableCell>{product.name}</TableCell>
       <TableCell>{product.sku}</TableCell>
-      <TableCell>${product.price}</TableCell>
+      <TableCell>${minPrice.toFixed(2)}</TableCell>
       <TableCell>{product.category}</TableCell>
       <TableCell>
         <div className="flex flex-wrap gap-1">
           {variants.map((variant) => (
             <Badge key={`${variant.id}`} variant="secondary">
-              {variant.color} - {variant.size} ({variant.stock})
+              {variant.color} - {variant.size} (${variant.price})
             </Badge>
           ))}
         </div>
