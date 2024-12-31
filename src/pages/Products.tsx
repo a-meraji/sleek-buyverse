@@ -13,6 +13,8 @@ const Products = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['products', priceRange, selectedCategory, searchQuery],
@@ -103,12 +105,15 @@ const Products = () => {
       <Navbar />
       <main>
         <div className="container mx-auto px-4 py-8">
-          <ProductsHeader />
+          <ProductsHeader 
+            setSortOrder={setSortOrder} 
+            setMobileFiltersOpen={setMobileFiltersOpen}
+          />
           <div className="flex flex-col lg:flex-row gap-8 mt-8">
             <div className="hidden lg:block w-64">
               <FilterSidebar
                 priceRange={priceRange}
-                setPriceRange={setPriceRange}
+                setPriceRange={(range: [number, number]) => setPriceRange(range)}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
                 searchQuery={searchQuery}
@@ -118,7 +123,7 @@ const Products = () => {
             <div className="lg:hidden">
               <MobileFilters
                 priceRange={priceRange}
-                setPriceRange={setPriceRange}
+                setPriceRange={(range: [number, number]) => setPriceRange(range)}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
                 searchQuery={searchQuery}
