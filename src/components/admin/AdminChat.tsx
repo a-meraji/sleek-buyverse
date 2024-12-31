@@ -31,8 +31,6 @@ export const AdminChat = () => {
         />
       </div>
 
-      <div className="relative">
-      
       <div className="col-span-8 overflow-auto">
         <Card className="h-full flex flex-col">
           <CardHeader className="flex-none">
@@ -42,12 +40,11 @@ export const AdminChat = () => {
             <div className="flex-1 px-6 overflow-auto">
               <MessageList sessionId={selectedSession} />
             </div>
-            <div className="flex-none p-6 pt-4 border-t bg-background absolute left-0 bottom-0 right-0 ">
+            <div className="flex-none p-6 pt-4 border-t bg-background w-full">
               <MessageInput sessionId={selectedSession} />
             </div>
           </CardContent>
         </Card>
-      </div>
       </div>
     </div>
   );
