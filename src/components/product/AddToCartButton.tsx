@@ -10,13 +10,15 @@ interface AddToCartButtonProps {
   selectedSize: string;
   productName: string;
   disabled?: boolean;
+  variantId?: string;
 }
 
 export const AddToCartButton = ({ 
   productId, 
   userId, 
   selectedSize, 
-  productName, 
+  productName,
+  variantId,
   disabled 
 }: AddToCartButtonProps) => {
   const { toast } = useToast();
@@ -35,14 +37,25 @@ export const AddToCartButton = ({
         return;
       }
 
+      if (!variantId) {
+        toast({
+          title: "Error",
+          description: "No variant selected for this size.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       console.log('Adding to cart:', {
         productId,
+        variantId,
         selectedSize,
         userId
       });
 
       await addToCart(userId, {
         product_id: productId,
+        variant_id: variantId,
         quantity: 1,
       });
 

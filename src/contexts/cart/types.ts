@@ -1,13 +1,20 @@
 export interface CartItem {
   id: string;
   product_id: string;
+  variant_id?: string;
   quantity: number;
   product?: {
     id: string;
     name: string;
-    price: number;
     image_url: string;
     description?: string;
+    product_variants?: Array<{
+      id: string;
+      price: number;
+      size: string;
+      color: string;
+      stock: number;
+    }>;
   };
 }
 

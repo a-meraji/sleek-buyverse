@@ -11,7 +11,7 @@ export const useCartOperations = () => {
     operation: 'add' | 'update' | 'remove',
     data: any
   ) => {
-    console.log(`Handling ${operation} operation for authenticated user:`, userId);
+    console.log(`Handling ${operation} operation for authenticated user:`, { userId, data });
     
     switch (operation) {
       case 'add': {
@@ -21,6 +21,7 @@ export const useCartOperations = () => {
           .select('*')
           .eq('user_id', userId)
           .eq('product_id', data.product_id)
+          .eq('variant_id', data.variant_id)
           .single();
 
         if (existingItem) {
@@ -46,6 +47,7 @@ export const useCartOperations = () => {
             .from('cart_items')
             .insert({
               product_id: data.product_id,
+              variant_id: data.variant_id,
               quantity: data.quantity,
               user_id: userId,
             })
@@ -91,7 +93,7 @@ export const useCartOperations = () => {
     operation: 'add' | 'update' | 'remove',
     data: any
   ) => {
-    console.log(`Handling ${operation} operation for unauthenticated user`);
+    console.log(`Handling ${operation} operation for unauthenticated user`, data);
     
     const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
 
@@ -99,7 +101,7 @@ export const useCartOperations = () => {
       case 'add': {
         const { data: product } = await supabase
           .from('products')
-          .select('*')
+          .select('*, product_variants(*)')
           .eq('id', data.product_id)
           .single();
 
@@ -135,7 +137,7 @@ export const useCartOperations = () => {
 
   const addToCart = async (userId: string | null, item: Omit<CartItem, 'id'>) => {
     try {
-      console.log('Adding to cart for user:', userId);
+      console.log('Adding to cart:', { userId, item });
       
       if (userId) {
         return await handleAuthenticatedCart(userId, 'add', item);
@@ -155,7 +157,7 @@ export const useCartOperations = () => {
 
   const updateQuantity = async (userId: string | null, id: string, quantity: number) => {
     try {
-      console.log('Updating quantity for item:', id, 'user:', userId);
+      console.log('Updating quantity:', { userId, id, quantity });
       
       if (userId && !id.startsWith('local-')) {
         await handleAuthenticatedCart(userId, 'update', { id, quantity });
@@ -175,7 +177,7 @@ export const useCartOperations = () => {
 
   const removeItem = async (userId: string | null, id: string) => {
     try {
-      console.log('Removing item:', id, 'for user:', userId);
+      console.log('Removing item:', { userId, id });
       
       if (userId && !id.startsWith('local-')) {
         await handleAuthenticatedCart(userId, 'remove', { id });

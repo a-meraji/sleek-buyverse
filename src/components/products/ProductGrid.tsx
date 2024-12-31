@@ -1,24 +1,16 @@
-import { ProductCard } from "@/components/ProductCard";
 import { Product } from "@/types/product";
+import { ProductCard } from "@/components/ProductCard";
 
 interface ProductGridProps {
-  products: Product[] | null | undefined;
-  isLoading: boolean;
-  error: Error | null;
+  products: Product[];
 }
 
-export const ProductGrid = ({ products, isLoading, error }: ProductGridProps) => {
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+export function ProductGrid({ products }: ProductGridProps) {
+  console.log('Rendering ProductGrid with products:', products);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {products?.map((product) => (
+    <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+      {products.map((product) => (
         <ProductCard
           key={product.id}
           id={product.id}

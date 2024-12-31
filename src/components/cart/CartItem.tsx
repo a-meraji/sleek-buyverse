@@ -11,13 +11,17 @@ interface CartItemProps {
 }
 
 export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemProps) => {
-  // Get the first variant's price or default to 0
-  const variantPrice = item.product?.product_variants?.[0]?.price ?? 0;
+  // Find the selected variant or default to the first one
+  const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id) 
+    || item.product?.product_variants?.[0];
+  
+  const variantPrice = selectedVariant?.price ?? 0;
   const subtotal = variantPrice * item.quantity;
 
   console.log('Rendering cart item:', {
     itemId: item.id,
     productName: item.product?.name,
+    variantId: item.variant_id,
     variantPrice,
     quantity: item.quantity,
     subtotal
@@ -43,7 +47,14 @@ export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemP
           </Button>
         </div>
         
-        <p className="text-sm text-muted-foreground">{item.product?.description}</p>
+        <p className="text-sm text-muted-foreground">
+          {item.product?.description}
+          {selectedVariant && (
+            <span className="block mt-1">
+              Size: {selectedVariant.size}, Color: {selectedVariant.color}
+            </span>
+          )}
+        </p>
         <p>${variantPrice.toFixed(2)} × {item.quantity} = ${subtotal.toFixed(2)}</p>
         
         <div className="flex items-center gap-2">
