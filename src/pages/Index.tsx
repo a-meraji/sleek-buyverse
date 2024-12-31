@@ -16,22 +16,35 @@ const Index = () => {
     queryKey: ['products'],
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          *,
-          product_variants (*)
-        `)
-        .limit(8)
-        .order('created_at', { ascending: false });
-      
-      if (error) {
+      try {
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .limit(8)
+          .order('created_at', { ascending: false });
+
+        if (productsError) throw productsError;
+
+        // Fetch variants separately to ensure RLS policies are properly applied
+        const { data: variantsData, error: variantsError } = await supabase
+          .from('product_variants')
+          .select('*')
+          .in('product_id', productsData.map(p => p.id));
+
+        if (variantsError) throw variantsError;
+
+        // Combine products with their variants
+        const productsWithVariants = productsData.map(product => ({
+          ...product,
+          product_variants: variantsData.filter(v => v.product_id === product.id)
+        }));
+
+        console.log('Products with variants fetched successfully:', productsWithVariants);
+        return productsWithVariants;
+      } catch (error) {
         console.error('Error fetching products:', error);
         throw error;
       }
-      
-      console.log('Products fetched successfully:', data);
-      return data;
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     retry: 1,
