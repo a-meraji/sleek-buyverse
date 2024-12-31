@@ -116,18 +116,18 @@ const Products = () => {
                 setPriceRange={(range: [number, number]) => setPriceRange(range)}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
+                categories={Array.from(new Set(products?.map(p => p.category)))}
               />
             </div>
             <div className="lg:hidden">
               <MobileFilters
+                open={mobileFiltersOpen}
+                setOpen={setMobileFiltersOpen}
                 priceRange={priceRange}
                 setPriceRange={(range: [number, number]) => setPriceRange(range)}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
+                categories={Array.from(new Set(products?.map(p => p.category)))}
               />
             </div>
             <div className="flex-1">
