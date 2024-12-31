@@ -33,12 +33,18 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
 
       // Transfer each item to the server
       for (const item of localCartItems) {
+        // Get the selected variant ID from the local cart item
+        const variantId = item.product?.product_variants?.find(
+          (v: any) => v.id === item.variant_id
+        )?.id;
+
         const { error } = await supabase
           .from('cart_items')
           .insert({
             user_id: userId,
             product_id: item.product.id,
-            quantity: item.quantity
+            quantity: item.quantity,
+            variant_id: variantId // Include the variant_id in the insert
           });
 
         if (error) {
