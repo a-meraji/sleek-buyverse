@@ -31,8 +31,6 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <CartProvider>
-          <Toaster />
-          <Sonner />
           <BrowserRouter>
             <div className="flex min-h-screen flex-col">
               <div className="flex-1">
@@ -50,6 +48,8 @@ const App = () => (
             </div>
             <ChatButton />
           </BrowserRouter>
+          <Toaster />
+          <Sonner />
         </CartProvider>
       </TooltipProvider>
     </QueryClientProvider>
