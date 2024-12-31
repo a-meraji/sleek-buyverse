@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/cart/CartContext";
-import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { ProductVariant } from "@/types";
 
@@ -23,7 +22,6 @@ export const AddToCartButton = ({
   disabled 
 }: AddToCartButtonProps) => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { addToCart } = useCart();
   const queryClient = useQueryClient();
 
@@ -57,11 +55,6 @@ export const AddToCartButton = ({
         userId
       });
 
-      if (!userId) {
-        navigate('/auth');
-        return;
-      }
-
       await addToCart(userId, {
         product_id: productId,
         variant_id: selectedVariant.id,
@@ -69,7 +62,9 @@ export const AddToCartButton = ({
       });
 
       // Invalidate the cart query to trigger a refetch
-      await queryClient.invalidateQueries({ queryKey: ['cart', userId] });
+      if (userId) {
+        await queryClient.invalidateQueries({ queryKey: ['cart', userId] });
+      }
 
       toast({
         title: "Added to cart",
