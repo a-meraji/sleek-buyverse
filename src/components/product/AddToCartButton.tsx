@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/cart/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { ProductVariant } from "@/types";
 
 interface AddToCartButtonProps {
   productId: string;
@@ -10,7 +11,7 @@ interface AddToCartButtonProps {
   selectedSize: string;
   productName: string;
   disabled?: boolean;
-  variantId?: string;
+  variants?: ProductVariant[];
 }
 
 export const AddToCartButton = ({ 
@@ -18,7 +19,7 @@ export const AddToCartButton = ({
   userId, 
   selectedSize, 
   productName,
-  variantId,
+  variants,
   disabled 
 }: AddToCartButtonProps) => {
   const { toast } = useToast();
@@ -37,7 +38,10 @@ export const AddToCartButton = ({
         return;
       }
 
-      if (!variantId) {
+      // Find the variant that matches the selected size
+      const selectedVariant = variants?.find(v => v.size === selectedSize);
+      
+      if (!selectedVariant) {
         toast({
           title: "Error",
           description: "No variant selected for this size.",
@@ -48,7 +52,7 @@ export const AddToCartButton = ({
 
       console.log('Adding to cart:', {
         productId,
-        variantId,
+        variantId: selectedVariant.id,
         selectedSize,
         userId
       });
@@ -60,7 +64,7 @@ export const AddToCartButton = ({
 
       await addToCart(userId, {
         product_id: productId,
-        variant_id: variantId,
+        variant_id: selectedVariant.id,
         quantity: 1,
       });
 
