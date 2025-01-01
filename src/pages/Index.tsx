@@ -8,7 +8,7 @@ import HeroBanner from "@/components/home/HeroBanner";
 import { useEffect } from "react";
 
 const Index = () => {
-  const { data: products = [], isLoading, error } = useHomeProducts();
+  const { products, isLoading, error } = useHomeProducts();
 
   useEffect(() => {
     console.log('Index: Component state:', {
