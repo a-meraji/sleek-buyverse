@@ -47,9 +47,26 @@ export function useFavorites(userId: string) {
       
       console.log('Raw favorites data:', data);
       
+      // Ensure the data matches the expected type structure
       const transformedData = data?.map(item => ({
         product_id: item.product_id,
-        products: item.products as Product
+        products: {
+          id: item.products.id,
+          name: item.products.name,
+          description: item.products.description,
+          image_url: item.products.image_url,
+          category: item.products.category,
+          sku: item.products.sku,
+          discount: item.products.discount,
+          product_variants: item.products.product_variants?.map(variant => ({
+            id: variant.id,
+            product_id: item.products.id,
+            size: variant.size,
+            color: variant.color,
+            stock: variant.stock,
+            price: variant.price
+          }))
+        } as Product
       }));
       
       console.log('Transformed favorites data:', transformedData);
