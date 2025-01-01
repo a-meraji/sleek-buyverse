@@ -39,7 +39,7 @@ export function FavoritesList({ userId }: FavoritesListProps) {
       // Add type assertion to handle the Supabase response type
       const typedData = (data || []).map(item => ({
         product_id: item.product_id,
-        products: item.products as Product
+        products: item.products as unknown as Product // First cast to unknown, then to Product
       }));
       
       return typedData;
