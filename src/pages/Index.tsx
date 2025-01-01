@@ -15,10 +15,10 @@ const Index = () => {
   const { data: products, isLoading, error } = useQuery<Product[]>({
     queryKey: ['products'],
     queryFn: async () => {
-      console.log('Fetching products from Supabase...');
+      console.log('Starting products fetch...');
+      const startTime = performance.now();
+
       try {
-        const startTime = performance.now();
-        
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select(`
@@ -74,6 +74,12 @@ const Index = () => {
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     retry: 1,
+  });
+
+  console.log('Index page rendering state:', {
+    isLoading,
+    error,
+    productsCount: products?.length
   });
 
   if (isLoading) {
