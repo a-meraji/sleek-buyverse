@@ -13,78 +13,95 @@ export const Navbar = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const { toast } = useToast();
 
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      console.log('Checking admin status for user:', userId);
+      const { data: adminData, error: adminError } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('id', userId)
+        .maybeSingle();
+
+      console.log("Admin status check:", { adminData, adminError });
+
+      if (adminError) {
+        console.error("Admin check error:", adminError);
+        return false;
+      }
+
+      return !!adminData;
+    } catch (error) {
+      console.error("Unexpected error during admin check:", error);
+      return false;
+    }
+  };
+
   useEffect(() => {
-    // Check initial session
-    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
-      console.log("Initial session check:", { session, error });
-      if (error) {
-        console.error("Session check error:", error);
-        toast({
-          title: "Authentication Error",
-          description: "Please sign in to access all features",
-          variant: "destructive",
-        });
-        return;
-      }
+    let mounted = true;
 
-      if (session?.user) {
-        // Check admin status
-        const { data: adminData, error: adminError } = await supabase
-          .from('admin_users')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-
-        console.log("Admin status check:", { adminData, adminError });
-
-        if (adminError) {
-          console.error("Admin check error:", adminError);
-          toast({
-            title: "Authorization Error",
-            description: "Failed to verify admin status",
-            variant: "destructive",
-          });
+    const initializeSession = async () => {
+      try {
+        console.log("Initializing session...");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session check error:", error);
+          if (mounted) {
+            toast({
+              title: "Authentication Error",
+              description: "Please sign in to access all features",
+              variant: "destructive",
+            });
+          }
+          return;
         }
-      }
-      
-      setUser(session?.user ?? null);
-    });
 
-    // Listen for auth changes
+        if (session?.user) {
+          console.log("Session found for user:", session.user.id);
+          if (mounted) {
+            await checkAdminStatus(session.user.id);
+            setUser(session.user);
+          }
+        } else {
+          console.log("No active session found");
+          if (mounted) setUser(null);
+        }
+      } catch (err) {
+        console.error("Session initialization error:", err);
+      }
+    };
+
+    initializeSession();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log("Auth state changed:", { event: _event, session });
       
       if (session?.user) {
-        // Check admin status on auth state change
-        const { data: adminData, error: adminError } = await supabase
-          .from('admin_users')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-
-        console.log("Admin status check on auth change:", { adminData, adminError });
-
-        if (adminError) {
-          console.error("Admin check error:", adminError);
+        if (mounted) {
+          await checkAdminStatus(session.user.id);
+          setUser(session.user);
         }
-      }
-
-      setUser(session?.user ?? null);
-      
-      if (_event === 'SIGNED_IN') {
-        toast({
-          title: "Welcome!",
-          description: "You've successfully signed in",
-        });
-      } else if (_event === 'SIGNED_OUT') {
-        toast({
-          title: "Signed out",
-          description: "You've been signed out successfully",
-        });
+        
+        if (_event === 'SIGNED_IN') {
+          toast({
+            title: "Welcome!",
+            description: "You've successfully signed in",
+          });
+        }
+      } else {
+        if (mounted) setUser(null);
+        
+        if (_event === 'SIGNED_OUT') {
+          toast({
+            title: "Signed out",
+            description: "You've been signed out successfully",
+          });
+        }
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [toast]);
