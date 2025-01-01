@@ -12,7 +12,7 @@ export const useHomeProducts = () => {
       try {
         console.log('Sending request to Supabase products table...');
         
-        const { data: productsData, error: productsError, status, statusText } = await supabase
+        const response = await supabase
           .from('products')
           .select(`
             *,
@@ -23,57 +23,41 @@ export const useHomeProducts = () => {
 
         const endTime = performance.now();
         
-        // Log the raw response first
-        console.log('Raw Supabase Response:', {
-          status,
-          statusText,
-          hasError: !!productsError,
-          hasData: !!productsData,
-          rawData: productsData,
-          error: productsError
+        // Log the complete response object
+        console.log('Complete Supabase Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: response.data,
+          error: response.error,
+          count: response.count,
+          body: response.body,
         });
 
-        // Then log the detailed API response metrics
-        console.log('Products API Response Details:', {
-          status,
-          statusText,
-          error: productsError,
-          dataLength: productsData?.length || 0,
-          queryTime: `${(endTime - startTime).toFixed(2)}ms`,
-          timestamp: new Date().toISOString()
-        });
-
-        if (productsError) {
-          console.error('Error fetching products:', {
-            message: productsError.message,
-            details: productsError.details,
-            hint: productsError.hint,
-            code: productsError.code
+        // Log detailed error information if present
+        if (response.error) {
+          console.error('Supabase Error Details:', {
+            message: response.error.message,
+            details: response.error.details,
+            hint: response.error.hint,
+            code: response.error.code
           });
-          throw productsError;
+          throw response.error;
         }
 
-        if (!productsData) {
-          console.log('No products found in response');
-          return [];
-        }
-
+        // Log success metrics
         console.log('Products fetch successful:', {
-          count: productsData.length,
-          firstProduct: productsData[0] ? {
-            id: productsData[0].id,
-            name: productsData[0].name,
-            variantsCount: productsData[0].product_variants?.length,
-            imagesCount: productsData[0].product_images?.length,
-            fullProduct: productsData[0] // Log the complete first product for debugging
-          } : null,
-          lastProduct: productsData[productsData.length - 1] ? {
-            id: productsData[productsData.length - 1].id,
-            name: productsData[productsData.length - 1].name
+          count: response.data?.length || 0,
+          queryTime: `${(endTime - startTime).toFixed(2)}ms`,
+          timestamp: new Date().toISOString(),
+          firstProduct: response.data?.[0] ? {
+            id: response.data[0].id,
+            name: response.data[0].name,
+            variantsCount: response.data[0].product_variants?.length,
+            imagesCount: response.data[0].product_images?.length,
           } : null
         });
 
-        return productsData as Product[];
+        return response.data as Product[] || [];
       } catch (error) {
         console.error('Unexpected error in products query:', error);
         throw error;
