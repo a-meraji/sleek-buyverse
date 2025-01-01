@@ -10,7 +10,7 @@ interface FavoritesListProps {
 
 interface FavoriteProduct {
   product_id: string;
-  products: Product;  // Single product, not an array
+  products: Product;
 }
 
 export function FavoritesList({ userId }: FavoritesListProps) {
@@ -22,15 +22,14 @@ export function FavoritesList({ userId }: FavoritesListProps) {
         .from('favorites')
         .select(`
           product_id,
-          products:products!inner (
+          products:products(
             id,
             name,
             description,
-            price,
             image_url,
             category,
             sku,
-            product_variants (*)
+            product_variants(*)
           )
         `)
         .eq('user_id', userId);
@@ -42,10 +41,9 @@ export function FavoritesList({ userId }: FavoritesListProps) {
       
       console.log('Raw favorites data:', data);
       
-      // Transform the data to match our expected type
       const transformedData = data?.map(item => ({
         product_id: item.product_id,
-        products: item.products as unknown as Product // Cast to Product type
+        products: item.products as Product
       }));
       
       console.log('Transformed favorites data:', transformedData);
