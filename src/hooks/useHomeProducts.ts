@@ -1,8 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
+import { useEffect } from "react";
 
 export const useHomeProducts = () => {
+  // Log initial hook execution
+  useEffect(() => {
+    console.log('useHomeProducts hook initialized');
+  }, []);
+
   return useQuery({
     queryKey: ['products'],
     queryFn: async () => {
@@ -10,20 +16,34 @@ export const useHomeProducts = () => {
       const startTime = performance.now();
 
       try {
+        console.log('Checking auth status before fetch...');
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Auth session state:', session ? 'Authenticated' : 'Unauthenticated');
+        
         console.log('Sending request to Supabase products table...');
         
         const response = await supabase
           .from('products')
           .select(`
             *,
-            product_variants (*),
-            product_images (*)
+            product_variants (
+              id,
+              size,
+              color,
+              price,
+              stock
+            ),
+            product_images (
+              id,
+              image_url,
+              display_order
+            )
           `)
           .order('created_at', { ascending: false });
 
         const endTime = performance.now();
         
-        // Log the complete response object with detailed information
+        // Log complete response for debugging
         console.log('Complete Supabase Response:', {
           status: response.status,
           statusText: response.statusText,
@@ -44,7 +64,7 @@ export const useHomeProducts = () => {
           throw response.error;
         }
 
-        // Log success metrics and first product details for debugging
+        // Log success metrics and data structure validation
         console.log('Products fetch successful:', {
           count: response.data?.length || 0,
           queryTime: `${(endTime - startTime).toFixed(2)}ms`,
@@ -54,6 +74,11 @@ export const useHomeProducts = () => {
             name: response.data[0].name,
             variantsCount: response.data[0].product_variants?.length,
             imagesCount: response.data[0].product_images?.length,
+            hasRequiredFields: Boolean(
+              response.data[0].id &&
+              response.data[0].name &&
+              response.data[0].image_url
+            )
           } : null
         });
 
