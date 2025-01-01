@@ -1,5 +1,5 @@
 import { ProductVariant } from "./variant";
-import { ProductImage } from "../types";
+import { ProductImage, Product } from "../types";
 
 export type { Product } from "../types";
 
