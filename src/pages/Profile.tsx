@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { ProfileForm } from "@/components/navbar/ProfileForm";
 import { FavoritesList } from "@/components/navbar/FavoritesList";
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -17,10 +16,22 @@ const Profile = () => {
   const { profile, isLoading, error, isAuthenticated, userId } = useProfileData();
 
   useEffect(() => {
+    console.log('Profile: Component state:', {
+      isLoading,
+      error: error ? {
+        message: error.message,
+        name: error.name
+      } : null,
+      isAuthenticated,
+      userId,
+      hasProfile: !!profile,
+      timestamp: new Date().toISOString()
+    });
+
     if (!isAuthenticated && !isLoading) {
       navigate('/auth');
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, navigate, error, profile]);
 
   const handleSignOut = async () => {
     try {

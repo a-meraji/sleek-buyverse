@@ -21,11 +21,25 @@ export const useProfileData = () => {
 
   useEffect(() => {
     console.log('useProfileData: Hook initialized');
+    
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        console.log('Session found for user:', session.user.id);
+        setAuthState({
+          isAuthenticated: true,
+          userId: session.user.id,
+        });
+      }
+    };
+
+    initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log('useProfileData: Auth state changed:', {
         event: _event,
         userId: session?.user?.id,
+        timestamp: new Date().toISOString()
       });
 
       setAuthState({
@@ -52,11 +66,16 @@ export const useProfileData = () => {
 
       try {
         console.log('useProfileData: Fetching profile data...');
+        const startTime = performance.now();
+        
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', authState.userId)
           .single();
+
+        const endTime = performance.now();
+        console.log(`Profile query took ${endTime - startTime}ms`);
 
         if (error) {
           console.error('useProfileData: Error fetching profile:', error);
@@ -75,6 +94,10 @@ export const useProfileData = () => {
       }
     },
     enabled: !!authState.userId,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    gcTime: 1000 * 60 * 30,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   return {
