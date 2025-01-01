@@ -44,7 +44,7 @@ export const useHomeProducts = () => {
           throw response.error;
         }
 
-        // Log success metrics
+        // Log success metrics and first product details for debugging
         console.log('Products fetch successful:', {
           count: response.data?.length || 0,
           queryTime: `${(endTime - startTime).toFixed(2)}ms`,
