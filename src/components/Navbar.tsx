@@ -6,26 +6,50 @@ import { supabase } from "@/integrations/supabase/client";
 import { SearchBar } from "./navbar/SearchBar";
 import { NavigationMenu } from "./navbar/NavigationMenu";
 import { ProfileButton } from "./navbar/ProfileButton";
+import { useToast } from "@/hooks/use-toast";
 
 export const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session);
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log("Initial session check:", { session, error });
+      if (error) {
+        console.error("Session check error:", error);
+        toast({
+          title: "Authentication Error",
+          description: "Please sign in to access all features",
+          variant: "destructive",
+        });
+      }
       setUser(session?.user ?? null);
     });
 
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log("Auth state changed:", { event: _event, session });
       setUser(session?.user ?? null);
+      
+      if (_event === 'SIGNED_IN') {
+        toast({
+          title: "Welcome!",
+          description: "You've successfully signed in",
+        });
+      } else if (_event === 'SIGNED_OUT') {
+        toast({
+          title: "Signed out",
+          description: "You've been signed out successfully",
+        });
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [toast]);
 
   return (
     <nav className="border-b">
