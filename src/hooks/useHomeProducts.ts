@@ -10,7 +10,6 @@ export const useHomeProducts = () => {
       const startTime = performance.now();
 
       try {
-        // Get products without waiting for auth state
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select(`
@@ -46,7 +45,8 @@ export const useHomeProducts = () => {
       }
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    retry: 2,
+    retry: 1, // Reduce retry attempts
     refetchOnWindowFocus: false,
+    initialData: [], // Provide initial data to prevent loading state
   });
 };

@@ -7,7 +7,7 @@ import { useHomeProducts } from "@/hooks/useHomeProducts";
 import HeroBanner from "@/components/home/HeroBanner";
 
 const Index = () => {
-  const { data: products, isLoading, error } = useHomeProducts();
+  const { data: products = [], isLoading, error } = useHomeProducts();
 
   console.log('Index page rendering state:', {
     isLoading,
@@ -21,11 +21,11 @@ const Index = () => {
       <Navbar />
       <main className="flex-1">
         <HeroBanner />
-        {isLoading ? (
+        {isLoading && !products.length ? (
           <LoadingState />
         ) : error ? (
           <ErrorState error={error} />
-        ) : products && products.length > 0 ? (
+        ) : products.length > 0 ? (
           <MainContent products={products} />
         ) : (
           <div className="container mx-auto px-4 py-8 text-center">
