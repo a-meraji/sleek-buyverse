@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchBar } from "./navbar/SearchBar";
 import { NavigationMenu } from "./navbar/NavigationMenu";
-import { AuthButtons } from "./navbar/AuthButtons";
+import { ProfileButton } from "./navbar/ProfileButton";
 
 export const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -41,8 +41,6 @@ export const Navbar = () => {
         </div>
         
         <div className="flex items-center gap-4">
-         
-          
           <Button 
             variant="ghost" 
             size="icon"
@@ -57,10 +55,10 @@ export const Navbar = () => {
             </Button>
           </Link>
           
-          <AuthButtons user={user} setUser={setUser} />
-           <NavigationMenu />
+          <ProfileButton user={user} setUser={setUser} />
+          <NavigationMenu />
         </div>
       </div>
     </nav>
   );
-};
+}

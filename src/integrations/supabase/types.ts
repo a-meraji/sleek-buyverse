@@ -137,6 +137,35 @@ export type Database = {
         }
         Relationships: []
       }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
@@ -315,18 +344,24 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          phone: string | null
+          shipping_address: Json | null
         }
         Insert: {
           created_at?: string
           first_name?: string | null
           id: string
           last_name?: string | null
+          phone?: string | null
+          shipping_address?: Json | null
         }
         Update: {
           created_at?: string
           first_name?: string | null
           id?: string
           last_name?: string | null
+          phone?: string | null
+          shipping_address?: Json | null
         }
         Relationships: []
       }

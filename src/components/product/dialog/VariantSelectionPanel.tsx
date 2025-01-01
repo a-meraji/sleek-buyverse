@@ -1,6 +1,7 @@
 import { ProductVariant } from "@/types/variant";
 import { VariantSelector } from "./VariantSelector";
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
 
 interface VariantSelectionPanelProps {
   variants: ProductVariant[];
@@ -17,9 +18,21 @@ export function VariantSelectionPanel({
   onSizeChange,
   onColorChange
 }: VariantSelectionPanelProps) {
-  const sizes = [...new Set(variants.map(v => v.size))];
   const colors = [...new Set(variants.map(v => v.color))];
+  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
   
+  useEffect(() => {
+    if (selectedColor) {
+      const sizes = variants
+        .filter(v => v.color === selectedColor)
+        .map(v => v.size);
+      setAvailableSizes(sizes);
+      if (!sizes.includes(selectedSize)) {
+        onSizeChange('');
+      }
+    }
+  }, [selectedColor, variants, selectedSize, onSizeChange]);
+
   const selectedVariant = variants.find(v => 
     v.size === selectedSize && v.color === selectedColor
   );
@@ -30,18 +43,20 @@ export function VariantSelectionPanel({
       {variants.length > 0 ? (
         <>
           <VariantSelector
-            label="Size"
-            options={sizes}
-            value={selectedSize}
-            onChange={onSizeChange}
-            variants={variants}
-          />
-          <VariantSelector
             label="Color"
             options={colors}
             value={selectedColor}
             onChange={onColorChange}
           />
+          {selectedColor && (
+            <VariantSelector
+              label="Size"
+              options={availableSizes}
+              value={selectedSize}
+              onChange={onSizeChange}
+              variants={variants.filter(v => v.color === selectedColor)}
+            />
+          )}
           {isOutOfStock && (
             <Badge variant="destructive" className="w-fit">
               Out of Stock
