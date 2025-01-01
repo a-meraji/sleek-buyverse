@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
+import { Product, ProductImage } from "@/types";
 import { ProductVariant } from "@/types/variant";
-import { ImageSelector } from "../../ImageSelector";
 import { ProductForm } from "./ProductForm";
 import { useProductForm } from "./useProductForm";
 
@@ -15,6 +14,10 @@ interface ProductFormContainerProps {
 
 export function ProductFormContainer({ onClose, initialData }: ProductFormContainerProps) {
   const [showImageSelector, setShowImageSelector] = useState(false);
+  const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
+  const [additionalImages, setAdditionalImages] = useState<ProductImage[]>(
+    initialData?.product_images || []
+  );
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { formData, variants, setVariants, handleFormChange } = useProductForm(initialData);
@@ -82,6 +85,21 @@ export function ProductFormContainer({ onClose, initialData }: ProductFormContai
         throw productError;
       }
 
+      // Insert additional images
+      if (additionalImages.length > 0) {
+        const imagesData = additionalImages.map((img, index) => ({
+          product_id: product.id,
+          image_url: img.image_url,
+          display_order: index
+        }));
+
+        const { error: imagesError } = await supabase
+          .from("product_images")
+          .insert(imagesData);
+
+        if (imagesError) throw imagesError;
+      }
+
       const variantsData = variants.map(variant => ({
         product_id: product.id,
         size: variant.size,
@@ -123,28 +141,51 @@ export function ProductFormContainer({ onClose, initialData }: ProductFormContai
 
   const handleImageSelect = (url: string) => {
     console.log('Selected image URL:', url);
-    handleFormChange({ image_url: url });
+    if (isSelectingMainImage) {
+      handleFormChange({ image_url: url });
+    } else {
+      const newImage: ProductImage = {
+        id: `temp-${Date.now()}`,
+        product_id: initialData?.id || '',
+        image_url: url,
+        display_order: additionalImages.length
+      };
+      setAdditionalImages(prev => [...prev, newImage]);
+    }
     setShowImageSelector(false);
   };
 
-  return (
-    <>
-      <ProductForm
-        formData={formData}
-        variants={variants}
-        onFormChange={handleFormChange}
-        onVariantsChange={setVariants}
-        onImageSelect={() => setShowImageSelector(true)}
-        onSubmit={handleSubmit}
-        onClose={onClose}
-        isSubmitting={createProduct.isPending}
-      />
+  const handleRemoveImage = (url: string) => {
+    if (url === formData.image_url) {
+      handleFormChange({ image_url: "" });
+    } else {
+      setAdditionalImages(prev => prev.filter(img => img.image_url !== url));
+    }
+  };
 
-      <ImageSelector
-        open={showImageSelector}
-        onClose={() => setShowImageSelector(false)}
-        onSelect={handleImageSelect}
-      />
-    </>
+  return (
+    <ProductForm
+      formData={formData}
+      variants={variants}
+      additionalImages={additionalImages}
+      showImageSelector={showImageSelector}
+      isSelectingMainImage={isSelectingMainImage}
+      onFormChange={handleFormChange}
+      onVariantsChange={setVariants}
+      onChooseMainImage={() => {
+        setIsSelectingMainImage(true);
+        setShowImageSelector(true);
+      }}
+      onAddAdditionalImage={() => {
+        setIsSelectingMainImage(false);
+        setShowImageSelector(true);
+      }}
+      onImageSelect={handleImageSelect}
+      onCloseImageSelector={() => setShowImageSelector(false)}
+      onRemoveImage={handleRemoveImage}
+      onSubmit={handleSubmit}
+      onClose={onClose}
+      isSubmitting={createProduct.isPending}
+    />
   );
 }

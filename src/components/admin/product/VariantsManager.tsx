@@ -17,7 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { VariantPriceField } from "./VariantPriceField";
 
 interface VariantsManagerProps {
   variants: ProductVariant[];
@@ -34,7 +33,6 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
   const handleAddVariant = () => {
     if (!newSize || !newColor) return;
 
-    // Check for duplicate variant
     const isDuplicate = variants.some(
       v => v.size.toLowerCase() === newSize.toLowerCase() && 
            v.color.toLowerCase() === newColor.toLowerCase()
@@ -77,6 +75,57 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
     <div className="space-y-4">
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-medium">Product Variants</h3>
+
+        {variants.length > 0 && (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Size</TableHead>
+                <TableHead>Color</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {variants.map((variant) => (
+                <TableRow key={variant.id}>
+                  <TableCell>{variant.size}</TableCell>
+                  <TableCell>{variant.color}</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={variant.stock}
+                      onChange={(e) => handleUpdateVariant(variant.id, { stock: Number(e.target.value) })}
+                      className="w-24"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={variant.price}
+                      onChange={(e) => handleUpdateVariant(variant.id, { price: Number(e.target.value) })}
+                      className="w-24"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveVariant(variant)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
         
         <div className="grid grid-cols-5 gap-4">
           <TooltipProvider>
@@ -112,7 +161,7 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
           <Input
             type="number"
             min="0"
-            placeholder="Stock"
+            placeholder="Enter stock quantity"
             value={newStock}
             onChange={(e) => setNewStock(Number(e.target.value))}
           />
@@ -121,7 +170,7 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
             type="number"
             min="0"
             step="0.01"
-            placeholder="Price"
+            placeholder="Enter price"
             value={newPrice}
             onChange={(e) => setNewPrice(Number(e.target.value))}
           />
@@ -132,55 +181,6 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
           </Button>
         </div>
       </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Size</TableHead>
-            <TableHead>Color</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {variants.map((variant) => (
-            <TableRow key={variant.id}>
-              <TableCell>{variant.size}</TableCell>
-              <TableCell>{variant.color}</TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  min="0"
-                  value={variant.stock}
-                  onChange={(e) => handleUpdateVariant(variant.id, { stock: Number(e.target.value) })}
-                  className="w-24"
-                />
-              </TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={variant.price}
-                  onChange={(e) => handleUpdateVariant(variant.id, { price: Number(e.target.value) })}
-                  className="w-24"
-                />
-              </TableCell>
-              <TableCell>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemoveVariant(variant)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
     </div>
   );
 }
