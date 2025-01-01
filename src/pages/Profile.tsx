@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useProfileData } from "@/hooks/useProfileData";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
 
 const Profile = () => {
   const navigate = useNavigate();
