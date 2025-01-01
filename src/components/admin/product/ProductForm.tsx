@@ -11,6 +11,7 @@ interface ProductFormProps {
   onChange: (updates: Partial<Product>) => void;
   onCancel: () => void;
   onChooseImage: () => void;
+  onAddAdditionalImage: () => void;
 }
 
 export function ProductForm({
@@ -20,6 +21,7 @@ export function ProductForm({
   onChange,
   onCancel,
   onChooseImage,
+  onAddAdditionalImage,
 }: ProductFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +48,7 @@ export function ProductForm({
         imageUrl={formData?.image_url}
         productName={formData?.name}
         onChooseImage={onChooseImage}
+        onAddAdditionalImage={onAddAdditionalImage}
       />
 
       <FormActions
