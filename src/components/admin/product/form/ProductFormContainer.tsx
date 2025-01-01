@@ -2,25 +2,21 @@ import { useState } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductImage } from "@/types";
-import { ProductVariant } from "@/types/variant";
+import { Product } from "@/types";
+import { ProductVariant } from "@/types";
 import { ProductForm } from "./ProductForm";
 import { useProductForm } from "./useProductForm";
 
 interface ProductFormContainerProps {
   onClose: () => void;
-  initialData?: Product;
 }
 
-export function ProductFormContainer({ onClose, initialData }: ProductFormContainerProps) {
+export function ProductFormContainer({ onClose }: ProductFormContainerProps) {
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
-  const [additionalImages, setAdditionalImages] = useState<ProductImage[]>(
-    initialData?.product_images || []
-  );
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { formData, variants, setVariants, handleFormChange } = useProductForm(initialData);
+  const { formData, variants, setVariants, handleFormChange } = useProductForm();
 
   const generateSKU = (name: string): string => {
     const timestamp = Date.now().toString().slice(-4);
@@ -68,6 +64,7 @@ export function ProductFormContainer({ onClose, initialData }: ProductFormContai
         category: formData.category || "",
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
+        discount: formData.discount,
       };
 
       console.log('Creating product with data:', productData);
@@ -83,21 +80,6 @@ export function ProductFormContainer({ onClose, initialData }: ProductFormContai
           throw new Error("A product with this SKU already exists. Please use a different SKU.");
         }
         throw productError;
-      }
-
-      // Insert additional images
-      if (additionalImages.length > 0) {
-        const imagesData = additionalImages.map((img, index) => ({
-          product_id: product.id,
-          image_url: img.image_url,
-          display_order: index
-        }));
-
-        const { error: imagesError } = await supabase
-          .from("product_images")
-          .insert(imagesData);
-
-        if (imagesError) throw imagesError;
       }
 
       const variantsData = variants.map(variant => ({
@@ -139,50 +121,16 @@ export function ProductFormContainer({ onClose, initialData }: ProductFormContai
     createProduct.mutate();
   };
 
-  const handleImageSelect = (url: string) => {
-    console.log('Selected image URL:', url);
-    if (isSelectingMainImage) {
-      handleFormChange({ image_url: url });
-    } else {
-      const newImage: ProductImage = {
-        id: `temp-${Date.now()}`,
-        product_id: initialData?.id || '',
-        image_url: url,
-        display_order: additionalImages.length
-      };
-      setAdditionalImages(prev => [...prev, newImage]);
-    }
-    setShowImageSelector(false);
-  };
-
-  const handleRemoveImage = (url: string) => {
-    if (url === formData.image_url) {
-      handleFormChange({ image_url: "" });
-    } else {
-      setAdditionalImages(prev => prev.filter(img => img.image_url !== url));
-    }
-  };
-
   return (
     <ProductForm
       formData={formData}
       variants={variants}
-      additionalImages={additionalImages}
       showImageSelector={showImageSelector}
       isSelectingMainImage={isSelectingMainImage}
       onFormChange={handleFormChange}
       onVariantsChange={setVariants}
-      onChooseMainImage={() => {
-        setIsSelectingMainImage(true);
-        setShowImageSelector(true);
-      }}
-      onAddAdditionalImage={() => {
-        setIsSelectingMainImage(false);
-        setShowImageSelector(true);
-      }}
-      onImageSelect={handleImageSelect}
-      onCloseImageSelector={() => setShowImageSelector(false)}
-      onRemoveImage={handleRemoveImage}
+      onShowImageSelector={setShowImageSelector}
+      onSelectingMainImage={setIsSelectingMainImage}
       onSubmit={handleSubmit}
       onClose={onClose}
       isSubmitting={createProduct.isPending}
