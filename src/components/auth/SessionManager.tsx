@@ -31,9 +31,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
 
       console.log('Found local cart items:', localCartItems);
 
-      // Transfer each item to the server
       for (const item of localCartItems) {
-        // Get the selected variant ID from the local cart item
         const variantId = item.product?.product_variants?.find(
           (v: any) => v.id === item.variant_id
         )?.id;
@@ -44,7 +42,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
             user_id: userId,
             product_id: item.product.id,
             quantity: item.quantity,
-            variant_id: variantId // Include the variant_id in the insert
+            variant_id: variantId
           });
 
         if (error) {
@@ -54,11 +52,8 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
       }
 
       console.log('Successfully transferred cart items to server');
-      
-      // Clear local cart after successful transfer
       localStorage.removeItem('cart');
-      console.log('Cleared local cart storage');
-
+      
       toast({
         title: "Cart Synchronized",
         description: "Your cart items have been saved to your account.",
@@ -74,34 +69,40 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
   };
 
   useEffect(() => {
-    const checkSession = async () => {
+    let mounted = true;
+
+    const initializeSession = async () => {
       try {
+        console.log("Initializing session...");
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error("Session check error:", error);
-          onError(error);
+          console.error("Session initialization error:", error);
+          if (mounted) onError(error);
           return;
         }
 
         if (session) {
-          console.log("User already logged in:", session.user);
-          await transferLocalCartToServer(session.user.id);
-          navigate("/");
+          console.log("Initial session found:", session.user.id);
+          if (mounted) {
+            await transferLocalCartToServer(session.user.id);
+          }
+        } else {
+          console.log("No initial session found");
         }
       } catch (err) {
-        console.error("Unexpected error during session check:", err);
-        onError(err as AuthError);
+        console.error("Unexpected error during session initialization:", err);
+        if (mounted) onError(err as AuthError);
       }
     };
 
-    checkSession();
+    initializeSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
-      console.log("Auth state changed:", event, session);
+      console.log("Auth state changed:", event, session?.user?.id);
       
-      if (event === "SIGNED_IN") {
-        console.log("User signed in successfully:", session?.user);
+      if (event === "SIGNED_IN" && mounted) {
+        console.log("User signed in:", session?.user?.id);
         if (session?.user) {
           await transferLocalCartToServer(session.user.id);
         }
@@ -112,38 +113,14 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
         navigate("/");
       }
 
-      if (event === "USER_UPDATED") {
-        console.log("User profile updated");
-        toast({
-          title: "Profile Updated",
-          description: "Your profile has been updated successfully.",
-        });
-      }
-
-      if (event === "PASSWORD_RECOVERY") {
-        console.log("Password recovery requested");
-        toast({
-          title: "Password Recovery",
-          description: "Check your email for password reset instructions.",
-        });
-      }
-
-      if (event === "SIGNED_OUT") {
+      if (event === "SIGNED_OUT" && mounted) {
         console.log("User signed out");
         navigate("/auth");
-      }
-
-      // Handle authentication errors
-      if (event === "TOKEN_REFRESHED" && !session) {
-        const error = session as unknown as AuthError;
-        if (error?.message) {
-          console.error("Token refresh error:", error);
-          onError(error);
-        }
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate, toast, onError]);

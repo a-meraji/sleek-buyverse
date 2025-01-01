@@ -18,7 +18,7 @@ export function useFavorites(userId: string) {
         .from('favorites')
         .select(`
           product_id,
-          products:products(
+          products (
             id,
             name,
             description,
@@ -26,7 +26,7 @@ export function useFavorites(userId: string) {
             category,
             sku,
             discount,
-            product_variants(
+            product_variants (
               id,
               size,
               color,
@@ -47,16 +47,16 @@ export function useFavorites(userId: string) {
       
       console.log('Raw favorites data:', data);
       
-      const transformedData = data?.map(item => {
-        const product = item.products as unknown as Product;
-        return {
-          product_id: item.product_id,
-          products: product
-        };
-      });
+      const transformedData = data?.map(item => ({
+        product_id: item.product_id,
+        products: item.products as Product
+      }));
       
       console.log('Transformed favorites data:', transformedData);
       return transformedData as FavoriteProduct[];
     },
+    enabled: !!userId,
+    retry: 2,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 }
