@@ -76,17 +76,17 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-medium">Product Variants</h3>
 
-        {variants.length > 0 && (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Size</TableHead>
-                <TableHead>Color</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Size</TableHead>
+              <TableHead>Color</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          {variants.length > 0 && (
             <TableBody>
               {variants.map((variant) => (
                 <TableRow key={variant.id}>
@@ -124,8 +124,8 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
-        )}
+          )}
+        </Table>
         
         <div className="grid grid-cols-5 gap-4">
           <TooltipProvider>

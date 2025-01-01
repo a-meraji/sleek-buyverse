@@ -27,6 +27,14 @@ export function useProductUpdate() {
 
       if (productError) throw productError;
 
+      // Delete cart items referencing the variants we're about to update
+      const { error: cartError } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("product_id", formData.id);
+
+      if (cartError) throw cartError;
+
       // Handle variants
       const { error: deleteError } = await supabase
         .from("product_variants")
