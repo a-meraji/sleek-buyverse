@@ -10,7 +10,7 @@ interface FavoritesListProps {
 
 interface FavoriteProduct {
   product_id: string;
-  products: Product;  // Changed from Product[] to Product since it's a single product
+  products: Product;  // Single product, not an array
 }
 
 export function FavoritesList({ userId }: FavoritesListProps) {
