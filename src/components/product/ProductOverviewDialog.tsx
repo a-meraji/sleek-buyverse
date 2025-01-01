@@ -5,7 +5,7 @@ import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelectionPanel } from "./dialog/VariantSelectionPanel";
 import { DialogActions } from "./dialog/DialogActions";
 import { ProductVariant } from "@/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
