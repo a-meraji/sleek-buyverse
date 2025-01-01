@@ -34,6 +34,24 @@ export function ProductOverviewDialog({
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const { toast } = useToast();
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      const checkFavorite = async () => {
+        const { data } = await supabase
+          .from('favorites')
+          .select()
+          .eq('user_id', userId)
+          .eq('product_id', productId)
+          .single();
+        
+        setIsFavorite(!!data);
+      };
+      
+      checkFavorite();
+    }
+  }, [userId, productId]);
 
   const handleAddToFavorites = async () => {
     if (!userId) {
@@ -46,24 +64,39 @@ export function ProductOverviewDialog({
     }
 
     try {
-      const { error } = await supabase
-        .from('favorites')
-        .upsert({ 
-          user_id: userId,
-          product_id: productId
+      if (isFavorite) {
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', userId)
+          .eq('product_id', productId);
+
+        if (error) throw error;
+        setIsFavorite(false);
+        toast({
+          title: "Removed from favorites",
+          description: "Product has been removed from your favorites"
         });
+      } else {
+        const { error } = await supabase
+          .from('favorites')
+          .upsert({ 
+            user_id: userId,
+            product_id: productId
+          });
 
-      if (error) throw error;
-
-      toast({
-        title: "Added to favorites",
-        description: "Product has been added to your favorites"
-      });
+        if (error) throw error;
+        setIsFavorite(true);
+        toast({
+          title: "Added to favorites",
+          description: "Product has been added to your favorites"
+        });
+      }
     } catch (error) {
-      console.error('Error adding to favorites:', error);
+      console.error('Error managing favorites:', error);
       toast({
         title: "Error",
-        description: "Failed to add product to favorites",
+        description: "Failed to update favorites",
         variant: "destructive"
       });
     }
@@ -80,7 +113,9 @@ export function ProductOverviewDialog({
               size="icon"
               onClick={handleAddToFavorites}
             >
-              <Heart className="h-5 w-5" />
+              <Heart 
+                className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} 
+              />
             </Button>
           </div>
         </DialogHeader>
@@ -97,7 +132,7 @@ export function ProductOverviewDialog({
               onColorChange={setSelectedColor}
             />
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <DialogActions
                 productId={productId}
                 userId={userId}

@@ -18,6 +18,12 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
     phone: "",
     shipping_address: "",
   });
+  const [initialProfile, setInitialProfile] = useState({
+    first_name: "",
+    last_name: "",
+    phone: "",
+    shipping_address: "",
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -34,12 +40,14 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
       }
 
       if (data) {
-        setProfile({
+        const profileData = {
           first_name: data.first_name || "",
           last_name: data.last_name || "",
           phone: data.phone || "",
           shipping_address: data.shipping_address ? JSON.stringify(data.shipping_address, null, 2) : "",
-        });
+        };
+        setProfile(profileData);
+        setInitialProfile(profileData);
       }
     };
 
@@ -64,16 +72,17 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
 
       const { error } = await supabase
         .from('profiles')
-        .update({
+        .upsert({
+          id: userId,
           first_name: profile.first_name,
           last_name: profile.last_name,
           phone: profile.phone,
           shipping_address: parsedAddress,
-        })
-        .eq('id', userId);
+        });
 
       if (error) throw error;
 
+      setInitialProfile(profile);
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully",
@@ -88,6 +97,8 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
       });
     }
   };
+
+  const hasChanges = JSON.stringify(profile) !== JSON.stringify(initialProfile);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -124,14 +135,16 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
           rows={4}
         />
       </div>
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit">
-          Save Changes
-        </Button>
-      </div>
+      {hasChanges && (
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={() => setProfile(initialProfile)}>
+            Cancel
+          </Button>
+          <Button type="submit">
+            Save Changes
+          </Button>
+        </div>
+      )}
     </form>
   );
 }

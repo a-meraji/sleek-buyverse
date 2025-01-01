@@ -11,6 +11,8 @@ const Product = () => {
   const { id } = useParams();
   const [selectedSize, setSelectedSize] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -26,6 +28,72 @@ const Product = () => {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (userId && id) {
+      const checkFavorite = async () => {
+        const { data } = await supabase
+          .from('favorites')
+          .select()
+          .eq('user_id', userId)
+          .eq('product_id', id)
+          .single();
+        
+        setIsFavorite(!!data);
+      };
+      
+      checkFavorite();
+    }
+  }, [userId, id]);
+
+  const handleFavoriteToggle = async () => {
+    if (!userId) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to add items to favorites",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      if (isFavorite) {
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', userId)
+          .eq('product_id', id);
+
+        if (error) throw error;
+        setIsFavorite(false);
+        toast({
+          title: "Removed from favorites",
+          description: "Product has been removed from your favorites"
+        });
+      } else {
+        const { error } = await supabase
+          .from('favorites')
+          .upsert({ 
+            user_id: userId,
+            product_id: id
+          });
+
+        if (error) throw error;
+        setIsFavorite(true);
+        toast({
+          title: "Added to favorites",
+          description: "Product has been added to your favorites"
+        });
+      }
+    } catch (error) {
+      console.error('Error managing favorites:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorites",
+        variant: "destructive"
+      });
+    }
+  };
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
@@ -89,12 +157,26 @@ const Product = () => {
             additionalImages={product.product_images}
           />
           
-          <ProductDetails
-            product={product}
-            userId={userId}
-            selectedSize={selectedSize}
-            onSizeSelect={setSelectedSize}
-          />
+          <div className="space-y-6">
+            <div className="flex justify-between items-start">
+              <ProductDetails
+                product={product}
+                userId={userId}
+                selectedSize={selectedSize}
+                onSizeSelect={setSelectedSize}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleFavoriteToggle}
+                className="mt-1"
+              >
+                <Heart 
+                  className={`h-6 w-6 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} 
+                />
+              </Button>
+            </div>
+          </div>
         </div>
       </main>
     </div>
