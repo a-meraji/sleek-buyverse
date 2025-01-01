@@ -25,43 +25,77 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
     shipping_address: "",
   });
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      try {
+        console.log('ProfileForm: Fetching profile for user:', userId);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return;
-      }
+        console.log('ProfileForm: Profile fetch response:', { data, error });
 
-      if (data) {
-        const profileData = {
-          first_name: data.first_name || "",
-          last_name: data.last_name || "",
-          phone: data.phone || "",
-          shipping_address: data.shipping_address ? JSON.stringify(data.shipping_address, null, 2) : "",
-        };
-        setProfile(profileData);
-        setInitialProfile(profileData);
+        if (error) {
+          console.error('ProfileForm: Error fetching profile:', error);
+          toast({
+            title: "Error loading profile",
+            description: "Failed to load your profile information.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (data) {
+          const profileData = {
+            first_name: data.first_name || "",
+            last_name: data.last_name || "",
+            phone: data.phone || "",
+            shipping_address: data.shipping_address ? JSON.stringify(data.shipping_address, null, 2) : "",
+          };
+          console.log('ProfileForm: Setting profile data:', profileData);
+          setProfile(profileData);
+          setInitialProfile(profileData);
+        } else {
+          console.log('ProfileForm: No profile found, creating new profile');
+          // If no profile exists, we'll create one when the user saves
+          const defaultProfile = {
+            first_name: "",
+            last_name: "",
+            phone: "",
+            shipping_address: "",
+          };
+          setProfile(defaultProfile);
+          setInitialProfile(defaultProfile);
+        }
+      } catch (error) {
+        console.error('ProfileForm: Unexpected error:', error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while loading your profile.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProfile();
-  }, [userId]);
+  }, [userId, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('ProfileForm: Submitting profile update');
 
     try {
       let parsedAddress;
       try {
         parsedAddress = profile.shipping_address ? JSON.parse(profile.shipping_address) : null;
       } catch (error) {
+        console.error('ProfileForm: Invalid address format:', error);
         toast({
           title: "Invalid address format",
           description: "Please enter a valid JSON address format",
@@ -80,8 +114,12 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
           shipping_address: parsedAddress,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('ProfileForm: Error updating profile:', error);
+        throw error;
+      }
 
+      console.log('ProfileForm: Profile updated successfully');
       setInitialProfile(profile);
       toast({
         title: "Profile updated",
@@ -89,7 +127,7 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
       });
       onClose();
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('ProfileForm: Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile",
@@ -99,6 +137,10 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
   };
 
   const hasChanges = JSON.stringify(profile) !== JSON.stringify(initialProfile);
+
+  if (isLoading) {
+    return <div className="p-4 text-center">Loading profile...</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
