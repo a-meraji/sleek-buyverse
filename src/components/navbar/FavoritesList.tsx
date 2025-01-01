@@ -29,6 +29,7 @@ export function FavoritesList({ userId }: FavoritesListProps) {
             image_url,
             category,
             sku,
+            discount,
             product_variants(
               id,
               size,
@@ -49,10 +50,6 @@ export function FavoritesList({ userId }: FavoritesListProps) {
       
       const transformedData = data?.map(item => {
         const product = item.products as unknown as Product;
-        // Ensure price is set from the first variant if available
-        if (product.product_variants && product.product_variants.length > 0) {
-          product.price = product.product_variants[0].price;
-        }
         return {
           product_id: item.product_id,
           products: product
@@ -97,6 +94,7 @@ export function FavoritesList({ userId }: FavoritesListProps) {
           name={favorite.products.name}
           image={favorite.products.image_url}
           product_variants={favorite.products.product_variants}
+          discount={favorite.products.discount}
         />
       ))}
     </div>
