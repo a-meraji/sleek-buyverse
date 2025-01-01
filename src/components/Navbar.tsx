@@ -134,7 +134,7 @@ export const Navbar = () => {
             </Button>
           </Link>
           
-{/*           <ProfileButton user={user} setUser={setUser} /> */}
+          <ProfileButton user={user} setUser={setUser} />
           <NavigationMenu />
         </div>
       </div>
