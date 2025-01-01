@@ -29,7 +29,13 @@ export function FavoritesList({ userId }: FavoritesListProps) {
             image_url,
             category,
             sku,
-            product_variants(*)
+            product_variants(
+              id,
+              size,
+              color,
+              stock,
+              price
+            )
           )
         `)
         .eq('user_id', userId);
@@ -41,10 +47,17 @@ export function FavoritesList({ userId }: FavoritesListProps) {
       
       console.log('Raw favorites data:', data);
       
-      const transformedData = data?.map(item => ({
-        product_id: item.product_id,
-        products: item.products as Product
-      }));
+      const transformedData = data?.map(item => {
+        const product = item.products as unknown as Product;
+        // Ensure price is set from the first variant if available
+        if (product.product_variants && product.product_variants.length > 0) {
+          product.price = product.product_variants[0].price;
+        }
+        return {
+          product_id: item.product_id,
+          products: product
+        };
+      });
       
       console.log('Transformed favorites data:', transformedData);
       return transformedData as FavoriteProduct[];
