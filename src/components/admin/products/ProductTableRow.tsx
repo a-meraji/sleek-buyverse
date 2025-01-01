@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Trash2 } from "lucide-react";
-import { Product } from "@/types/product";
-import { ProductVariant } from "@/types/variant";
+import { Trash2, Percent } from "lucide-react";
+import { Product } from "@/types";
+import { ProductVariant } from "@/types";
 
 interface ProductTableRowProps {
   product: Product;
@@ -22,6 +22,11 @@ export function ProductTableRow({
     ? Math.min(...variants.map(v => v.price))
     : 0;
   const totalStock = variants.reduce((sum, variant) => sum + variant.stock, 0);
+  
+  // Calculate discounted price if discount exists
+  const discountedPrice = product.discount 
+    ? minPrice * (1 - product.discount / 100)
+    : null;
 
   return (
     <TableRow>
@@ -34,7 +39,22 @@ export function ProductTableRow({
       </TableCell>
       <TableCell>{product.name}</TableCell>
       <TableCell>{product.sku}</TableCell>
-      <TableCell>${minPrice.toFixed(2)}</TableCell>
+      <TableCell>
+        {product.discount ? (
+          <div className="space-y-1">
+            <span className="line-through text-gray-500">${minPrice.toFixed(2)}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-red-500">${discountedPrice?.toFixed(2)}</span>
+              <Badge variant="destructive" className="flex items-center gap-1">
+                <Percent className="h-3 w-3" />
+                {product.discount}% off
+              </Badge>
+            </div>
+          </div>
+        ) : (
+          <>${minPrice.toFixed(2)}</>
+        )}
+      </TableCell>
       <TableCell>{product.category}</TableCell>
       <TableCell>
         <div className="flex flex-wrap gap-1">
