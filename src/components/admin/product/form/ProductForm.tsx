@@ -2,7 +2,7 @@ import { Product } from "@/types";
 import { ProductVariant } from "@/types";
 import { ProductFormFields } from "./ProductFormFields";
 import { VariantsManager } from "../VariantsManager";
-import { ImageSelector } from "../ImageSelector";
+import { ImageSelector } from "../../ImageSelector";
 import { FormActions } from "../FormActions";
 
 interface ProductFormProps {
