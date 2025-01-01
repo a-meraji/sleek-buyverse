@@ -10,6 +10,7 @@ import Cart from "./pages/Cart";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
+import Profile from "./pages/Profile";
 import { ChatButton } from "./components/chat/ChatButton";
 import { Footer } from "./components/home/Footer";
 import { CartProvider } from "./contexts/cart/CartContext";
@@ -40,6 +41,7 @@ const App = () => (
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/profile" element={<Profile />} />
               </Routes>
             </div>
             <Footer />

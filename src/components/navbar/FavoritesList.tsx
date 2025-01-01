@@ -14,9 +14,10 @@ interface FavoriteProduct {
 }
 
 export function FavoritesList({ userId }: FavoritesListProps) {
-  const { data: favorites, isLoading } = useQuery({
+  const { data: favorites, isLoading, error } = useQuery({
     queryKey: ['favorites', userId],
     queryFn: async () => {
+      console.log('Fetching favorites for user:', userId);
       const { data, error } = await supabase
         .from('favorites')
         .select(`
@@ -34,15 +35,13 @@ export function FavoritesList({ userId }: FavoritesListProps) {
         `)
         .eq('user_id', userId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching favorites:', error);
+        throw error;
+      }
       
-      // Add type assertion to handle the Supabase response type
-      const typedData = (data || []).map(item => ({
-        product_id: item.product_id,
-        products: item.products as unknown as Product // First cast to unknown, then to Product
-      }));
-      
-      return typedData;
+      console.log('Favorites data:', data);
+      return data as FavoriteProduct[];
     },
   });
 
@@ -50,6 +49,14 @@ export function FavoritesList({ userId }: FavoritesListProps) {
     return (
       <div className="flex justify-center p-4">
         <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-4 text-red-500">
+        Error loading favorites. Please try again.
       </div>
     );
   }
