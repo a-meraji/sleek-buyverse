@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface ProfileButtonProps {
   user: any;
@@ -45,7 +45,13 @@ export function ProfileButton({ user, setUser }: ProfileButtonProps) {
   };
 
   if (!user) {
-    return null;
+    return (
+      <Link to="/profile">
+        <Button variant="ghost" size="icon">
+          <User className="h-5 w-5" />
+        </Button>
+      </Link>
+    );
   }
 
   return (
