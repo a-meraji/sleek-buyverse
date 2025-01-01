@@ -1,9 +1,9 @@
-import { Product } from "@/types/product";
-import { ProductVariant } from "@/types/variant";
+import { Product } from "@/types";
+import { ProductVariant } from "@/types";
 import { ProductDetailsFields } from "./ProductDetailsFields";
 import { CategorySelector } from "./CategorySelector";
 import { VariantsManager } from "./VariantsManager";
-import { ImagePreview } from "./ImagePreview";
+import { ImageManager } from "./ImageManager";
 import { Button } from "@/components/ui/button";
 
 interface EditProductContentProps {
@@ -49,10 +49,12 @@ export function EditProductContent({
         productId={formData.id}
       />
 
-      <ImagePreview
-        imageUrl={formData.image_url}
-        productName={formData.name}
-        onChooseImage={onImageSelect}
+      <ImageManager
+        productId={formData.id}
+        mainImage={formData.image_url}
+        additionalImages={formData.product_images}
+        onMainImageSelect={onImageSelect}
+        onImagesChange={(images) => onFormChange({ product_images: images })}
       />
 
       <div className="flex justify-end gap-2">

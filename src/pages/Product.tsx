@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { ProductDetails } from "@/components/product/ProductDetails";
+import { ProductImageCarousel } from "@/components/product/ProductImageCarousel";
 
 const Product = () => {
   const { id } = useParams();
@@ -12,12 +13,10 @@ const Product = () => {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id ?? null);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Product detail auth state changed:', event, session);
       setUserId(session?.user?.id ?? null);
@@ -32,22 +31,26 @@ const Product = () => {
     queryKey: ['product', id],
     queryFn: async () => {
       console.log('Fetching product with ID:', id);
-      const { data, error } = await supabase
+      const { data: productData, error: productError } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          product_variants (*),
+          product_images (*)
+        `)
         .eq('id', id)
         .single();
 
-      if (error) {
-        console.error('Error fetching product:', error);
-        throw error;
+      if (productError) {
+        console.error('Error fetching product:', productError);
+        throw productError;
       }
 
-      console.log('Product fetched successfully:', data);
-      return data;
+      console.log('Product fetched successfully:', productData);
+      return productData;
     },
-    staleTime: 1000 * 60 * 5, // Data stays fresh for 5 minutes
-    gcTime: 1000 * 60 * 30, // Cache persists for 30 minutes
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 
   if (isLoading) {
@@ -81,13 +84,10 @@ const Product = () => {
       <Navbar />
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="bg-secondary rounded-lg overflow-hidden">
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-[500px] object-cover"
-            />
-          </div>
+          <ProductImageCarousel 
+            mainImage={product.image_url}
+            additionalImages={product.product_images}
+          />
           
           <ProductDetails
             product={product}

@@ -9,6 +9,13 @@ export interface ProductVariant {
   price: number;
 }
 
+export interface ProductImage {
+  id: string;
+  product_id: string;
+  image_url: string;
+  display_order: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -19,4 +26,5 @@ export interface Product {
   category?: string;
   sku?: string;
   product_variants?: ProductVariant[];
+  product_images?: ProductImage[];
 }

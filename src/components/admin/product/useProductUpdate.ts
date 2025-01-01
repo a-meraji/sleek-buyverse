@@ -27,8 +27,7 @@ export function useProductUpdate() {
 
       if (productError) throw productError;
 
-      // Then handle variants
-      // First, delete all existing variants
+      // Handle variants
       const { error: deleteError } = await supabase
         .from("product_variants")
         .delete()
@@ -36,7 +35,6 @@ export function useProductUpdate() {
 
       if (deleteError) throw deleteError;
 
-      // Then insert all current variants
       const variantsData = variants.map(variant => ({
         product_id: formData.id,
         size: variant.size,
@@ -50,6 +48,22 @@ export function useProductUpdate() {
         .insert(variantsData);
 
       if (variantsError) throw variantsError;
+
+      // Handle additional images
+      if (formData.product_images && formData.product_images.length > 0) {
+        const { error: imagesError } = await supabase
+          .from("product_images")
+          .upsert(
+            formData.product_images.map((image, index) => ({
+              id: image.id,
+              product_id: formData.id,
+              image_url: image.image_url,
+              display_order: index
+            }))
+          );
+
+        if (imagesError) throw imagesError;
+      }
     },
     onSuccess: (_, { formData }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
