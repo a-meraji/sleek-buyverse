@@ -3,7 +3,6 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
-import { ProductVariant } from "@/types";
 import { ProductForm } from "./ProductForm";
 import { useProductForm } from "./useProductForm";
 
