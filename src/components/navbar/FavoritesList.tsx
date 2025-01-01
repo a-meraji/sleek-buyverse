@@ -40,8 +40,16 @@ export function FavoritesList({ userId }: FavoritesListProps) {
         throw error;
       }
       
-      console.log('Favorites data:', data);
-      return data as FavoriteProduct[];
+      console.log('Raw favorites data:', data);
+      
+      // Transform the data to match our expected type
+      const transformedData = data?.map(item => ({
+        product_id: item.product_id,
+        products: item.products as Product
+      }));
+      
+      console.log('Transformed favorites data:', transformedData);
+      return transformedData as FavoriteProduct[];
     },
   });
 
