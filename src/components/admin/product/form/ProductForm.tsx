@@ -12,6 +12,7 @@ interface ProductFormProps {
   onFormChange: (updates: Partial<Product>) => void;
   onVariantsChange: (variants: ProductVariant[]) => void;
   onImageSelect: () => void;
+  onAddAdditionalImage: () => void;
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
   isSubmitting: boolean;
@@ -23,6 +24,7 @@ export function ProductForm({
   onFormChange,
   onVariantsChange,
   onImageSelect,
+  onAddAdditionalImage,
   onSubmit,
   onClose,
   isSubmitting,
@@ -51,7 +53,9 @@ export function ProductForm({
       <ImagePreview
         imageUrl={formData.image_url}
         productName={formData.name}
+        additionalImages={formData.product_images}
         onChooseImage={onImageSelect}
+        onAddAdditionalImage={onAddAdditionalImage}
       />
 
       <FormActions

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
+import { Product } from "@/types";
 import { ImageSelector } from "./ImageSelector";
 import { EditProductContent } from "./product/EditProductContent";
 import { useProductUpdate } from "./product/useProductUpdate";
@@ -19,34 +19,42 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
   const updateProduct = useProductUpdate();
 
-  // Fetch variants for this product
-  const { data: productVariants } = useQuery({
-    queryKey: ["product-variants", product?.id],
+  // Fetch variants and images for this product
+  const { data: productData } = useQuery({
+    queryKey: ["product-details", product?.id],
     queryFn: async () => {
-      if (!product?.id) return [];
-      const { data, error } = await supabase
-        .from("product_variants")
-        .select("*")
-        .eq("product_id", product.id);
+      if (!product?.id) return null;
+      
+      const [variantsResponse, imagesResponse] = await Promise.all([
+        supabase.from("product_variants").select("*").eq("product_id", product.id),
+        supabase.from("product_images").select("*").eq("product_id", product.id)
+      ]);
 
-      if (error) throw error;
-      return data;
+      if (variantsResponse.error) throw variantsResponse.error;
+      if (imagesResponse.error) throw imagesResponse.error;
+
+      return {
+        variants: variantsResponse.data,
+        images: imagesResponse.data
+      };
     },
     enabled: !!product?.id,
   });
 
   useEffect(() => {
-    if (product) {
-      setFormData(product);
+    if (product && productData) {
+      setFormData({
+        ...product,
+        product_images: productData.images
+      });
+      setVariants(productData.variants);
     }
-    if (productVariants) {
-      setVariants(productVariants);
-    }
-  }, [product, productVariants]);
+  }, [product, productData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
+    console.log('Submitting form with data:', { formData, variants });
     updateProduct.mutate({ formData, variants }, {
       onSuccess: () => onClose(),
     });
@@ -63,7 +71,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     } else {
       // Add new image to product_images array
       const newImage = {
-        id: `temp-${Date.now()}`,
+        id: crypto.randomUUID(),
         product_id: formData?.id || '',
         image_url: url,
         display_order: formData?.product_images?.length || 0

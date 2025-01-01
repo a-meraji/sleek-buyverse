@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
-import { ProductVariant } from "@/types/variant";
+import { Product } from "@/types";
+import { ProductVariant } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 
 export function useProductUpdate() {
@@ -51,23 +51,31 @@ export function useProductUpdate() {
 
       // Handle additional images
       if (formData.product_images && formData.product_images.length > 0) {
+        // First delete existing images
+        const { error: deleteImagesError } = await supabase
+          .from("product_images")
+          .delete()
+          .eq("product_id", formData.id);
+
+        if (deleteImagesError) throw deleteImagesError;
+
+        // Then insert new images
+        const imagesData = formData.product_images.map((image, index) => ({
+          product_id: formData.id,
+          image_url: image.image_url,
+          display_order: index
+        }));
+
         const { error: imagesError } = await supabase
           .from("product_images")
-          .upsert(
-            formData.product_images.map((image, index) => ({
-              id: image.id,
-              product_id: formData.id,
-              image_url: image.image_url,
-              display_order: index
-            }))
-          );
+          .insert(imagesData);
 
         if (imagesError) throw imagesError;
       }
     },
     onSuccess: (_, { formData }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-      queryClient.invalidateQueries({ queryKey: ["product-variants", formData.id] });
+      queryClient.invalidateQueries({ queryKey: ["product-details", formData.id] });
       toast({
         title: "Success",
         description: "Product updated successfully",
