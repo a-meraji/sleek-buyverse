@@ -24,14 +24,25 @@ export function FavoritesList({ userId }: FavoritesListProps) {
           products (
             id,
             name,
+            description,
+            price,
             image_url,
+            category,
+            sku,
             product_variants (*)
           )
         `)
         .eq('user_id', userId);
 
       if (error) throw error;
-      return data as FavoriteProduct[];
+      
+      // Add type assertion to handle the Supabase response type
+      const typedData = (data || []).map(item => ({
+        product_id: item.product_id,
+        products: item.products as Product
+      }));
+      
+      return typedData;
     },
   });
 
