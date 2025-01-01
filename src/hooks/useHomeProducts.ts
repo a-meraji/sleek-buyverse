@@ -23,13 +23,14 @@ export const useHomeProducts = () => {
 
         const endTime = performance.now();
         
-        // Log the complete response object without the body property
+        // Log the complete response object with detailed information
         console.log('Complete Supabase Response:', {
           status: response.status,
           statusText: response.statusText,
           data: response.data,
           error: response.error,
-          count: response.count
+          count: response.count,
+          queryTime: `${(endTime - startTime).toFixed(2)}ms`
         });
 
         // Log detailed error information if present
