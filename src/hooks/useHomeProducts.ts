@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types";
 import { useEffect, useState } from "react";
+import { Product } from "@/types";
 
 export const useHomeProducts = () => {
   const [authState, setAuthState] = useState<{
@@ -45,55 +45,35 @@ export const useHomeProducts = () => {
     queryKey: ['products'],
     queryFn: async () => {
       console.log('useHomeProducts: Starting products fetch...');
-      console.log('useHomeProducts: Auth state:', authState);
       
-      const startTime = performance.now();
-
       try {
         console.log('useHomeProducts: Fetching products with variants and images...');
         const { data, error } = await supabase
           .from('products')
           .select(`
             *,
-            product_variants (
-              id,
-              size,
-              color,
-              price,
-              stock
-            ),
-            product_images (
-              id,
-              image_url,
-              display_order
-            )
+            product_variants (*),
+            product_images (*)
           `)
           .order('created_at', { ascending: false });
 
-        const endTime = performance.now();
-        
         if (error) {
           console.error('useHomeProducts: Error fetching products:', error);
           throw error;
         }
 
-        // Validate and log success metrics
         const validProducts = data?.filter(p => p.id && p.name && p.image_url) || [];
+        
         console.log('useHomeProducts: Fetch successful:', {
           totalProducts: data?.length || 0,
-          validProducts: validProducts?.length || 0,
-          queryTime: `${(endTime - startTime).toFixed(2)}ms`,
+          validProducts: validProducts.length,
           timestamp: new Date().toISOString(),
           sampleProduct: validProducts[0] ? {
             id: validProducts[0].id,
             name: validProducts[0].name,
             variantsCount: validProducts[0].product_variants?.length,
             imagesCount: validProducts[0].product_images?.length,
-            isValid: Boolean(
-              validProducts[0].id &&
-              validProducts[0].name &&
-              validProducts[0].image_url
-            )
+            isValid: true
           } : null
         });
 
