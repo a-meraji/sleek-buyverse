@@ -1,30 +1,55 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const useHomeProducts = () => {
-  // Log initial hook execution
+  const [authState, setAuthState] = useState<{
+    isAuthenticated: boolean;
+    userId: string | null;
+  }>({
+    isAuthenticated: false,
+    userId: null,
+  });
+
   useEffect(() => {
     console.log('useHomeProducts: Hook initialized');
+    
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        console.log('useHomeProducts: Session found:', session.user.id);
+        setAuthState({
+          isAuthenticated: true,
+          userId: session.user.id,
+        });
+      }
+    };
+
+    initializeAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('useHomeProducts: Auth state changed:', { event: _event, userId: session?.user?.id });
+      setAuthState({
+        isAuthenticated: !!session?.user,
+        userId: session?.user?.id || null,
+      });
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  return useQuery({
-    queryKey: ['products'],
+  const { data: products = [], isLoading, error } = useQuery({
+    queryKey: ['products', authState],
     queryFn: async () => {
       console.log('useHomeProducts: Starting products fetch...');
+      console.log('useHomeProducts: Auth state:', authState);
+      
       const startTime = performance.now();
 
       try {
-        // Check authentication status
-        console.log('useHomeProducts: Checking auth status...');
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('useHomeProducts: Auth state:', {
-          isAuthenticated: !!session,
-          userId: session?.user?.id
-        });
-
-        // Fetch products with related data
         console.log('useHomeProducts: Fetching products with variants and images...');
         const { data, error } = await supabase
           .from('products')
@@ -48,12 +73,7 @@ export const useHomeProducts = () => {
         const endTime = performance.now();
         
         if (error) {
-          console.error('useHomeProducts: Error fetching products:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-          });
+          console.error('useHomeProducts: Error fetching products:', error);
           throw error;
         }
 
@@ -83,8 +103,11 @@ export const useHomeProducts = () => {
         throw error;
       }
     },
+    enabled: true, // Always enabled to allow immediate data fetching
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     retry: 2,
     refetchOnWindowFocus: false,
   });
+
+  return { products, isLoading, error };
 };
