@@ -10,10 +10,7 @@ export const useHomeProducts = () => {
       const startTime = performance.now();
 
       try {
-        // Wait for any pending auth state to be resolved
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('Current session state:', session ? 'Authenticated' : 'Unauthenticated');
-
+        // Get products without waiting for auth state
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select(`

@@ -12,7 +12,8 @@ const Index = () => {
   console.log('Index page rendering state:', {
     isLoading,
     error,
-    productsCount: products?.length
+    productsCount: products?.length,
+    hasProducts: !!products
   });
 
   return (
