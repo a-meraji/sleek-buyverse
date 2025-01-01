@@ -11,12 +11,16 @@ const Index = () => {
   const { data: products = [], isLoading, error } = useHomeProducts();
 
   useEffect(() => {
-    console.log('Index page rendering state:', {
+    console.log('Index: Component state:', {
       isLoading,
-      error,
+      error: error ? {
+        message: error.message,
+        name: error.name
+      } : null,
       productsCount: products?.length,
-      hasProducts: Boolean(products),
-      productsValid: products?.every(p => p.id && p.name && p.image_url)
+      hasProducts: Boolean(products?.length),
+      productsValid: products?.every(p => p.id && p.name && p.image_url),
+      timestamp: new Date().toISOString()
     });
   }, [isLoading, error, products]);
 

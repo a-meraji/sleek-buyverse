@@ -6,23 +6,27 @@ import { useEffect } from "react";
 export const useHomeProducts = () => {
   // Log initial hook execution
   useEffect(() => {
-    console.log('useHomeProducts hook initialized');
+    console.log('useHomeProducts: Hook initialized');
   }, []);
 
   return useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      console.log('Starting products fetch...');
+      console.log('useHomeProducts: Starting products fetch...');
       const startTime = performance.now();
 
       try {
-        console.log('Checking auth status before fetch...');
+        // Check authentication status
+        console.log('useHomeProducts: Checking auth status...');
         const { data: { session } } = await supabase.auth.getSession();
-        console.log('Auth session state:', session ? 'Authenticated' : 'Unauthenticated');
-        
-        console.log('Sending request to Supabase products table...');
-        
-        const response = await supabase
+        console.log('useHomeProducts: Auth state:', {
+          isAuthenticated: !!session,
+          userId: session?.user?.id
+        });
+
+        // Fetch products with related data
+        console.log('useHomeProducts: Fetching products with variants and images...');
+        const { data, error } = await supabase
           .from('products')
           .select(`
             *,
@@ -43,48 +47,39 @@ export const useHomeProducts = () => {
 
         const endTime = performance.now();
         
-        // Log complete response for debugging
-        console.log('Complete Supabase Response:', {
-          status: response.status,
-          statusText: response.statusText,
-          data: response.data,
-          error: response.error,
-          count: response.count,
-          queryTime: `${(endTime - startTime).toFixed(2)}ms`
-        });
-
-        // Log detailed error information if present
-        if (response.error) {
-          console.error('Supabase Error Details:', {
-            message: response.error.message,
-            details: response.error.details,
-            hint: response.error.hint,
-            code: response.error.code
+        if (error) {
+          console.error('useHomeProducts: Error fetching products:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
           });
-          throw response.error;
+          throw error;
         }
 
-        // Log success metrics and data structure validation
-        console.log('Products fetch successful:', {
-          count: response.data?.length || 0,
+        // Validate and log success metrics
+        const validProducts = data?.filter(p => p.id && p.name && p.image_url);
+        console.log('useHomeProducts: Fetch successful:', {
+          totalProducts: data?.length || 0,
+          validProducts: validProducts?.length || 0,
           queryTime: `${(endTime - startTime).toFixed(2)}ms`,
           timestamp: new Date().toISOString(),
-          firstProduct: response.data?.[0] ? {
-            id: response.data[0].id,
-            name: response.data[0].name,
-            variantsCount: response.data[0].product_variants?.length,
-            imagesCount: response.data[0].product_images?.length,
-            hasRequiredFields: Boolean(
-              response.data[0].id &&
-              response.data[0].name &&
-              response.data[0].image_url
+          sampleProduct: data?.[0] ? {
+            id: data[0].id,
+            name: data[0].name,
+            variantsCount: data[0].product_variants?.length,
+            imagesCount: data[0].product_images?.length,
+            isValid: Boolean(
+              data[0].id &&
+              data[0].name &&
+              data[0].image_url
             )
           } : null
         });
 
-        return response.data as Product[] || [];
+        return validProducts as Product[] || [];
       } catch (error) {
-        console.error('Unexpected error in products query:', error);
+        console.error('useHomeProducts: Unexpected error:', error);
         throw error;
       }
     },
