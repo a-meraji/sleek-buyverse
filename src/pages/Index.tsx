@@ -66,7 +66,7 @@ const Index = () => {
           hasVariants: productsData[0]?.product_variants?.length > 0
         });
 
-        return productsData;
+        return productsData as Product[];
       } catch (error) {
         console.error('Error in products query:', error);
         throw error;
