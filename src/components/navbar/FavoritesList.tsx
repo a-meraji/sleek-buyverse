@@ -10,7 +10,7 @@ interface FavoritesListProps {
 
 interface FavoriteProduct {
   product_id: string;
-  products: Product;
+  products: Product;  // Changed from Product[] to Product since it's a single product
 }
 
 export function FavoritesList({ userId }: FavoritesListProps) {
@@ -22,7 +22,7 @@ export function FavoritesList({ userId }: FavoritesListProps) {
         .from('favorites')
         .select(`
           product_id,
-          products (
+          products:products!inner (
             id,
             name,
             description,
