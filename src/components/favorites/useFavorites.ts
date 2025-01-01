@@ -68,8 +68,8 @@ export function useFavorites(userId: string) {
       
       console.log('Raw favorites data:', data);
       
-      // Transform the data with proper typing
-      const transformedData = (data as SupabaseFavoriteResponse[])?.map(item => ({
+      // Transform the data with proper typing and null checks
+      const transformedData = (data as unknown as SupabaseFavoriteResponse[])?.map(item => ({
         product_id: item.product_id,
         products: {
           id: item.products.id,
