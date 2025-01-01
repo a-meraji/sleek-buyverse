@@ -13,7 +13,6 @@ import About from "./pages/About";
 import { ChatButton } from "./components/chat/ChatButton";
 import { Footer } from "./components/home/Footer";
 import { CartProvider } from "./contexts/cart/CartContext";
-import * as React from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,33 +26,31 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <TooltipProvider>
-          <BrowserRouter>
-            <div className="flex min-h-screen flex-col">
-              <div className="flex-1">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/product/:id" element={<Product />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/about" element={<About />} />
-                </Routes>
-              </div>
-              <Footer />
+  <QueryClientProvider client={queryClient}>
+    <CartProvider>
+      <TooltipProvider>
+        <BrowserRouter>
+          <div className="flex min-h-screen flex-col">
+            <div className="flex-1">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/product/:id" element={<Product />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/about" element={<About />} />
+              </Routes>
             </div>
-            <ChatButton />
-            <Toaster />
-            <Sonner />
-          </BrowserRouter>
-        </TooltipProvider>
-      </CartProvider>
-    </QueryClientProvider>
-  </React.StrictMode>
+            <Footer />
+          </div>
+          <ChatButton />
+          <Toaster />
+          <Sonner />
+        </BrowserRouter>
+      </TooltipProvider>
+    </CartProvider>
+  </QueryClientProvider>
 );
 
 export default App;

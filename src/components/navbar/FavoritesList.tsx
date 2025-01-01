@@ -2,9 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { Loader2 } from "lucide-react";
+import { Product } from "@/types";
 
 interface FavoritesListProps {
   userId: string;
+}
+
+interface FavoriteProduct {
+  product_id: string;
+  products: Product;
 }
 
 export function FavoritesList({ userId }: FavoritesListProps) {
@@ -25,7 +31,7 @@ export function FavoritesList({ userId }: FavoritesListProps) {
         .eq('user_id', userId);
 
       if (error) throw error;
-      return data;
+      return data as FavoriteProduct[];
     },
   });
 
