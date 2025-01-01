@@ -45,7 +45,7 @@ export function FavoritesList({ userId }: FavoritesListProps) {
       // Transform the data to match our expected type
       const transformedData = data?.map(item => ({
         product_id: item.product_id,
-        products: item.products as Product
+        products: item.products as unknown as Product // Cast to Product type
       }));
       
       console.log('Transformed favorites data:', transformedData);
