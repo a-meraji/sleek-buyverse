@@ -20,6 +20,7 @@ interface ProductOverviewDialogProps {
   productImage: string;
   userId: string | null;
   variants?: ProductVariant[];
+  discount?: number | null;
 }
 
 export function ProductOverviewDialog({
@@ -159,3 +160,4 @@ export function ProductOverviewDialog({
     </Dialog>
   );
 }
+
