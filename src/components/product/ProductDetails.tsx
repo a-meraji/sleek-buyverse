@@ -4,6 +4,8 @@ import { AddToCartButton } from "./AddToCartButton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { ColorSelector } from "./ColorSelector";
+import { useState } from "react";
 
 interface ProductDetailsProps {
   product: Product;
@@ -13,6 +15,8 @@ interface ProductDetailsProps {
 }
 
 export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: ProductDetailsProps) => {
+  const [selectedColor, setSelectedColor] = useState("");
+
   const { data: variants, isLoading: isLoadingVariants } = useQuery({
     queryKey: ['product-variants', product.id],
     queryFn: async () => {
@@ -32,11 +36,13 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
     }
   });
 
-  const selectedVariant = variants?.find(v => v.size === selectedSize);
+  const selectedVariant = variants?.find(v => v.size === selectedSize && v.color === selectedColor);
   const isOutOfStock = selectedVariant?.stock <= 0;
   const minPrice = variants?.length 
     ? Math.min(...variants.map(v => v.price))
     : 0;
+
+  const colors = [...new Set(variants?.map(v => v.color) || [])];
 
   return (
     <div className="space-y-6">
@@ -48,10 +54,16 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
         <p className="text-sm text-gray-500">Loading variants...</p>
       ) : variants && variants.length > 0 ? (
         <>
+          <ColorSelector
+            colors={colors}
+            selectedColor={selectedColor}
+            onColorSelect={setSelectedColor}
+          />
+
           <SizeSelector 
             selectedSize={selectedSize} 
             onSizeSelect={onSizeSelect}
-            variants={variants}
+            variants={variants.filter(v => v.color === selectedColor)}
           />
           
           {selectedVariant && (
@@ -73,7 +85,7 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
             selectedSize={selectedSize}
             productName={product.name}
             variants={variants}
-            disabled={!variants?.length || isOutOfStock}
+            disabled={!selectedColor || !selectedSize || isOutOfStock}
           />
         </>
       ) : (

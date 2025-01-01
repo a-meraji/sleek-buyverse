@@ -42,7 +42,7 @@ export const AddToCartButton = ({
       if (!selectedVariant) {
         toast({
           title: "Error",
-          description: "Please select a valid size variant.",
+          description: "Please select a valid size and color variant.",
           variant: "destructive",
         });
         return;
