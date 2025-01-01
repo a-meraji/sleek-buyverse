@@ -23,8 +23,10 @@ export function ProductForm({ onClose }: ProductFormProps) {
     image_url: "",
     sku: "",
   });
+  const [additionalImages, setAdditionalImages] = useState<{ image_url: string }[]>([]);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
+  const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -91,6 +93,21 @@ export function ProductForm({ onClose }: ProductFormProps) {
         throw productError;
       }
 
+      // Insert additional images if any
+      if (additionalImages.length > 0) {
+        const imagesData = additionalImages.map((img, index) => ({
+          product_id: product.id,
+          image_url: img.image_url,
+          display_order: index
+        }));
+
+        const { error: imagesError } = await supabase
+          .from("product_images")
+          .insert(imagesData);
+
+        if (imagesError) throw imagesError;
+      }
+
       const variantsData = variants.map(variant => ({
         product_id: product.id,
         size: variant.size,
@@ -136,8 +153,20 @@ export function ProductForm({ onClose }: ProductFormProps) {
 
   const handleImageSelect = (url: string) => {
     console.log('Selected image URL:', url);
-    handleFormChange({ image_url: url });
+    if (isSelectingMainImage) {
+      handleFormChange({ image_url: url });
+    } else {
+      setAdditionalImages(prev => [...prev, { image_url: url }]);
+    }
     setShowImageSelector(false);
+  };
+
+  const handleRemoveImage = (url: string) => {
+    if (url === formData.image_url) {
+      handleFormChange({ image_url: "" });
+    } else {
+      setAdditionalImages(prev => prev.filter(img => img.image_url !== url));
+    }
   };
 
   return (
@@ -165,7 +194,21 @@ export function ProductForm({ onClose }: ProductFormProps) {
         <ImagePreview
           imageUrl={formData.image_url}
           productName={formData.name}
-          onChooseImage={() => setShowImageSelector(true)}
+          additionalImages={additionalImages.map((img, index) => ({
+            id: `new-${index}`,
+            image_url: img.image_url,
+            product_id: '',
+            display_order: index
+          }))}
+          onChooseImage={() => {
+            setIsSelectingMainImage(true);
+            setShowImageSelector(true);
+          }}
+          onAddAdditionalImage={() => {
+            setIsSelectingMainImage(false);
+            setShowImageSelector(true);
+          }}
+          onRemoveImage={handleRemoveImage}
         />
 
         <div className="flex justify-end gap-2">

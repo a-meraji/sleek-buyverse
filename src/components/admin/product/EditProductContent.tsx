@@ -3,7 +3,7 @@ import { ProductVariant } from "@/types";
 import { ProductDetailsFields } from "./ProductDetailsFields";
 import { CategorySelector } from "./CategorySelector";
 import { VariantsManager } from "./VariantsManager";
-import { ImageManager } from "./ImageManager";
+import { ImagePreview } from "./ImagePreview";
 import { Button } from "@/components/ui/button";
 
 interface EditProductContentProps {
@@ -12,6 +12,8 @@ interface EditProductContentProps {
   onFormChange: (updates: Partial<Product>) => void;
   onVariantsChange: (variants: ProductVariant[]) => void;
   onImageSelect: () => void;
+  onAddAdditionalImage: () => void;
+  onRemoveImage: (imageUrl: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
   isSubmitting: boolean;
@@ -23,6 +25,8 @@ export function EditProductContent({
   onFormChange,
   onVariantsChange,
   onImageSelect,
+  onAddAdditionalImage,
+  onRemoveImage,
   onSubmit,
   onClose,
   isSubmitting,
@@ -49,12 +53,13 @@ export function EditProductContent({
         productId={formData.id}
       />
 
-      <ImageManager
-        productId={formData.id}
-        mainImage={formData.image_url}
+      <ImagePreview
+        imageUrl={formData.image_url}
+        productName={formData.name}
         additionalImages={formData.product_images}
-        onMainImageSelect={onImageSelect}
-        onImagesChange={(images) => onFormChange({ product_images: images })}
+        onChooseImage={onImageSelect}
+        onAddAdditionalImage={onAddAdditionalImage}
+        onRemoveImage={onRemoveImage}
       />
 
       <div className="flex justify-end gap-2">

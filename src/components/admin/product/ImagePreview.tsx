@@ -7,6 +7,7 @@ interface ImagePreviewProps {
   productName?: string;
   additionalImages?: ProductImage[];
   onChooseImage: () => void;
+  onAddAdditionalImage: () => void;
   onRemoveImage?: (imageUrl: string) => void;
 }
 
@@ -15,57 +16,76 @@ export function ImagePreview({
   productName, 
   additionalImages = [],
   onChooseImage,
+  onAddAdditionalImage,
   onRemoveImage 
 }: ImagePreviewProps) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium">Product Images</label>
-      <div className="flex flex-wrap gap-4">
-        {imageUrl && (
-          <div className="relative group">
-            <img
-              src={imageUrl}
-              alt={`Main image - ${productName}`}
-              className="h-20 w-20 object-cover rounded-lg border border-border"
-            />
-            {onRemoveImage && (
-              <button
-                onClick={() => onRemoveImage(imageUrl)}
-                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        )}
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Main Product Image</label>
+        <div className="flex items-center gap-4">
+          {imageUrl ? (
+            <div className="relative group">
+              <img
+                src={imageUrl}
+                alt={`Main image - ${productName}`}
+                className="h-20 w-20 object-cover rounded-lg border border-border"
+              />
+              {onRemoveImage && (
+                <button
+                  onClick={() => onRemoveImage(imageUrl)}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="h-20 w-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+              <Image className="h-8 w-8 text-gray-400" />
+            </div>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onChooseImage}
+          >
+            {imageUrl ? 'Change Main Image' : 'Add Main Image'}
+          </Button>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium">Additional Images</label>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onAddAdditionalImage}
+          >
+            Add Image
+          </Button>
+        </div>
         
-        {additionalImages?.map((image, index) => (
-          <div key={image.id || index} className="relative group">
-            <img
-              src={image.image_url}
-              alt={`Product image ${index + 1}`}
-              className="h-20 w-20 object-cover rounded-lg border border-border"
-            />
-            {onRemoveImage && (
-              <button
-                onClick={() => onRemoveImage(image.image_url)}
-                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        ))}
-        
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onChooseImage}
-          className="h-20 w-20 flex flex-col items-center justify-center gap-1"
-        >
-          <Image className="h-4 w-4" />
-          <span className="text-xs">Add Image</span>
-        </Button>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {additionalImages?.map((image) => (
+            <div key={image.id} className="relative group">
+              <img
+                src={image.image_url}
+                alt="Additional product image"
+                className="h-20 w-20 object-cover rounded-lg border border-border"
+              />
+              {onRemoveImage && (
+                <button
+                  onClick={() => onRemoveImage(image.image_url)}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

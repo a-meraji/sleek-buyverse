@@ -16,6 +16,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   const [formData, setFormData] = useState<Product | null>(null);
   const [variants, setVariants] = useState([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
+  const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
   const updateProduct = useProductUpdate();
 
   // Fetch variants for this product
@@ -57,8 +58,31 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
 
   const handleImageSelect = (url: string) => {
     console.log('Selected image URL:', url);
-    handleFormChange({ image_url: url });
+    if (isSelectingMainImage) {
+      handleFormChange({ image_url: url });
+    } else {
+      // Add new image to product_images array
+      const newImage = {
+        id: `temp-${Date.now()}`,
+        product_id: formData?.id || '',
+        image_url: url,
+        display_order: formData?.product_images?.length || 0
+      };
+      handleFormChange({ 
+        product_images: [...(formData?.product_images || []), newImage]
+      });
+    }
     setShowImageSelector(false);
+  };
+
+  const handleRemoveImage = (url: string) => {
+    if (url === formData?.image_url) {
+      handleFormChange({ image_url: "" });
+    } else {
+      handleFormChange({
+        product_images: formData?.product_images?.filter(img => img.image_url !== url) || []
+      });
+    }
   };
 
   if (!product || !formData) return null;
@@ -76,7 +100,15 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
             variants={variants}
             onFormChange={handleFormChange}
             onVariantsChange={setVariants}
-            onImageSelect={() => setShowImageSelector(true)}
+            onImageSelect={() => {
+              setIsSelectingMainImage(true);
+              setShowImageSelector(true);
+            }}
+            onAddAdditionalImage={() => {
+              setIsSelectingMainImage(false);
+              setShowImageSelector(true);
+            }}
+            onRemoveImage={handleRemoveImage}
             onSubmit={handleSubmit}
             onClose={onClose}
             isSubmitting={updateProduct.isPending}
