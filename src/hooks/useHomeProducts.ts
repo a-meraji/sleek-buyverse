@@ -10,6 +10,8 @@ export const useHomeProducts = () => {
       const startTime = performance.now();
 
       try {
+        console.log('Sending request to Supabase products table...');
+        
         const { data: productsData, error: productsError, status, statusText } = await supabase
           .from('products')
           .select(`
@@ -20,12 +22,25 @@ export const useHomeProducts = () => {
           .order('created_at', { ascending: false });
 
         const endTime = performance.now();
-        console.log('Products API Response:', {
+        
+        // Log the raw response first
+        console.log('Raw Supabase Response:', {
+          status,
+          statusText,
+          hasError: !!productsError,
+          hasData: !!productsData,
+          rawData: productsData,
+          error: productsError
+        });
+
+        // Then log the detailed API response metrics
+        console.log('Products API Response Details:', {
           status,
           statusText,
           error: productsError,
           dataLength: productsData?.length || 0,
-          queryTime: `${(endTime - startTime).toFixed(2)}ms`
+          queryTime: `${(endTime - startTime).toFixed(2)}ms`,
+          timestamp: new Date().toISOString()
         });
 
         if (productsError) {
@@ -49,7 +64,8 @@ export const useHomeProducts = () => {
             id: productsData[0].id,
             name: productsData[0].name,
             variantsCount: productsData[0].product_variants?.length,
-            imagesCount: productsData[0].product_images?.length
+            imagesCount: productsData[0].product_images?.length,
+            fullProduct: productsData[0] // Log the complete first product for debugging
           } : null,
           lastProduct: productsData[productsData.length - 1] ? {
             id: productsData[productsData.length - 1].id,
