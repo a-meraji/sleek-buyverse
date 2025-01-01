@@ -313,6 +313,7 @@ export type Database = {
           category: string | null
           created_at: string
           description: string | null
+          discount: number | null
           id: string
           image_url: string
           name: string
@@ -322,6 +323,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
+          discount?: number | null
           id?: string
           image_url: string
           name: string
@@ -331,6 +333,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
+          discount?: number | null
           id?: string
           image_url?: string
           name?: string
