@@ -17,10 +17,26 @@ const Index = () => {
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
       try {
-        // First fetch products
         const { data: productsData, error: productsError } = await supabase
           .from('products')
-          .select('*, product_variants(*), product_images(*)');
+          .select(`
+            *,
+            product_variants (
+              id,
+              product_id,
+              size,
+              color,
+              stock,
+              price
+            ),
+            product_images (
+              id,
+              product_id,
+              image_url,
+              display_order
+            )
+          `)
+          .order('created_at', { ascending: false });
 
         if (productsError) {
           console.error('Error fetching products:', productsError);

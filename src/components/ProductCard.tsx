@@ -23,7 +23,7 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
     : 0;
 
   // Calculate discounted price if discount exists
-  const discountedPrice = discount 
+  const discountedPrice = discount && minPrice
     ? minPrice * (1 - discount / 100)
     : null;
 
@@ -42,7 +42,14 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
     };
   }, []);
 
-  console.log('ProductCard variants:', product_variants);
+  console.log('ProductCard rendering:', {
+    id,
+    name,
+    variants: product_variants,
+    minPrice,
+    discount,
+    discountedPrice
+  });
 
   return (
     <div className="group relative rounded-lg border p-4 hover:shadow-lg transition-shadow">
