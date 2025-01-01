@@ -9,54 +9,26 @@ export const useAuthenticatedCart = () => {
     console.log('Adding to authenticated cart:', { userId, data });
     
     try {
-      // First check if the item exists
-      const { data: existingItem } = await supabase
+      // Insert new item directly without checking for existing items
+      const { data: insertData, error: insertError } = await supabase
         .from('cart_items')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('product_id', data.product_id)
-        .eq('variant_id', data.variant_id)
+        .insert({
+          product_id: data.product_id,
+          variant_id: data.variant_id,
+          quantity: data.quantity,
+          user_id: userId,
+        })
+        .select(`
+          *,
+          product:products(
+            *,
+            product_variants(*)
+          )
+        `)
         .single();
 
-      if (existingItem) {
-        // Update quantity if item exists
-        const { data: updatedItem, error: updateError } = await supabase
-          .from('cart_items')
-          .update({ quantity: existingItem.quantity + 1 })
-          .eq('id', existingItem.id)
-          .select(`
-            *,
-            product:products(
-              *,
-              product_variants(*)
-            )
-          `)
-          .single();
-
-        if (updateError) throw updateError;
-        return updatedItem;
-      } else {
-        // Insert new item if it doesn't exist
-        const { data: insertData, error: insertError } = await supabase
-          .from('cart_items')
-          .insert({
-            product_id: data.product_id,
-            variant_id: data.variant_id,
-            quantity: data.quantity,
-            user_id: userId,
-          })
-          .select(`
-            *,
-            product:products(
-              *,
-              product_variants(*)
-            )
-          `)
-          .single();
-
-        if (insertError) throw insertError;
-        return insertData;
-      }
+      if (insertError) throw insertError;
+      return insertData;
     } catch (error) {
       console.error('Error in authenticated cart operation:', error);
       toast({
