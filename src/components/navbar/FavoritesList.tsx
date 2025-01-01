@@ -5,13 +5,22 @@ import { FavoritesGrid } from "../favorites/FavoritesGrid";
 import { useFavorites } from "../favorites/useFavorites";
 
 interface FavoritesListProps {
-  userId: string;
+  userId: string | undefined;
 }
 
 export function FavoritesList({ userId }: FavoritesListProps) {
   const { data: favorites, isLoading, error } = useFavorites(userId);
 
-  console.log('FavoritesList rendering state:', { isLoading, error, favoritesCount: favorites?.length });
+  console.log('FavoritesList rendering state:', { 
+    isLoading, 
+    error, 
+    favoritesCount: favorites?.length,
+    userId 
+  });
+
+  if (!userId) {
+    return <EmptyFavorites />;
+  }
 
   if (isLoading) {
     return (

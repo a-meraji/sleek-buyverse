@@ -28,10 +28,15 @@ interface SupabaseFavoriteResponse {
   };
 }
 
-export function useFavorites(userId: string) {
+export function useFavorites(userId: string | undefined) {
   return useQuery({
     queryKey: ['favorites', userId],
     queryFn: async () => {
+      if (!userId) {
+        console.log('No user ID provided for favorites query');
+        return [];
+      }
+
       console.log('Fetching favorites for user:', userId);
       const startTime = performance.now();
       
