@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
+import { Product } from "@/types";
 import { ProductForm } from "./ProductForm";
 import { EditProductDialog } from "./EditProductDialog";
 import { ProductSearchBar } from "./products/ProductSearchBar";
