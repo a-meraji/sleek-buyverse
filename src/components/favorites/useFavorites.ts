@@ -7,6 +7,27 @@ interface FavoriteProduct {
   products: Product;
 }
 
+// Type for the raw Supabase response
+interface SupabaseFavoriteResponse {
+  product_id: string;
+  products: {
+    id: string;
+    name: string;
+    description: string | null;
+    image_url: string;
+    category: string | null;
+    sku: string | null;
+    discount: number | null;
+    product_variants?: {
+      id: string;
+      size: string;
+      color: string;
+      stock: number;
+      price: number;
+    }[];
+  };
+}
+
 export function useFavorites(userId: string) {
   return useQuery({
     queryKey: ['favorites', userId],
@@ -47,8 +68,8 @@ export function useFavorites(userId: string) {
       
       console.log('Raw favorites data:', data);
       
-      // Ensure the data matches the expected type structure
-      const transformedData = data?.map(item => ({
+      // Transform the data with proper typing
+      const transformedData = (data as SupabaseFavoriteResponse[])?.map(item => ({
         product_id: item.product_id,
         products: {
           id: item.products.id,
