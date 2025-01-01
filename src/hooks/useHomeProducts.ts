@@ -45,8 +45,7 @@ export const useHomeProducts = () => {
       }
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    retry: 1, // Reduce retry attempts
+    retry: 2,
     refetchOnWindowFocus: false,
-    initialData: [], // Provide initial data to prevent loading state
   });
 };

@@ -21,15 +21,15 @@ const Index = () => {
       <Navbar />
       <main className="flex-1">
         <HeroBanner />
-        {isLoading && !products.length ? (
+        {isLoading ? (
           <LoadingState />
         ) : error ? (
           <ErrorState error={error} />
-        ) : products.length > 0 ? (
+        ) : products && products.length > 0 ? (
           <MainContent products={products} />
         ) : (
           <div className="container mx-auto px-4 py-8 text-center">
-            <p className="text-muted-foreground">No products available</p>
+            <p className="text-muted-foreground">Loading products...</p>
           </div>
         )}
       </main>
