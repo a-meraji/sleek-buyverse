@@ -17,10 +17,19 @@ const Index = () => {
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
       try {
+        const startTime = performance.now();
+        
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select(`
-            *,
+            id,
+            name,
+            description,
+            image_url,
+            category,
+            sku,
+            discount,
+            created_at,
             product_variants (
               id,
               product_id,
@@ -38,6 +47,9 @@ const Index = () => {
           `)
           .order('created_at', { ascending: false });
 
+        const endTime = performance.now();
+        console.log(`Products query took ${endTime - startTime}ms`);
+
         if (productsError) {
           console.error('Error fetching products:', productsError);
           throw productsError;
@@ -48,7 +60,12 @@ const Index = () => {
           return [];
         }
 
-        console.log('Products fetched successfully:', productsData);
+        console.log('Products fetched successfully:', {
+          count: productsData.length,
+          firstProduct: productsData[0],
+          hasVariants: productsData[0]?.product_variants?.length > 0
+        });
+
         return productsData;
       } catch (error) {
         console.error('Error in products query:', error);
@@ -74,6 +91,7 @@ const Index = () => {
   }
 
   if (error) {
+    console.error('Error rendering products:', error);
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
