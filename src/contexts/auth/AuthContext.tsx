@@ -46,16 +46,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        setState(prev => ({ ...prev, isLoading: false }));
-
-        try {
-          if (session?.user) {
-            console.log("AuthProvider: Processing signed in user:", {
-              userId: session.user.id,
-              isLoading: false,
-              timestamp: new Date().toISOString()
-            });
-            
+        if (session?.user) {
+          console.log("AuthProvider: Processing signed in user:", {
+            userId: session.user.id,
+            isLoading: false,
+            timestamp: new Date().toISOString()
+          });
+          
+          try {
             const isAdmin = await checkAdminStatus(session.user.id);
             
             if (mounted) {
@@ -67,18 +65,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 timestamp: new Date().toISOString()
               });
             }
-          } else {
-            console.log("AuthProvider: No session, updating state:", {
-              isLoading: false,
-              timestamp: new Date().toISOString()
-            });
-            
+          } catch (error) {
+            console.error("AuthProvider: Error checking admin status:", error);
             if (mounted) {
-              setState({ user: null, isLoading: false, isAdmin: false });
+              setState({ user: session.user, isLoading: false, isAdmin: false });
             }
           }
-        } catch (error) {
-          console.error("AuthProvider: Error processing auth state change:", error);
+        } else {
+          console.log("AuthProvider: No session, updating state:", {
+            isLoading: false,
+            timestamp: new Date().toISOString()
+          });
+          
           if (mounted) {
             setState({ user: null, isLoading: false, isAdmin: false });
           }
