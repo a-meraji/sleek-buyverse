@@ -9,7 +9,7 @@ import { useState } from "react";
 
 const Product = () => {
   const { id } = useParams();
-  const { session } = useAuthSession();
+  const { state } = useAuthSession();
   const [selectedSize, setSelectedSize] = useState("");
 
   const { data: product, isLoading, error } = useQuery({
@@ -111,7 +111,7 @@ const Product = () => {
           />
           <ProductDetails
             product={product}
-            userId={session?.user?.id || null}
+            userId={state.user?.id || null}
             selectedSize={selectedSize}
             onSizeSelect={setSelectedSize}
           />
