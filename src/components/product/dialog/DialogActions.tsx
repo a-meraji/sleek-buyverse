@@ -5,6 +5,7 @@ interface DialogActionsProps {
   productId: string;
   userId: string | null;
   selectedSize: string;
+  selectedColor: string;
   productName: string;
   disabled?: boolean;
   variants?: ProductVariant[];
@@ -14,6 +15,7 @@ export function DialogActions({
   productId,
   userId,
   selectedSize,
+  selectedColor,
   productName,
   disabled,
   variants
@@ -24,6 +26,7 @@ export function DialogActions({
         productId={productId}
         userId={userId}
         selectedSize={selectedSize}
+        selectedColor={selectedColor}
         productName={productName}
         disabled={disabled}
         variants={variants}

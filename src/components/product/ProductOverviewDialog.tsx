@@ -137,6 +137,7 @@ export function ProductOverviewDialog({
                 productId={productId}
                 userId={userId}
                 selectedSize={selectedSize}
+                selectedColor={selectedColor}
                 productName={productName}
                 disabled={!selectedSize || !selectedColor}
                 variants={variants}

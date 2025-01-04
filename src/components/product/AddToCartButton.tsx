@@ -8,6 +8,7 @@ interface AddToCartButtonProps {
   productId: string;
   userId: string | null;
   selectedSize: string;
+  selectedColor: string;
   productName: string;
   disabled?: boolean;
   variants?: ProductVariant[];
@@ -16,7 +17,8 @@ interface AddToCartButtonProps {
 export const AddToCartButton = ({ 
   productId, 
   userId, 
-  selectedSize, 
+  selectedSize,
+  selectedColor,
   productName,
   variants,
   disabled 
@@ -27,22 +29,24 @@ export const AddToCartButton = ({
 
   const handleAddToCart = async () => {
     try {
-      if (!selectedSize) {
+      if (!selectedSize || !selectedColor) {
         toast({
-          title: "Please select a size",
-          description: "You need to select a size before adding to cart.",
+          title: "Please select options",
+          description: "You need to select both size and color before adding to cart.",
           variant: "destructive",
         });
         return;
       }
 
-      // Find the variant that matches the selected size
-      const selectedVariant = variants?.find(v => v.size === selectedSize);
+      // Find the variant that matches both the selected size and color
+      const selectedVariant = variants?.find(v => 
+        v.size === selectedSize && v.color === selectedColor
+      );
       
       if (!selectedVariant) {
         toast({
           title: "Error",
-          description: "Please select a valid size and color variant.",
+          description: "Selected combination is not available.",
           variant: "destructive",
         });
         return;
@@ -52,6 +56,7 @@ export const AddToCartButton = ({
         productId,
         variantId: selectedVariant.id,
         selectedSize,
+        selectedColor,
         userId,
         price: selectedVariant.price
       });
@@ -69,7 +74,7 @@ export const AddToCartButton = ({
 
       toast({
         title: "Added to cart",
-        description: `${productName} (${selectedSize}) has been added to your cart.`,
+        description: `${productName} (${selectedSize}, ${selectedColor}) has been added to your cart.`,
       });
     } catch (error) {
       console.error('Error adding to cart:', error);
