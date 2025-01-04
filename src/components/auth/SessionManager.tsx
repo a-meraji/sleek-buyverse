@@ -91,14 +91,15 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
           
           if (mounted) {
             await transferLocalCartToServer(session.user.id);
-            // Persist session in localStorage
+            // Store session data in localStorage
             localStorage.setItem('supabase.auth.token', session.access_token);
+            localStorage.setItem('supabase.auth.user', JSON.stringify(session.user));
           }
         } else {
           console.log("SessionManager: No active session found");
           if (mounted) {
-            // Clear any stale session data
             localStorage.removeItem('supabase.auth.token');
+            localStorage.removeItem('supabase.auth.user');
             navigate('/auth');
           }
         }
@@ -122,6 +123,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
         if (session?.user) {
           await transferLocalCartToServer(session.user.id);
           localStorage.setItem('supabase.auth.token', session.access_token);
+          localStorage.setItem('supabase.auth.user', JSON.stringify(session.user));
         }
         toast({
           title: "Welcome back!",
@@ -133,14 +135,17 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
       if (event === "SIGNED_OUT" && mounted) {
         console.log("SessionManager: User signed out");
         localStorage.removeItem('supabase.auth.token');
+        localStorage.removeItem('supabase.auth.user');
         navigate("/auth");
       }
 
-      // Handle token refresh
       if (event === "TOKEN_REFRESHED" && mounted) {
         console.log("SessionManager: Token refreshed");
         if (session?.access_token) {
           localStorage.setItem('supabase.auth.token', session.access_token);
+          if (session.user) {
+            localStorage.setItem('supabase.auth.user', JSON.stringify(session.user));
+          }
         }
       }
     });

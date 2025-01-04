@@ -23,6 +23,17 @@ export const useProfileData = () => {
     console.log('useProfileData: Hook initialized');
     
     const initializeAuth = async () => {
+      // First check localStorage for existing session
+      const storedUser = localStorage.getItem('supabase.auth.user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        setAuthState({
+          isAuthenticated: true,
+          userId: user.id,
+        });
+      }
+
+      // Then verify with Supabase
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         console.log('Session found for user:', session.user.id);
