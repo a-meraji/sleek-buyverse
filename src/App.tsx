@@ -3,7 +3,7 @@ import { AuthProvider } from "@/contexts/auth/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
-import Home from "@/pages/Home";
+import Home from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import Profile from "@/pages/Profile";
 import "./App.css";

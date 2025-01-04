@@ -7,31 +7,26 @@ import { FavoritesList } from "@/components/navbar/FavoritesList";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useProfileData } from "@/hooks/useProfileData";
+import { useAuth } from "@/contexts/auth/AuthContext";
 import { Loader2, LogOut } from "lucide-react";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { profile, isLoading, error, isAuthenticated, userId } = useProfileData();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
     console.log('Profile: Component state:', {
       isLoading,
-      error: error ? {
-        message: error.message,
-        name: error.name
-      } : null,
-      isAuthenticated,
-      userId,
-      hasProfile: !!profile,
+      isAuthenticated: !!user,
+      userId: user?.id,
       timestamp: new Date().toISOString()
     });
 
-    if (!isAuthenticated && !isLoading) {
+    if (!user && !isLoading) {
       navigate('/auth');
     }
-  }, [isAuthenticated, isLoading, navigate, error, profile]);
+  }, [user, isLoading, navigate]);
 
   const handleSignOut = async () => {
     try {
@@ -68,20 +63,7 @@ const Profile = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center text-red-500">
-            Error loading profile. Please try again later.
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (!userId) return null;
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -97,7 +79,7 @@ const Profile = () => {
             </TabsList>
 
             <TabsContent value="info" className="space-y-6">
-              <ProfileForm userId={userId} onClose={() => {}} />
+              <ProfileForm userId={user.id} onClose={() => {}} />
               <Button 
                 variant="destructive" 
                 className="w-full"
@@ -109,7 +91,7 @@ const Profile = () => {
             </TabsContent>
 
             <TabsContent value="favorites">
-              <FavoritesList userId={userId} />
+              <FavoritesList userId={user.id} />
             </TabsContent>
           </Tabs>
         </div>
