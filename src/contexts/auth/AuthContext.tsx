@@ -22,7 +22,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Initialize auth on mount
   useEffect(() => {
     console.log("AuthProvider: Starting initialization");
-    initializeAuth();
+    let mounted = true;
+
+    const initialize = async () => {
+      if (mounted) {
+        await initializeAuth();
+      }
+    };
+
+    initialize();
+
+    return () => {
+      mounted = false;
+    };
   }, [initializeAuth]);
 
   // Set up auth state change listener

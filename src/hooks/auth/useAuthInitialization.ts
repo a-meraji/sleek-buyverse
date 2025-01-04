@@ -34,24 +34,16 @@ export const useAuthInitialization = () => {
           timestamp: new Date().toISOString()
         });
         
-        setState(prevState => {
-          const newState = { user, isLoading, isAdmin };
-          console.log("useAuthInitialization: State update:", {
-            prevState,
-            newState,
-            timestamp: new Date().toISOString()
-          });
-          return newState;
+        setState({
+          user,
+          isLoading,
+          isAdmin
         });
       } else {
-        setState(prevState => {
-          const newState = { user: null, isLoading, isAdmin: false };
-          console.log("useAuthInitialization: State update:", {
-            prevState,
-            newState,
-            timestamp: new Date().toISOString()
-          });
-          return newState;
+        setState({
+          user: null,
+          isLoading,
+          isAdmin: false
         });
       }
     } catch (error) {
@@ -63,7 +55,6 @@ export const useAuthInitialization = () => {
   const initializeAuth = useCallback(async () => {
     console.log("useAuthInitialization: Starting initialization");
     try {
-      setState(prev => ({ ...prev, isLoading: true }));
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
