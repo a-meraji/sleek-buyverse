@@ -24,14 +24,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAdminStatus = async (userId: string) => {
     try {
       console.log("AuthProvider: Starting admin check for", userId);
-      const { data, error } = await supabase
+      
+      // First verify the query is constructed correctly
+      const query = supabase
         .from("admin_users")
         .select("role")
         .eq("id", userId)
         .single();
+      
+      console.log("AuthProvider: Executing query:", query);
+      
+      const { data, error, status } = await query;
+      
+      console.log("AuthProvider: Query completed with status:", status);
 
       if (error) {
-        console.error("Admin check error:", error.message);
+        console.error("Admin check error:", error.message, "Status:", status, "Details:", error);
         return false;
       }
 
