@@ -83,6 +83,7 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
             productId={product.id}
             userId={userId}
             selectedSize={selectedSize}
+            selectedColor={selectedColor}
             productName={product.name}
             variants={variants}
             disabled={!selectedColor || !selectedSize || isOutOfStock}
