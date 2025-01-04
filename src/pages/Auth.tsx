@@ -9,32 +9,31 @@ const Auth = () => {
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
+    console.log("Auth page: Checking authentication state", {
+      user: !!user,
+      isLoading,
+      timestamp: new Date().toISOString()
+    });
+
     if (user && !isLoading) {
-      console.log("Auth: User is authenticated, redirecting to home");
+      console.log("Auth page: User is authenticated, redirecting to home");
       navigate("/");
     }
   }, [user, isLoading, navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Welcome</h1>
-          <AuthForm />
+          <h1 className="text-3xl font-bold mb-8 text-center">Welcome</h1>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+            </div>
+          ) : (
+            <AuthForm />
+          )}
         </div>
       </main>
     </div>

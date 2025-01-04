@@ -6,7 +6,7 @@ import { Product } from "@/types";
 export const useHomeProducts = () => {
   const { isInitialized } = useAuthState();
 
-  const { data: products = [], isLoading, error } = useQuery({
+  return useQuery({
     queryKey: ['products', isInitialized],
     queryFn: async () => {
       console.log('useHomeProducts: Starting products fetch...', {
@@ -46,7 +46,6 @@ export const useHomeProducts = () => {
             name: validProducts[0].name,
             variantsCount: validProducts[0].product_variants?.length,
             imagesCount: validProducts[0].product_images?.length,
-            isValid: true
           } : null
         });
 
@@ -58,8 +57,6 @@ export const useHomeProducts = () => {
     },
     enabled: isInitialized,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    refetchOnWindowFocus: false,
+    retry: 2,
   });
-
-  return { products, isLoading, error };
 };

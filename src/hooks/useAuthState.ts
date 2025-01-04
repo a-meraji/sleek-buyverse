@@ -20,34 +20,42 @@ export const useAuthState = () => {
     
     const initializeAuth = async () => {
       try {
-        // Get session from Supabase
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log('useAuthState: Starting initialization');
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (!mounted) return;
+        if (error) {
+          console.error('useAuthState: Session error:', error);
+          if (mounted) {
+            setAuthState({
+              isAuthenticated: false,
+              userId: null,
+              isInitialized: true,
+            });
+          }
+          return;
+        }
 
         if (session?.user) {
           console.log('useAuthState: Session found for user:', session.user.id);
-          localStorage.setItem('supabase.auth.token', session.access_token);
-          localStorage.setItem('supabase.auth.user', JSON.stringify(session.user));
-          
-          setAuthState({
-            isAuthenticated: true,
-            userId: session.user.id,
-            isInitialized: true,
-          });
+          if (mounted) {
+            setAuthState({
+              isAuthenticated: true,
+              userId: session.user.id,
+              isInitialized: true,
+            });
+          }
         } else {
-          console.log('useAuthState: No active session found');
-          localStorage.removeItem('supabase.auth.token');
-          localStorage.removeItem('supabase.auth.user');
-          
-          setAuthState({
-            isAuthenticated: false,
-            userId: null,
-            isInitialized: true,
-          });
+          console.log('useAuthState: No active session');
+          if (mounted) {
+            setAuthState({
+              isAuthenticated: false,
+              userId: null,
+              isInitialized: true,
+            });
+          }
         }
       } catch (error) {
-        console.error('useAuthState: Error initializing auth:', error);
+        console.error('useAuthState: Initialization error:', error);
         if (mounted) {
           setAuthState(state => ({ ...state, isInitialized: true }));
         }
@@ -56,9 +64,9 @@ export const useAuthState = () => {
 
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log('useAuthState: Auth state changed:', { 
-        event: _event, 
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('useAuthState: Auth state changed:', {
+        event,
         userId: session?.user?.id,
         timestamp: new Date().toISOString()
       });
@@ -66,18 +74,12 @@ export const useAuthState = () => {
       if (!mounted) return;
 
       if (session?.user) {
-        localStorage.setItem('supabase.auth.token', session.access_token);
-        localStorage.setItem('supabase.auth.user', JSON.stringify(session.user));
-        
         setAuthState({
           isAuthenticated: true,
           userId: session.user.id,
           isInitialized: true,
         });
       } else {
-        localStorage.removeItem('supabase.auth.token');
-        localStorage.removeItem('supabase.auth.user');
-        
         setAuthState({
           isAuthenticated: false,
           userId: null,
