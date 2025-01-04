@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log("AuthProvider: Auth state changed:", { 
           event, 
           userId: session?.user?.id,
-          isLoading: state.isLoading,
+          isLoading: false, // Log the intended loading state
           timestamp: new Date().toISOString(),
           sessionDetails: session
         });
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (session?.user) {
             console.log("AuthProvider: Processing signed in user:", {
               userId: session.user.id,
-              isLoading: true,
+              isLoading: false, // Log the intended loading state
               timestamp: new Date().toISOString()
             });
             
