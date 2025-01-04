@@ -35,32 +35,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq("id", userId)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error("AuthProvider: Admin check error:", error);
+          return false;
+        }
+        console.log("AuthProvider: Admin check result:", data);
         return !!data;
       } catch (error) {
-        console.error("AuthProvider: Admin check error:", error);
+        console.error("AuthProvider: Admin check unexpected error:", error);
         return false;
       }
     };
 
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log("AuthProvider: Starting initialization...");
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (!mounted) return;
+        if (error) {
+          console.error("AuthProvider: Session error:", error);
+          if (mounted) {
+            setState(prev => ({ ...prev, isLoading: false }));
+          }
+          return;
+        }
 
         if (session?.user) {
           console.log("AuthProvider: Session found for user:", session.user.id);
           const isAdmin = await checkAdminStatus(session.user.id);
-          setState({ user: session.user, isLoading: false, isAdmin });
+          if (mounted) {
+            setState({ user: session.user, isLoading: false, isAdmin });
+          }
         } else {
           console.log("AuthProvider: No session found");
-          setState({ user: null, isLoading: false, isAdmin: false });
+          if (mounted) {
+            setState({ user: null, isLoading: false, isAdmin: false });
+          }
         }
       } catch (error) {
         console.error("AuthProvider: Init error:", error);
         if (mounted) {
-          setState({ user: null, isLoading: false, isAdmin: false });
+          setState(prev => ({ ...prev, isLoading: false }));
         }
       }
     };
@@ -69,7 +84,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("AuthProvider: Auth state changed:", { event, userId: session?.user?.id });
+        console.log("AuthProvider: Auth state changed:", { 
+          event, 
+          userId: session?.user?.id,
+          timestamp: new Date().toISOString(),
+          sessionDetails: session // Adding full session details for debugging
+        });
 
         if (!mounted) return;
 
@@ -83,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     return () => {
+      console.log("AuthProvider: Cleanup - unmounting");
       mounted = false;
       subscription.unsubscribe();
     };
