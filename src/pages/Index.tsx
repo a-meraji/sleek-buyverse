@@ -17,22 +17,33 @@ const Index = () => {
     refetch 
   } = useProducts();
 
+  // Effect for handling auth state changes and product refetch
   useEffect(() => {
-    console.log("Index: Auth and Products loading state:", {
-      isAuthLoading,
-      isProductsLoading,
-      user: user?.id,
-      timestamp: new Date().toISOString()
-    });
+    const logState = () => {
+      console.log("Index: Auth and Products state update:", {
+        isAuthLoading,
+        isProductsLoading,
+        userId: user?.id,
+        hasUser: !!user,
+        timestamp: new Date().toISOString()
+      });
+    };
 
+    logState();
+
+    // Only refetch if auth is done loading, we have a user, and products are still loading
     if (!isAuthLoading && user && isProductsLoading) {
-      console.log("Index: Auth loading finished and user present, triggering product refetch");
+      console.log("Index: Triggering product refetch:", {
+        userId: user.id,
+        timestamp: new Date().toISOString()
+      });
       refetch();
     }
   }, [isAuthLoading, isProductsLoading, refetch, user]);
 
+  // Effect for monitoring component state changes
   useEffect(() => {
-    console.log("Index: Component state:", {
+    console.log("Index: Component state updated:", {
       isAuthLoading,
       isProductsLoading,
       error: error ? {
@@ -42,9 +53,11 @@ const Index = () => {
       productsCount: products?.length,
       hasProducts: Boolean(products?.length),
       productsValid: products?.every(p => p.id && p.name && p.image_url),
+      hasUser: !!user,
+      userId: user?.id,
       timestamp: new Date().toISOString()
     });
-  }, [isAuthLoading, isProductsLoading, error, products]);
+  }, [isAuthLoading, isProductsLoading, error, products, user]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
