@@ -38,14 +38,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       console.log("AuthProvider: Executing query:", query);
       
-      const { data, error, status } = await Promise.race([
+      type QueryResponse = Awaited<ReturnType<typeof query>>;
+      
+      const result = await Promise.race([
         query,
-        new Promise((_, reject) => 
+        new Promise<QueryResponse>((_, reject) => 
           setTimeout(() => reject(new Error("Admin check timeout")), 5000)
         )
       ]);
       
       clearTimeout(timeoutId);
+      
+      const { data, error, status } = result;
       
       console.log("AuthProvider: Query completed with status:", status, "Data:", data);
 
