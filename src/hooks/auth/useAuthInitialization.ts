@@ -18,19 +18,42 @@ export const useAuthInitialization = () => {
   const { checkAdminStatus } = useAdminCheck();
 
   const updateAuthState = useCallback(async (user: User | null, isLoading: boolean) => {
-    console.log("useAuthInitialization: Updating auth state:", {
+    console.log("useAuthInitialization: Starting state update:", {
       userId: user?.id,
       isLoading,
+      currentState: state,
       timestamp: new Date().toISOString()
     });
 
     if (user) {
       const isAdmin = await checkAdminStatus(user.id);
-      setState({ user, isLoading, isAdmin });
+      console.log("useAuthInitialization: Completed admin check:", {
+        userId: user.id,
+        isAdmin,
+        timestamp: new Date().toISOString()
+      });
+      
+      setState(prevState => {
+        const newState = { user, isLoading, isAdmin };
+        console.log("useAuthInitialization: State update:", {
+          prevState,
+          newState,
+          timestamp: new Date().toISOString()
+        });
+        return newState;
+      });
     } else {
-      setState({ user: null, isLoading, isAdmin: false });
+      setState(prevState => {
+        const newState = { user: null, isLoading, isAdmin: false };
+        console.log("useAuthInitialization: State update:", {
+          prevState,
+          newState,
+          timestamp: new Date().toISOString()
+        });
+        return newState;
+      });
     }
-  }, [checkAdminStatus]);
+  }, [checkAdminStatus, state]);
 
   const initializeAuth = useCallback(async () => {
     console.log("useAuthInitialization: Starting initialization");

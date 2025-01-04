@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthInitialization } from "@/hooks/auth/useAuthInitialization";
@@ -19,14 +19,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { state, updateAuthState, initializeAuth } = useAuthInitialization();
   
-  // Initialize auth on mount
-  useEffect(() => {
-    console.log("AuthProvider: Starting initialization");
-    initializeAuth();
-  }, [initializeAuth]);
-
   // Set up auth state change listener
   useAuthStateChange(updateAuthState);
+
+  // Initialize auth on mount
+  initializeAuth();
 
   const signOut = async () => {
     try {
@@ -37,8 +34,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const value = {
+    ...state,
+    signOut
+  };
+
+  console.log("AuthProvider: Rendering with state:", {
+    userId: state.user?.id,
+    isLoading: state.isLoading,
+    isAdmin: state.isAdmin,
+    timestamp: new Date().toISOString()
+  });
+
   return (
-    <AuthContext.Provider value={{ ...state, signOut }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
