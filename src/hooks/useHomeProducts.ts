@@ -5,9 +5,11 @@ import { Product } from "@/types";
 
 export const useHomeProducts = () => {
   const [authState, setAuthState] = useState<{
+    isInitialized: boolean;
     isAuthenticated: boolean;
     userId: string | null;
   }>({
+    isInitialized: false,
     isAuthenticated: false,
     userId: null,
   });
@@ -16,21 +18,34 @@ export const useHomeProducts = () => {
     console.log('useHomeProducts: Hook initialized');
     
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        console.log('Session found for user:', session.user.id);
-        setAuthState({
-          isAuthenticated: true,
-          userId: session.user.id,
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('useHomeProducts: Initial session check:', {
+          hasSession: !!session,
+          userId: session?.user?.id
         });
+        
+        setAuthState({
+          isInitialized: true,
+          isAuthenticated: !!session?.user,
+          userId: session?.user?.id || null,
+        });
+      } catch (error) {
+        console.error('useHomeProducts: Error checking initial session:', error);
+        setAuthState(state => ({ ...state, isInitialized: true }));
       }
     };
 
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('useHomeProducts: Auth state changed:', { event: _event, userId: session?.user?.id });
+      console.log('useHomeProducts: Auth state changed:', { 
+        event: _event, 
+        userId: session?.user?.id 
+      });
+      
       setAuthState({
+        isInitialized: true,
         isAuthenticated: !!session?.user,
         userId: session?.user?.id || null,
       });
@@ -42,10 +57,18 @@ export const useHomeProducts = () => {
   }, []);
 
   const { data: products = [], isLoading, error } = useQuery({
-    queryKey: ['products'],
+    queryKey: ['products', authState.isInitialized],
     queryFn: async () => {
-      console.log('useHomeProducts: Starting products fetch...');
+      console.log('useHomeProducts: Starting products fetch...', {
+        authState,
+        timestamp: new Date().toISOString()
+      });
       
+      if (!authState.isInitialized) {
+        console.log('useHomeProducts: Auth not initialized yet, delaying fetch');
+        return [];
+      }
+
       try {
         console.log('useHomeProducts: Fetching products with variants and images...');
         const { data, error } = await supabase
@@ -83,6 +106,7 @@ export const useHomeProducts = () => {
         throw error;
       }
     },
+    enabled: authState.isInitialized,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
   });
