@@ -17,7 +17,6 @@ const Index = () => {
     refetch 
   } = useProducts();
 
-  // Effect for handling auth state changes and product refetch
   useEffect(() => {
     console.log("Index: Auth and Products loading state:", {
       isAuthLoading,
@@ -32,7 +31,6 @@ const Index = () => {
     }
   }, [isAuthLoading, isProductsLoading, refetch, user]);
 
-  // Effect for debugging component state
   useEffect(() => {
     console.log("Index: Component state:", {
       isAuthLoading,
