@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAdminStatus = async (userId: string) => {
     try {
-      console.log("AuthProvider: Checking admin status for", userId);
+      console.log("AuthProvider: Starting admin check for", userId);
       const { data, error } = await supabase
         .from("admin_users")
         .select("role")
@@ -31,12 +31,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) {
-        console.error("Admin check error:", error);
+        console.error("Admin check error:", error.message);
         return false;
       }
+
+      console.log("AuthProvider: Admin check response:", data);
       return !!data;
     } catch (error) {
-      console.error("Admin check failed:", error);
+      console.error("Admin check failed with exception:", error);
       return false;
     }
   };
@@ -53,13 +55,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (session?.user) {
+        console.log("AuthProvider: Session found for user:", session.user.id);
         const isAdmin = await checkAdminStatus(session.user.id);
+        console.log("AuthProvider: Admin status result:", isAdmin);
         setState({
           user: session.user,
           isLoading: false,
           isAdmin
         });
       } else {
+        console.log("AuthProvider: No active session");
         setState({
           user: null,
           isLoading: false,
@@ -85,13 +90,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log("Auth state changed:", { event, userId: session?.user?.id });
 
         if (session?.user) {
+          console.log("AuthProvider: Processing auth state change for user:", session.user.id);
           const isAdmin = await checkAdminStatus(session.user.id);
+          console.log("AuthProvider: Updated admin status:", isAdmin);
           setState({
             user: session.user,
             isLoading: false,
             isAdmin
           });
         } else {
+          console.log("AuthProvider: Clearing auth state");
           setState({
             user: null,
             isLoading: false,
