@@ -3,19 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
 import { ProductVariant } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { useAdmin } from "@/hooks/useAdmin";
 
 export function useProductUpdate() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { data: adminStatus } = useAdmin();
 
   return useMutation({
     mutationFn: async ({ formData, variants }: { formData: Product, variants: ProductVariant[] }) => {
-      if (!adminStatus?.isAdmin) {
-        throw new Error("Unauthorized: Admin privileges required");
-      }
-
       console.log('Updating product with data:', formData);
       console.log('Updating variants:', variants);
       
@@ -28,7 +22,6 @@ export function useProductUpdate() {
           category: formData.category,
           image_url: formData.image_url,
           sku: formData.sku,
-          discount: formData.discount
         })
         .eq("id", formData.id);
 
@@ -98,13 +91,9 @@ export function useProductUpdate() {
     },
     onError: (error: any) => {
       console.error("Error updating product:", error);
-      const errorMessage = error.message === "Unauthorized: Admin privileges required" 
-        ? "You need admin privileges to update products"
-        : "Failed to update product. Please try again.";
-      
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Failed to update product. Please try again.",
         variant: "destructive",
       });
     },

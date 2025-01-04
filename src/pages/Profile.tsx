@@ -1,32 +1,34 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { ProfileForm } from "@/components/navbar/ProfileForm";
 import { FavoritesList } from "@/components/navbar/FavoritesList";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/auth/AuthContext";
-import { Loader2, LogOut } from "lucide-react";
 
 const Profile = () => {
-  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
-  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('Profile: Component state:', {
-      isLoading,
-      isAuthenticated: !!user,
-      userId: user?.id,
-      timestamp: new Date().toISOString()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate('/auth');
+        return;
+      }
+      setUser(session.user);
     });
 
-    if (!user && !isLoading) {
-      navigate('/auth');
-    }
-  }, [user, isLoading, navigate]);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const handleSignOut = async () => {
     try {
@@ -49,19 +51,6 @@ const Profile = () => {
       });
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   if (!user) return null;
 

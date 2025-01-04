@@ -1,26 +1,68 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { ProductCard } from "@/components/ProductCard";
 import { Loader2 } from "lucide-react";
-import { EmptyFavorites } from "../favorites/EmptyFavorites";
-import { FavoritesError } from "../favorites/FavoritesError";
-import { FavoritesGrid } from "../favorites/FavoritesGrid";
-import { useFavorites } from "../favorites/useFavorites";
+import { Product } from "@/types";
 
 interface FavoritesListProps {
-  userId: string | undefined;
+  userId: string;
+}
+
+interface FavoriteProduct {
+  product_id: string;
+  products: Product;
 }
 
 export function FavoritesList({ userId }: FavoritesListProps) {
-  const { data: favorites, isLoading, error } = useFavorites(userId);
+  const { data: favorites, isLoading, error } = useQuery({
+    queryKey: ['favorites', userId],
+    queryFn: async () => {
+      console.log('Fetching favorites for user:', userId);
+      const { data, error } = await supabase
+        .from('favorites')
+        .select(`
+          product_id,
+          products:products(
+            id,
+            name,
+            description,
+            image_url,
+            category,
+            sku,
+            product_variants(
+              id,
+              size,
+              color,
+              stock,
+              price
+            )
+          )
+        `)
+        .eq('user_id', userId);
 
-  console.log('FavoritesList rendering state:', { 
-    isLoading, 
-    error, 
-    favoritesCount: favorites?.length,
-    userId 
+      if (error) {
+        console.error('Error fetching favorites:', error);
+        throw error;
+      }
+      
+      console.log('Raw favorites data:', data);
+      
+      const transformedData = data?.map(item => {
+        const product = item.products as unknown as Product;
+        // Ensure price is set from the first variant if available
+        if (product.product_variants && product.product_variants.length > 0) {
+          product.price = product.product_variants[0].price;
+        }
+        return {
+          product_id: item.product_id,
+          products: product
+        };
+      });
+      
+      console.log('Transformed favorites data:', transformedData);
+      return transformedData as FavoriteProduct[];
+    },
   });
-
-  if (!userId) {
-    return <EmptyFavorites />;
-  }
 
   if (isLoading) {
     return (
@@ -31,12 +73,32 @@ export function FavoritesList({ userId }: FavoritesListProps) {
   }
 
   if (error) {
-    return <FavoritesError />;
+    return (
+      <div className="text-center py-4 text-red-500">
+        Error loading favorites. Please try again.
+      </div>
+    );
   }
 
   if (!favorites?.length) {
-    return <EmptyFavorites />;
+    return (
+      <div className="text-center py-4 text-gray-500">
+        No favorite products yet
+      </div>
+    );
   }
 
-  return <FavoritesGrid favorites={favorites} />;
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {favorites.map((favorite) => (
+        <ProductCard
+          key={favorite.product_id}
+          id={favorite.products.id}
+          name={favorite.products.name}
+          image={favorite.products.image_url}
+          product_variants={favorite.products.product_variants}
+        />
+      ))}
+    </div>
+  );
 }

@@ -10,10 +10,9 @@ interface ProductCardProps {
   name: string;
   image: string;
   product_variants?: Product['product_variants'];
-  discount?: number | null;
 }
 
-export function ProductCard({ id, name, image, product_variants, discount }: ProductCardProps) {
+export function ProductCard({ id, name, image, product_variants }: ProductCardProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -21,11 +20,6 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
   const minPrice = product_variants?.length 
     ? Math.min(...product_variants.map(v => v.price))
     : 0;
-
-  // Calculate discounted price if discount exists
-  const discountedPrice = discount && minPrice
-    ? minPrice * (1 - discount / 100)
-    : null;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -42,14 +36,7 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
     };
   }, []);
 
-  console.log('ProductCard rendering:', {
-    id,
-    name,
-    variants: product_variants,
-    minPrice,
-    discount,
-    discountedPrice
-  });
+  console.log('ProductCard variants:', product_variants);
 
   return (
     <div className="group relative rounded-lg border p-4 hover:shadow-lg transition-shadow">
@@ -65,15 +52,7 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
           <h3 className="text-lg font-medium">{name}</h3>
           <p className="mt-1 text-sm text-gray-500">
             {product_variants?.length ? (
-              discount ? (
-                <span className="space-x-2">
-                  <span className="line-through">${minPrice.toFixed(2)}</span>
-                  <span className="text-red-500">${discountedPrice?.toFixed(2)}</span>
-                  <span className="text-red-500">({discount}% off)</span>
-                </span>
-              ) : (
-                <>From ${minPrice.toFixed(2)}</>
-              )
+              <>From ${minPrice.toFixed(2)}</>
             ) : (
               "Price not available"
             )}
@@ -97,7 +76,6 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
         productImage={image}
         userId={userId}
         variants={product_variants}
-        discount={discount}
       />
     </div>
   );

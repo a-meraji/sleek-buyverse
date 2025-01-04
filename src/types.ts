@@ -20,12 +20,11 @@ export interface Product {
   id: string;
   name: string;
   description?: string;
+  price: number;
   image_url: string;
   stock?: number;
   category?: string;
   sku?: string;
-  discount: number | null;
-  created_at?: string;
   product_variants?: ProductVariant[];
   product_images?: ProductImage[];
 }

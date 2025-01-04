@@ -3,12 +3,13 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types";
-import { ProductVariant } from "@/types";
+import { Product } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 import { ImageSelector } from "./ImageSelector";
-import { VariantsManager } from "./product/VariantsManager";
-import { ProductFormFields } from "./product/form/ProductFormFields";
+import { ProductDetailsFields } from "./product/ProductDetailsFields";
+import { CategorySelector } from "./product/CategorySelector";
 import { ImagePreview } from "./product/ImagePreview";
+import { VariantsManager } from "./product/VariantsManager";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -21,7 +22,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
     category: "",
     image_url: "",
     sku: "",
-    discount: null,
   });
   const [additionalImages, setAdditionalImages] = useState<{ image_url: string }[]>([]);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
@@ -76,7 +76,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
         category: formData.category || "",
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
-        discount: formData.discount,
       };
 
       console.log('Creating product with data:', productData);
@@ -173,9 +172,18 @@ export function ProductForm({ onClose }: ProductFormProps) {
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-        <ProductFormFields
-          formData={formData}
-          onFormChange={handleFormChange}
+        <ProductDetailsFields
+          name={formData.name ?? ""}
+          description={formData.description ?? ""}
+          sku={formData.sku ?? ""}
+          onNameChange={(value) => handleFormChange({ name: value })}
+          onDescriptionChange={(value) => handleFormChange({ description: value })}
+          onSkuChange={(value) => handleFormChange({ sku: value })}
+        />
+
+        <CategorySelector
+          value={formData.category ?? ""}
+          onChange={(value) => handleFormChange({ category: value })}
         />
 
         <VariantsManager

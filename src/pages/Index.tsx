@@ -1,70 +1,116 @@
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, Grid } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/home/Footer";
-import { LoadingState } from "@/components/home/LoadingState";
-import { ErrorState } from "@/components/home/ErrorState";
-import { MainContent } from "@/components/home/MainContent";
-import { useProducts } from "@/hooks/products/useProducts";
-import { useAuth } from "@/contexts/auth/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import HeroBanner from "@/components/home/HeroBanner";
+import { ProductCarousel } from "@/components/home/ProductCarousel";
+import { StyleShowcase } from "@/components/home/StyleShowcase";
+import { ReviewsScroll } from "@/components/home/ReviewsScroll";
+import { Footer } from "@/components/home/Footer";
+import { Product } from "@/types";
 
 const Index = () => {
-  const { isLoading: isAuthLoading, user } = useAuth();
-  const { 
-    data: products, 
-    isLoading: isProductsLoading, 
-    error,
-    refetch 
-  } = useProducts();
+  const { data: products, isLoading, error } = useQuery<Product[]>({
+    queryKey: ['products'],
+    queryFn: async () => {
+      console.log('Fetching products from Supabase...');
+      try {
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .limit(8)
+          .order('created_at', { ascending: false });
 
-  // Effect for handling auth state changes and product refetch
-  useEffect(() => {
-    console.log("Index: Auth state changed effect triggered:", {
-      isAuthLoading,
-      userId: user?.id,
-      isProductsLoading,
-      timestamp: new Date().toISOString()
-    });
+        if (productsError) throw productsError;
 
-    // Only refetch if auth is done loading and we have a user
-    if (!isAuthLoading && user) {
-      console.log("Index: Triggering product refetch due to auth state change:", {
-        userId: user.id,
-        timestamp: new Date().toISOString()
-      });
-      refetch();
-    }
-  }, [isAuthLoading, user, refetch]); // Added proper dependencies
+        // Fetch variants separately to ensure RLS policies are properly applied
+        const { data: variantsData, error: variantsError } = await supabase
+          .from('product_variants')
+          .select('*')
+          .in('product_id', productsData.map(p => p.id));
 
-  // Effect for monitoring component state changes
-  useEffect(() => {
-    console.log("Index: Component state updated:", {
-      isAuthLoading,
-      isProductsLoading,
-      error: error ? {
-        message: error.message,
-        name: error.name
-      } : null,
-      productsCount: products?.length,
-      hasProducts: Boolean(products?.length),
-      productsValid: products?.every(p => p.id && p.name && p.image_url),
-      hasUser: !!user,
-      userId: user?.id,
-      timestamp: new Date().toISOString()
-    });
-  }, [isAuthLoading, isProductsLoading, error, products, user]);
+        if (variantsError) throw variantsError;
+
+        // Combine products with their variants
+        const productsWithVariants = productsData.map(product => ({
+          ...product,
+          product_variants: variantsData.filter(v => v.product_id === product.id)
+        }));
+
+        console.log('Products with variants fetched successfully:', productsWithVariants);
+        return productsWithVariants;
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+      }
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    retry: 1,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="flex-1">
+          <div className="flex items-center justify-center h-[50vh]">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-destructive mb-4">
+                Error loading products
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Please try refreshing the page
+              </p>
+              <Button 
+                onClick={() => window.location.reload()}
+                variant="outline"
+              >
+                Refresh Page
+              </Button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1">
         <HeroBanner />
-        {(isAuthLoading || isProductsLoading) ? (
-          <LoadingState />
-        ) : error ? (
-          <ErrorState error={error} />
-        ) : products && products.length > 0 ? (
-          <MainContent products={products} />
+        {products && products.length > 0 ? (
+          <>
+            <ProductCarousel title="New Arrivals" products={products} />
+            <StyleShowcase />
+            <ProductCarousel title="Popular Products" products={products} />
+            <ReviewsScroll />
+            <div className="py-16 px-6 text-center">
+              <Link to="/products">
+                <Button className="bg-[#1d8757] hover:bg-[#1d8757]/90 text-white px-8 py-6 rounded-full text-lg">
+                  <Grid className="mr-2 h-5 w-5" />
+                  View All Products
+                </Button>
+              </Link>
+            </div>
+          </>
         ) : (
           <div className="container mx-auto px-4 py-8 text-center">
             <p className="text-muted-foreground">No products available</p>
