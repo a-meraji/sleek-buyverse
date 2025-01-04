@@ -19,7 +19,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { state, updateAuthState, initializeAuth } = useAuthInitialization();
   
-  // Initialize auth on mount
   useEffect(() => {
     console.log("AuthProvider: Starting initialization");
     let mounted = true;
@@ -37,7 +36,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [initializeAuth]);
 
-  // Set up auth state change listener
   useAuthStateChange(updateAuthState);
 
   const signOut = async () => {

@@ -21,6 +21,12 @@ const Auth = () => {
     }
   }, [user, isLoading, navigate]);
 
+  console.log("Auth page: Rendering with state:", {
+    hasUser: !!user,
+    isLoading,
+    timestamp: new Date().toISOString()
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -31,9 +37,9 @@ const Auth = () => {
             <div className="flex justify-center items-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
             </div>
-          ) : (
-            !user && <AuthForm />
-          )}
+          ) : !user ? (
+            <AuthForm />
+          ) : null}
         </div>
       </main>
     </div>
