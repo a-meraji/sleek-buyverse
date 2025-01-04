@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthSession } from "@/hooks/auth/useAuthSession";
 
 interface AuthState {
   user: User | null;
@@ -15,86 +16,33 @@ interface AuthContextType extends AuthState {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    isLoading: true,
-    isAdmin: false,
-  });
+  const { state, setState, initializeAuth } = useAuthSession();
 
   useEffect(() => {
-    console.log("AuthProvider: Initializing");
+    console.log("AuthProvider: Initializing with state:", {
+      userId: state.user?.id,
+      isLoading: state.isLoading,
+      timestamp: new Date().toISOString()
+    });
     
     let mounted = true;
 
-    const checkAdminStatus = async (userId: string) => {
-      try {
-        console.log("AuthProvider: Checking admin status for", userId);
-        const { data, error } = await supabase
-          .from("admin_users")
-          .select("role")
-          .eq("id", userId)
-          .single();
-
-        if (error) {
-          console.error("AuthProvider: Admin check error:", error);
-          return false;
-        }
-        console.log("AuthProvider: Admin check result:", data);
-        return !!data;
-      } catch (error) {
-        console.error("AuthProvider: Admin check unexpected error:", error);
-        return false;
-      }
-    };
-
-    const initializeAuth = async () => {
-      try {
-        console.log("AuthProvider: Starting initialization...");
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error("AuthProvider: Session error:", error);
-          if (mounted) {
-            setState(prev => ({ ...prev, isLoading: false }));
-          }
-          return;
-        }
-
-        if (session?.user) {
-          console.log("AuthProvider: Session found for user:", session.user.id);
-          const isAdmin = await checkAdminStatus(session.user.id);
-          if (mounted) {
-            setState({ user: session.user, isLoading: false, isAdmin });
-          }
-        } else {
-          console.log("AuthProvider: No session found");
-          if (mounted) {
-            setState({ user: null, isLoading: false, isAdmin: false });
-          }
-        }
-      } catch (error) {
-        console.error("AuthProvider: Init error:", error);
-        if (mounted) {
-          setState(prev => ({ ...prev, isLoading: false }));
-        }
-      }
-    };
-
-    initializeAuth();
+    initializeAuth(mounted);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("AuthProvider: Auth state changed:", { 
           event, 
           userId: session?.user?.id,
+          isLoading: state.isLoading,
           timestamp: new Date().toISOString(),
-          sessionDetails: session // Adding full session details for debugging
+          sessionDetails: session
         });
 
         if (!mounted) return;
 
         if (session?.user) {
-          const isAdmin = await checkAdminStatus(session.user.id);
+          const isAdmin = await useAdminCheck().checkAdminStatus(session.user.id);
           setState({ user: session.user, isLoading: false, isAdmin });
         } else {
           setState({ user: null, isLoading: false, isAdmin: false });
@@ -103,11 +51,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     return () => {
-      console.log("AuthProvider: Cleanup - unmounting");
+      console.log("AuthProvider: Cleanup - unmounting", {
+        userId: state.user?.id,
+        isLoading: state.isLoading,
+        timestamp: new Date().toISOString()
+      });
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [state.user?.id, state.isLoading, setState, initializeAuth]);
 
   const signOut = async () => {
     try {
