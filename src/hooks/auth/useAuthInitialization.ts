@@ -25,39 +25,45 @@ export const useAuthInitialization = () => {
       timestamp: new Date().toISOString()
     });
 
-    if (user) {
-      const isAdmin = await checkAdminStatus(user.id);
-      console.log("useAuthInitialization: Completed admin check:", {
-        userId: user.id,
-        isAdmin,
-        timestamp: new Date().toISOString()
-      });
-      
-      setState(prevState => {
-        const newState = { user, isLoading, isAdmin };
-        console.log("useAuthInitialization: State update:", {
-          prevState,
-          newState,
+    try {
+      if (user) {
+        const isAdmin = await checkAdminStatus(user.id);
+        console.log("useAuthInitialization: Admin check completed:", {
+          userId: user.id,
+          isAdmin,
           timestamp: new Date().toISOString()
         });
-        return newState;
-      });
-    } else {
-      setState(prevState => {
-        const newState = { user: null, isLoading, isAdmin: false };
-        console.log("useAuthInitialization: State update:", {
-          prevState,
-          newState,
-          timestamp: new Date().toISOString()
+        
+        setState(prevState => {
+          const newState = { user, isLoading, isAdmin };
+          console.log("useAuthInitialization: State update:", {
+            prevState,
+            newState,
+            timestamp: new Date().toISOString()
+          });
+          return newState;
         });
-        return newState;
-      });
+      } else {
+        setState(prevState => {
+          const newState = { user: null, isLoading, isAdmin: false };
+          console.log("useAuthInitialization: State update:", {
+            prevState,
+            newState,
+            timestamp: new Date().toISOString()
+          });
+          return newState;
+        });
+      }
+    } catch (error) {
+      console.error("useAuthInitialization: Error during state update:", error);
+      setState(prevState => ({ ...prevState, isLoading: false }));
     }
-  }, [checkAdminStatus]); // Removed state from dependencies
+  }, [checkAdminStatus]);
 
   const initializeAuth = useCallback(async () => {
     console.log("useAuthInitialization: Starting initialization");
     try {
+      setState(prev => ({ ...prev, isLoading: true }));
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
