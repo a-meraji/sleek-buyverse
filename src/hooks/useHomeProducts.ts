@@ -1,70 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useAuthState } from "./useAuthState";
 import { Product } from "@/types";
 
 export const useHomeProducts = () => {
-  const [authState, setAuthState] = useState<{
-    isInitialized: boolean;
-    isAuthenticated: boolean;
-    userId: string | null;
-  }>({
-    isInitialized: false,
-    isAuthenticated: false,
-    userId: null,
-  });
-
-  useEffect(() => {
-    console.log('useHomeProducts: Hook initialized');
-    
-    const initializeAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('useHomeProducts: Initial session check:', {
-          hasSession: !!session,
-          userId: session?.user?.id
-        });
-        
-        setAuthState({
-          isInitialized: true,
-          isAuthenticated: !!session?.user,
-          userId: session?.user?.id || null,
-        });
-      } catch (error) {
-        console.error('useHomeProducts: Error checking initial session:', error);
-        setAuthState(state => ({ ...state, isInitialized: true }));
-      }
-    };
-
-    initializeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('useHomeProducts: Auth state changed:', { 
-        event: _event, 
-        userId: session?.user?.id 
-      });
-      
-      setAuthState({
-        isInitialized: true,
-        isAuthenticated: !!session?.user,
-        userId: session?.user?.id || null,
-      });
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { isInitialized } = useAuthState();
 
   const { data: products = [], isLoading, error } = useQuery({
-    queryKey: ['products', authState.isInitialized],
+    queryKey: ['products', isInitialized],
     queryFn: async () => {
       console.log('useHomeProducts: Starting products fetch...', {
-        authState,
+        isInitialized,
         timestamp: new Date().toISOString()
       });
       
-      if (!authState.isInitialized) {
+      if (!isInitialized) {
         console.log('useHomeProducts: Auth not initialized yet, delaying fetch');
         return [];
       }
@@ -106,7 +56,7 @@ export const useHomeProducts = () => {
         throw error;
       }
     },
-    enabled: authState.isInitialized,
+    enabled: isInitialized,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
   });
