@@ -32,9 +32,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq("id", userId)
         .maybeSingle();
       
-      console.log("AuthProvider: Query completed");
+      console.log("AuthProvider: Query response:", { data, error });
       
       if (error) {
+        if (error.code === 'PGRST116') {
+          console.log("AuthProvider: No admin record found for user");
+          return false;
+        }
         console.error("Admin check error:", error);
         console.error("Error details:", {
           code: error.code,
@@ -44,8 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
 
-      console.log("AuthProvider: Admin check response:", data);
-      return !!data;
+      const isAdmin = !!data;
+      console.log("AuthProvider: Admin check result:", { isAdmin, role: data?.role });
+      return isAdmin;
     } catch (error) {
       console.error("Admin check failed with exception:", error);
       if (error instanceof Error) {
