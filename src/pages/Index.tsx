@@ -38,7 +38,7 @@ const Index = () => {
       <Navbar />
       <main className="flex-1">
         <HeroBanner />
-        {isLoading ? (
+        {isAuthLoading || isProductsLoading ? (
           <LoadingState />
         ) : error ? (
           <ErrorState error={error} />
