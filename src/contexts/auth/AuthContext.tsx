@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthSession } from "@/hooks/auth/useAuthSession";
-import { useAdminCheck } from "@/hooks/auth/useAdminCheck"; // Add this import
+import { useAdminCheck } from "@/hooks/auth/useAdminCheck";
 
 interface AuthState {
   user: User | null;
@@ -18,7 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { state, setState, initializeAuth } = useAuthSession();
-  const { checkAdminStatus } = useAdminCheck(); // Use the imported hook
+  const { checkAdminStatus } = useAdminCheck();
 
   useEffect(() => {
     console.log("AuthProvider: Initializing with state:", {
@@ -41,13 +41,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           sessionDetails: session
         });
 
-        if (!mounted) return;
+        if (!mounted) {
+          console.log("AuthProvider: Component unmounted, skipping state update");
+          return;
+        }
 
-        if (session?.user) {
-          const isAdmin = await checkAdminStatus(session.user.id);
-          setState({ user: session.user, isLoading: false, isAdmin });
-        } else {
-          setState({ user: null, isLoading: false, isAdmin: false });
+        try {
+          if (session?.user) {
+            console.log("AuthProvider: Processing signed in user:", {
+              userId: session.user.id,
+              isLoading: true,
+              timestamp: new Date().toISOString()
+            });
+            
+            const isAdmin = await checkAdminStatus(session.user.id);
+            
+            if (mounted) {
+              setState({ user: session.user, isLoading: false, isAdmin });
+              console.log("AuthProvider: State updated after sign in:", {
+                userId: session.user.id,
+                isLoading: false,
+                isAdmin,
+                timestamp: new Date().toISOString()
+              });
+            }
+          } else {
+            console.log("AuthProvider: No session, updating state:", {
+              isLoading: false,
+              timestamp: new Date().toISOString()
+            });
+            
+            if (mounted) {
+              setState({ user: null, isLoading: false, isAdmin: false });
+            }
+          }
+        } catch (error) {
+          console.error("AuthProvider: Error processing auth state change:", error);
+          if (mounted) {
+            setState({ user: null, isLoading: false, isAdmin: false });
+          }
         }
       }
     );
