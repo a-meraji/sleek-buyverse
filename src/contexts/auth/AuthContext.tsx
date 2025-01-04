@@ -25,37 +25,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("AuthProvider: Starting admin check for", userId);
       
-      type AdminCheckResult = {
-        data: { role: string } | null;
-        error: any | null;
-      };
-
-      const result = await Promise.race([
-        supabase
-          .from("admin_users")
-          .select("role")
-          .eq("id", userId)
-          .maybeSingle(),
-        new Promise<AdminCheckResult>((_, reject) => {
-          setTimeout(() => {
-            console.log("AuthProvider: Admin check timed out");
-            reject(new Error("Admin check timeout"));
-          }, 5000);
-        })
-      ]) as AdminCheckResult;
+      const { data, error } = await supabase
+        .from("admin_users")
+        .select("role")
+        .eq("id", userId)
+        .maybeSingle();
       
-      if (result.error) {
-        if (result.error.code === 'PGRST116') {
-          // Record not found - user is not an admin
-          console.log("AuthProvider: User is not an admin");
-          return false;
-        }
-        console.error("Admin check error:", result.error.message);
+      if (error) {
+        console.error("Admin check error:", error.message);
         return false;
       }
 
-      console.log("AuthProvider: Admin check response:", result.data);
-      return !!result.data;
+      console.log("AuthProvider: Admin check response:", data);
+      return !!data;
     } catch (error) {
       console.error("Admin check failed with exception:", error);
       return false;

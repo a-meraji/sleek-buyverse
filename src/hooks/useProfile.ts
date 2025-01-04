@@ -30,13 +30,17 @@ export function useProfile(userId: string) {
     const fetchProfile = async () => {
       try {
         console.log('useProfile: Fetching profile for user:', userId);
+        
+        if (!userId) {
+          console.log('useProfile: No user ID provided');
+          return;
+        }
+
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', userId)
-          .maybeSingle();
-
-        console.log('useProfile: Profile fetch response:', { data, error });
+          .single();
 
         if (!mounted) return;
 
@@ -50,18 +54,14 @@ export function useProfile(userId: string) {
           return;
         }
 
+        console.log('useProfile: Profile data received:', data);
+
         const profileData = {
           first_name: data?.first_name || "",
           last_name: data?.last_name || "",
           phone: data?.phone || "",
           shipping_address: data?.shipping_address ? JSON.stringify(data.shipping_address, null, 2) : "",
         };
-
-        if (data) {
-          console.log('useProfile: Setting existing profile data:', profileData);
-        } else {
-          console.log('useProfile: No profile found, using default profile');
-        }
 
         setProfile(profileData);
         setInitialProfile(profileData);
@@ -144,4 +144,4 @@ export function useProfile(userId: string) {
     hasChanges: JSON.stringify(profile) !== JSON.stringify(initialProfile),
     resetProfile: () => setProfile(initialProfile),
   };
-}
+};
