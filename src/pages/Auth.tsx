@@ -9,6 +9,12 @@ const Auth = () => {
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
+    console.log("Auth page: Checking authentication state", {
+      user: !!user,
+      isLoading,
+      timestamp: new Date().toISOString(),
+    });
+
     if (user && !isLoading) {
       console.log("Auth: Redirecting authenticated user to home");
       navigate("/");
