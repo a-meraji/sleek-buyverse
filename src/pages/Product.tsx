@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { ProductDetails } from "@/components/product/ProductDetails";
 import { ProductImageCarousel } from "@/components/product/ProductImageCarousel";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthSession } from "@/hooks/useAuthSession";
+import { useAuthSession } from "@/hooks/auth/useAuthSession";
 import { useState } from "react";
 
 const Product = () => {

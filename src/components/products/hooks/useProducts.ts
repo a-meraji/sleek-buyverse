@@ -11,7 +11,7 @@ export const useProducts = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ['products', searchQuery],
+    queryKey: ['products', urlSearchQuery],
     queryFn: async () => {
       console.log('useProducts: Starting products fetch with params:', {
         searchQuery: urlSearchQuery,
