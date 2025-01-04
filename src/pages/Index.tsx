@@ -5,8 +5,8 @@ import { LoadingState } from "@/components/home/LoadingState";
 import { ErrorState } from "@/components/home/ErrorState";
 import { MainContent } from "@/components/home/MainContent";
 import { useProducts } from "@/hooks/products/useProducts";
-import HeroBanner from "@/components/home/HeroBanner";
 import { useAuth } from "@/contexts/auth/AuthContext";
+import HeroBanner from "@/components/home/HeroBanner";
 
 const Index = () => {
   const { isLoading: isAuthLoading } = useAuth();

@@ -23,11 +23,21 @@ export const useProducts = () => {
           throw error;
         }
 
-        const validProducts = data?.filter(p => p.id && p.name && p.image_url) || [];
+        if (!data) {
+          console.log('useProducts: No data returned from query');
+          return [];
+        }
+
+        const validProducts = data.filter(p => p.id && p.name && p.image_url);
         
         console.log('useProducts: Fetch successful:', {
-          totalProducts: data?.length || 0,
+          totalProducts: data.length,
           validProducts: validProducts.length,
+          firstProduct: validProducts[0] ? {
+            id: validProducts[0].id,
+            name: validProducts[0].name,
+            hasVariants: validProducts[0].product_variants?.length > 0
+          } : null,
           timestamp: new Date().toISOString()
         });
 
