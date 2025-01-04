@@ -19,27 +19,22 @@ const Index = () => {
 
   // Effect for handling auth state changes and product refetch
   useEffect(() => {
-    const logState = () => {
-      console.log("Index: Auth and Products state update:", {
-        isAuthLoading,
-        isProductsLoading,
-        userId: user?.id,
-        hasUser: !!user,
-        timestamp: new Date().toISOString()
-      });
-    };
+    console.log("Index: Auth state changed effect triggered:", {
+      isAuthLoading,
+      userId: user?.id,
+      isProductsLoading,
+      timestamp: new Date().toISOString()
+    });
 
-    logState();
-
-    // Only refetch if auth is done loading, we have a user, and products are still loading
-    if (!isAuthLoading && user && isProductsLoading) {
-      console.log("Index: Triggering product refetch:", {
+    // Only refetch if auth is done loading and we have a user
+    if (!isAuthLoading && user) {
+      console.log("Index: Triggering product refetch due to auth state change:", {
         userId: user.id,
         timestamp: new Date().toISOString()
       });
       refetch();
     }
-  }, [isAuthLoading, isProductsLoading, refetch, user]);
+  }, [isAuthLoading, user, refetch]); // Added proper dependencies
 
   // Effect for monitoring component state changes
   useEffect(() => {
