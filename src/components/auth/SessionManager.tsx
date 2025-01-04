@@ -73,25 +73,37 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
 
     const initializeSession = async () => {
       try {
-        console.log("Initializing session...");
+        console.log("SessionManager: Starting session initialization...");
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error("Session initialization error:", error);
+          console.error("SessionManager: Session initialization error:", error);
           if (mounted) onError(error);
           return;
         }
 
-        if (session) {
-          console.log("Initial session found:", session.user.id);
+        if (session?.user) {
+          console.log("SessionManager: Initial session found:", {
+            userId: session.user.id,
+            email: session.user.email,
+            timestamp: new Date().toISOString()
+          });
+          
           if (mounted) {
             await transferLocalCartToServer(session.user.id);
+            // Persist session in localStorage
+            localStorage.setItem('supabase.auth.token', session.access_token);
           }
         } else {
-          console.log("No initial session found");
+          console.log("SessionManager: No active session found");
+          if (mounted) {
+            // Clear any stale session data
+            localStorage.removeItem('supabase.auth.token');
+            navigate('/auth');
+          }
         }
       } catch (err) {
-        console.error("Unexpected error during session initialization:", err);
+        console.error("SessionManager: Unexpected error during initialization:", err);
         if (mounted) onError(err as AuthError);
       }
     };
@@ -99,12 +111,17 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
     initializeSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
-      console.log("Auth state changed:", event, session?.user?.id);
+      console.log("SessionManager: Auth state changed:", {
+        event,
+        userId: session?.user?.id,
+        timestamp: new Date().toISOString()
+      });
       
       if (event === "SIGNED_IN" && mounted) {
-        console.log("User signed in:", session?.user?.id);
+        console.log("SessionManager: User signed in:", session?.user?.id);
         if (session?.user) {
           await transferLocalCartToServer(session.user.id);
+          localStorage.setItem('supabase.auth.token', session.access_token);
         }
         toast({
           title: "Welcome back!",
@@ -114,8 +131,17 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onError }) => {
       }
 
       if (event === "SIGNED_OUT" && mounted) {
-        console.log("User signed out");
+        console.log("SessionManager: User signed out");
+        localStorage.removeItem('supabase.auth.token');
         navigate("/auth");
+      }
+
+      // Handle token refresh
+      if (event === "TOKEN_REFRESHED" && mounted) {
+        console.log("SessionManager: Token refreshed");
+        if (session?.access_token) {
+          localStorage.setItem('supabase.auth.token', session.access_token);
+        }
       }
     });
 
