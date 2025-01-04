@@ -1,32 +1,46 @@
+import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Product } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useSearchParams } from "react-router-dom";
-import { Product } from "@/types";
 
 export const useProducts = () => {
   const [searchParams] = useSearchParams();
-  const searchQuery = searchParams.get('search');
+  const urlSearchQuery = searchParams.get('search') || '';
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 
-  const { data: products, isLoading, error } = useQuery<Product[]>({
+  const { data: products, isLoading, error } = useQuery({
     queryKey: ['products', searchQuery],
     queryFn: async () => {
       console.log('useProducts: Starting products fetch with params:', {
-        searchQuery,
+        searchQuery: urlSearchQuery,
         timestamp: new Date().toISOString()
       });
       
       try {
         let query = supabase
           .from('products')
-          .select('*, product_variants(*)');
+          .select(`
+            *,
+            product_variants (*)
+          `);
 
-        if (searchQuery) {
-          query = query.ilike('name', `%${searchQuery}%`);
+        if (urlSearchQuery) {
+          query = query.ilike('name', `%${urlSearchQuery}%`);
         }
         
         console.log('useProducts: Executing query...');
-        const { data, error } = await query;
+        const { data, error, status, statusText } = await query;
         
+        console.log('useProducts: Query response:', {
+          status,
+          statusText,
+          hasError: !!error,
+          dataLength: data?.length,
+          timestamp: new Date().toISOString()
+        });
+
         if (error) {
           console.error('useProducts: Error fetching products:', {
             error,
@@ -45,6 +59,7 @@ export const useProducts = () => {
         
         console.log('useProducts: Fetch successful:', {
           totalProducts: data.length,
+          firstProduct: data[0],
           timestamp: new Date().toISOString()
         });
         
@@ -62,6 +77,42 @@ export const useProducts = () => {
     retry: 1 // Limit retries to avoid infinite loops
   });
 
+  const filteredProducts = useMemo(() => {
+    console.log('Filtering products:', { 
+      totalProducts: products?.length,
+      searchQuery: urlSearchQuery,
+      selectedCategories,
+      priceRange
+    });
+
+    return products?.filter(product => {
+      // Search filter
+      const matchesSearch = !urlSearchQuery || 
+        product.name.toLowerCase().includes(urlSearchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(urlSearchQuery.toLowerCase());
+      
+      // Category filter
+      const matchesCategory = selectedCategories.length === 0 || 
+        (product.category && selectedCategories.includes(product.category));
+      
+      // Price filter - use minimum price from variants
+      const minPrice = product.product_variants?.length 
+        ? Math.min(...product.product_variants.map(v => v.price))
+        : 0;
+      const matchesPrice = minPrice >= priceRange[0] && minPrice <= priceRange[1];
+
+      const isIncluded = matchesSearch && matchesCategory && matchesPrice;
+      console.log(`Product ${product.name}:`, { 
+        matchesSearch, 
+        matchesCategory, 
+        matchesPrice,
+        isIncluded 
+      });
+
+      return isIncluded;
+    }) || [];
+  }, [products, urlSearchQuery, selectedCategories, priceRange]);
+
   // Extract unique categories from products
   const categories = products 
     ? [...new Set(products.filter(p => p.category).map(p => p.category!))]
@@ -71,6 +122,12 @@ export const useProducts = () => {
     products,
     isLoading,
     error,
-    categories
+    categories,
+    searchQuery: urlSearchQuery,
+    selectedCategories,
+    priceRange,
+    setSelectedCategories,
+    setPriceRange,
+    filteredProducts
   };
 };
