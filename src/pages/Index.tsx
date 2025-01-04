@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/auth/AuthContext";
 import HeroBanner from "@/components/home/HeroBanner";
 
 const Index = () => {
-  const { isLoading: isAuthLoading } = useAuth();
+  const { isLoading: isAuthLoading, user } = useAuth();
   const { 
     data: products, 
     isLoading: isProductsLoading, 
@@ -17,19 +17,22 @@ const Index = () => {
     refetch 
   } = useProducts();
 
+  // Effect for handling auth state changes and product refetch
   useEffect(() => {
     console.log("Index: Auth and Products loading state:", {
       isAuthLoading,
       isProductsLoading,
+      user: user?.id,
       timestamp: new Date().toISOString()
     });
 
-    if (!isAuthLoading && isProductsLoading) {
-      console.log("Index: Auth loading finished but products still loading, triggering refetch");
+    if (!isAuthLoading && user && isProductsLoading) {
+      console.log("Index: Auth loading finished and user present, triggering product refetch");
       refetch();
     }
-  }, [isAuthLoading, isProductsLoading, refetch]);
+  }, [isAuthLoading, isProductsLoading, refetch, user]);
 
+  // Effect for debugging component state
   useEffect(() => {
     console.log("Index: Component state:", {
       isAuthLoading,
