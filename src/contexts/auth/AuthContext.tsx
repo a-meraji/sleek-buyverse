@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthSession } from "@/hooks/auth/useAuthSession";
-import { useAdminCheck } from "@/hooks/auth/useAdminCheck";
+import { useAuthInitialization } from "@/hooks/auth/useAuthInitialization";
+import { useAuthStateChange } from "@/hooks/auth/useAuthStateChange";
 
 interface AuthState {
   user: User | null;
@@ -17,88 +17,21 @@ interface AuthContextType extends AuthState {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { state, setState, initializeAuth } = useAuthSession();
-  const { checkAdminStatus } = useAdminCheck();
-
+  const { state, updateAuthState, initializeAuth } = useAuthInitialization();
+  
+  // Initialize auth on mount
   useEffect(() => {
-    console.log("AuthProvider: Initializing with state:", {
-      userId: state.user?.id,
-      isLoading: state.isLoading,
-      timestamp: new Date().toISOString()
-    });
-    
-    let mounted = true;
+    console.log("AuthProvider: Starting initialization");
+    initializeAuth();
+  }, [initializeAuth]);
 
-    initializeAuth(mounted);
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("AuthProvider: Auth state changed:", { 
-          event, 
-          userId: session?.user?.id,
-          isLoading: false,
-          timestamp: new Date().toISOString(),
-          sessionDetails: session
-        });
-
-        if (!mounted) {
-          console.log("AuthProvider: Component unmounted, skipping state update");
-          return;
-        }
-
-        if (session?.user) {
-          console.log("AuthProvider: Processing signed in user:", {
-            userId: session.user.id,
-            isLoading: false,
-            timestamp: new Date().toISOString()
-          });
-          
-          try {
-            const isAdmin = await checkAdminStatus(session.user.id);
-            
-            if (mounted) {
-              setState({ user: session.user, isLoading: false, isAdmin });
-              console.log("AuthProvider: State updated after sign in:", {
-                userId: session.user.id,
-                isLoading: false,
-                isAdmin,
-                timestamp: new Date().toISOString()
-              });
-            }
-          } catch (error) {
-            console.error("AuthProvider: Error checking admin status:", error);
-            if (mounted) {
-              setState({ user: session.user, isLoading: false, isAdmin: false });
-            }
-          }
-        } else {
-          console.log("AuthProvider: No session, updating state:", {
-            isLoading: false,
-            timestamp: new Date().toISOString()
-          });
-          
-          if (mounted) {
-            setState({ user: null, isLoading: false, isAdmin: false });
-          }
-        }
-      }
-    );
-
-    return () => {
-      console.log("AuthProvider: Cleanup - unmounting", {
-        userId: state.user?.id,
-        isLoading: state.isLoading,
-        timestamp: new Date().toISOString()
-      });
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, [state.user?.id, state.isLoading, setState, initializeAuth, checkAdminStatus]);
+  // Set up auth state change listener
+  useAuthStateChange(updateAuthState);
 
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      setState({ user: null, isLoading: false, isAdmin: false });
+      await updateAuthState(null, false);
     } catch (error) {
       console.error("AuthProvider: Sign out error:", error);
     }
