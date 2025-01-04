@@ -10,7 +10,9 @@ import HeroBanner from "@/components/home/HeroBanner";
 
 const Index = () => {
   const { isLoading: isAuthLoading } = useAuth();
-  const { data: products, isLoading: isProductsLoading, error, refetch } = useProducts();
+  const { data: products, isLoading: isProductsLoading, error } = useProducts();
+
+  const isLoading = isAuthLoading || isProductsLoading;
 
   useEffect(() => {
     console.log("Index: Component state:", {
@@ -25,20 +27,14 @@ const Index = () => {
       productsValid: products?.every(p => p.id && p.name && p.image_url),
       timestamp: new Date().toISOString()
     });
-
-    // Refetch products when auth loading is finished and products are still loading
-    if (!isAuthLoading && isProductsLoading) {
-      console.log("Index: Auth loading finished, refetching products...");
-      refetch();
-    }
-  }, [isAuthLoading, isProductsLoading, products, error, refetch]);
+  }, [isAuthLoading, isProductsLoading, error, products]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1">
         <HeroBanner />
-        {isAuthLoading || isProductsLoading ? (
+        {isLoading ? (
           <LoadingState />
         ) : error ? (
           <ErrorState error={error} />
