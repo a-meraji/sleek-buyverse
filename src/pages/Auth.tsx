@@ -1,14 +1,35 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { useAuthErrorHandler } from "@/components/auth/AuthErrorHandler";
-import { SessionManager } from "@/components/auth/SessionManager";
+import { useAuth } from "@/contexts/auth/AuthContext";
 
 const Auth = () => {
-  const handleAuthError = useAuthErrorHandler();
+  const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (user && !isLoading) {
+      console.log("Auth: User is authenticated, redirecting to home");
+      navigate("/");
+    }
+  }, [user, isLoading, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <SessionManager onError={handleAuthError} />
       <Navbar />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">

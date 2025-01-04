@@ -1,18 +1,23 @@
+import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/home/Footer";
 import { LoadingState } from "@/components/home/LoadingState";
 import { ErrorState } from "@/components/home/ErrorState";
 import { MainContent } from "@/components/home/MainContent";
-import { useHomeProducts } from "@/hooks/useHomeProducts";
+import { useProducts } from "@/hooks/products/useProducts";
 import HeroBanner from "@/components/home/HeroBanner";
-import { useEffect } from "react";
+import { useAuth } from "@/contexts/auth/AuthContext";
 
 const Index = () => {
-  const { products, isLoading, error } = useHomeProducts();
+  const { isLoading: isAuthLoading } = useAuth();
+  const { data: products, isLoading: isProductsLoading, error } = useProducts();
+
+  const isLoading = isAuthLoading || isProductsLoading;
 
   useEffect(() => {
-    console.log('Index: Component state:', {
-      isLoading,
+    console.log("Index: Component state:", {
+      isAuthLoading,
+      isProductsLoading,
       error: error ? {
         message: error.message,
         name: error.name
@@ -22,7 +27,7 @@ const Index = () => {
       productsValid: products?.every(p => p.id && p.name && p.image_url),
       timestamp: new Date().toISOString()
     });
-  }, [isLoading, error, products]);
+  }, [isAuthLoading, isProductsLoading, error, products]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
