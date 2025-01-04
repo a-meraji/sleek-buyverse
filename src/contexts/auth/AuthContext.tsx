@@ -25,11 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("AuthProvider: Starting admin check for", userId);
       
-      // Create an AbortController for the timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      
-      // First verify the query is constructed correctly
       const query = supabase
         .from("admin_users")
         .select("role")
@@ -38,23 +33,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       console.log("AuthProvider: Executing query:", query);
       
-      type QueryResponse = Awaited<ReturnType<typeof query>>;
-      
-      const result = await Promise.race([
+      const { data, error } = await Promise.race([
         query,
-        new Promise<QueryResponse>((_, reject) => 
-          setTimeout(() => reject(new Error("Admin check timeout")), 5000)
-        )
+        new Promise((_, reject) => {
+          setTimeout(() => {
+            console.log("AuthProvider: Admin check timed out");
+            reject(new Error("Admin check timeout"));
+          }, 10000); // Increased timeout to 10 seconds
+        }).then(() => ({ data: null, error: new Error("Timeout") }))
       ]);
       
-      clearTimeout(timeoutId);
-      
-      const { data, error, status } = result;
-      
-      console.log("AuthProvider: Query completed with status:", status, "Data:", data);
-
       if (error) {
-        console.error("Admin check error:", error.message, "Status:", status, "Details:", error);
+        console.error("Admin check error:", error.message);
         return false;
       }
 
