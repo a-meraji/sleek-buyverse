@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthSession } from "@/hooks/auth/useAuthSession";
+import { useAdminCheck } from "@/hooks/auth/useAdminCheck"; // Add this import
 
 interface AuthState {
   user: User | null;
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { state, setState, initializeAuth } = useAuthSession();
+  const { checkAdminStatus } = useAdminCheck(); // Use the imported hook
 
   useEffect(() => {
     console.log("AuthProvider: Initializing with state:", {
@@ -42,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!mounted) return;
 
         if (session?.user) {
-          const isAdmin = await useAdminCheck().checkAdminStatus(session.user.id);
+          const isAdmin = await checkAdminStatus(session.user.id);
           setState({ user: session.user, isLoading: false, isAdmin });
         } else {
           setState({ user: null, isLoading: false, isAdmin: false });
@@ -59,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [state.user?.id, state.isLoading, setState, initializeAuth]);
+  }, [state.user?.id, state.isLoading, setState, initializeAuth, checkAdminStatus]);
 
   const signOut = async () => {
     try {
