@@ -25,25 +25,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("AuthProvider: Starting admin check for", userId);
       
-      const query = supabase
-        .from("admin_users")
-        .select("role")
-        .eq("id", userId)
-        .single();
-      
-      console.log("AuthProvider: Executing query:", query);
-      
       const { data, error } = await Promise.race([
-        query,
+        supabase
+          .from("admin_users")
+          .select("role")
+          .eq("id", userId)
+          .maybeSingle(),
         new Promise((_, reject) => {
           setTimeout(() => {
             console.log("AuthProvider: Admin check timed out");
             reject(new Error("Admin check timeout"));
-          }, 10000); // Increased timeout to 10 seconds
-        }).then(() => ({ data: null, error: new Error("Timeout") }))
+          }, 5000);
+        })
       ]);
       
       if (error) {
+        if (error.code === 'PGRST116') {
+          // Record not found - user is not an admin
+          console.log("AuthProvider: User is not an admin");
+          return false;
+        }
         console.error("Admin check error:", error.message);
         return false;
       }
