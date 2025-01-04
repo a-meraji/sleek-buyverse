@@ -53,7 +53,7 @@ export const useAuthInitialization = () => {
         return newState;
       });
     }
-  }, [checkAdminStatus, state]);
+  }, [checkAdminStatus]); // Removed state from dependencies
 
   const initializeAuth = useCallback(async () => {
     console.log("useAuthInitialization: Starting initialization");
