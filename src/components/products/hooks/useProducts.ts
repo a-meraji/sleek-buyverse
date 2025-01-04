@@ -10,28 +10,56 @@ export const useProducts = () => {
   const { data: products, isLoading, error } = useQuery<Product[]>({
     queryKey: ['products', searchQuery],
     queryFn: async () => {
-      console.log('Fetching products with search query:', searchQuery);
+      console.log('useProducts: Starting products fetch with params:', {
+        searchQuery,
+        timestamp: new Date().toISOString()
+      });
       
-      let query = supabase
-        .from('products')
-        .select('*, product_variants(*)');
+      try {
+        let query = supabase
+          .from('products')
+          .select('*, product_variants(*)');
 
-      if (searchQuery) {
-        query = query.ilike('name', `%${searchQuery}%`);
+        if (searchQuery) {
+          query = query.ilike('name', `%${searchQuery}%`);
+        }
+        
+        console.log('useProducts: Executing query...');
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error('useProducts: Error fetching products:', {
+            error,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+            timestamp: new Date().toISOString()
+          });
+          throw error;
+        }
+        
+        if (!data) {
+          console.log('useProducts: No data returned');
+          return [];
+        }
+        
+        console.log('useProducts: Fetch successful:', {
+          totalProducts: data.length,
+          timestamp: new Date().toISOString()
+        });
+        
+        return data;
+      } catch (err) {
+        console.error('useProducts: Unexpected error:', {
+          error: err,
+          timestamp: new Date().toISOString()
+        });
+        throw err;
       }
-      
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-      }
-      
-      console.log('Fetched products:', data);
-      return data || [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    retry: 1 // Limit retries to avoid infinite loops
   });
 
   // Extract unique categories from products

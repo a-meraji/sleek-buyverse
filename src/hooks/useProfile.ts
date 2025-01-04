@@ -29,13 +29,17 @@ export function useProfile(userId: string) {
     let mounted = true;
     const fetchProfile = async () => {
       try {
-        console.log('useProfile: Fetching profile for user:', userId);
+        console.log('useProfile: Starting profile fetch:', {
+          userId,
+          timestamp: new Date().toISOString()
+        });
         
         if (!userId) {
           console.log('useProfile: No user ID provided');
           return;
         }
 
+        console.log('useProfile: Executing query...');
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -45,7 +49,13 @@ export function useProfile(userId: string) {
         if (!mounted) return;
 
         if (error) {
-          console.error('useProfile: Error fetching profile:', error);
+          console.error('useProfile: Error fetching profile:', {
+            error,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+            timestamp: new Date().toISOString()
+          });
           toast({
             title: "Error loading profile",
             description: "Failed to load your profile information.",
@@ -54,7 +64,15 @@ export function useProfile(userId: string) {
           return;
         }
 
-        console.log('useProfile: Profile data received:', data);
+        if (!data) {
+          console.log('useProfile: No profile data found');
+          return;
+        }
+
+        console.log('useProfile: Profile fetch successful:', {
+          profileData: data,
+          timestamp: new Date().toISOString()
+        });
 
         const profileData = {
           first_name: data?.first_name || "",
@@ -66,7 +84,10 @@ export function useProfile(userId: string) {
         setProfile(profileData);
         setInitialProfile(profileData);
       } catch (error) {
-        console.error('useProfile: Unexpected error:', error);
+        console.error('useProfile: Unexpected error:', {
+          error,
+          timestamp: new Date().toISOString()
+        });
         toast({
           title: "Error",
           description: "An unexpected error occurred while loading your profile.",
