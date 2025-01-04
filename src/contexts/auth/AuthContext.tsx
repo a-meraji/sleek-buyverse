@@ -25,14 +25,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("AuthProvider: Starting admin check for", userId);
       
+      console.log("AuthProvider: Executing admin query...");
       const { data, error } = await supabase
         .from("admin_users")
         .select("role")
         .eq("id", userId)
         .maybeSingle();
       
+      console.log("AuthProvider: Query completed");
+      
       if (error) {
-        console.error("Admin check error:", error.message);
+        console.error("Admin check error:", error);
+        console.error("Error details:", {
+          code: error.code,
+          message: error.message,
+          details: error.details
+        });
         return false;
       }
 
@@ -40,6 +48,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return !!data;
     } catch (error) {
       console.error("Admin check failed with exception:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+      }
       return false;
     }
   };
