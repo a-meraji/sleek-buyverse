@@ -9,23 +9,11 @@ const Auth = () => {
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    console.log("Auth page: Checking authentication state", {
-      user: !!user,
-      isLoading,
-      timestamp: new Date().toISOString()
-    });
-
     if (user && !isLoading) {
-      console.log("Auth page: User is authenticated, redirecting to home");
+      console.log("Auth: Redirecting authenticated user to home");
       navigate("/");
     }
   }, [user, isLoading, navigate]);
-
-  console.log("Auth page: Rendering with state:", {
-    hasUser: !!user,
-    isLoading,
-    timestamp: new Date().toISOString()
-  });
 
   return (
     <div className="min-h-screen bg-background">

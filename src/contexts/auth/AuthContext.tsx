@@ -1,8 +1,6 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthInitialization } from "@/hooks/auth/useAuthInitialization";
-import { useAuthStateChange } from "@/hooks/auth/useAuthStateChange";
 
 interface AuthState {
   user: User | null;
@@ -17,50 +15,113 @@ interface AuthContextType extends AuthState {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { state, updateAuthState, initializeAuth } = useAuthInitialization();
-  
-  useEffect(() => {
-    console.log("AuthProvider: Starting initialization");
-    let mounted = true;
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    isLoading: true,
+    isAdmin: false
+  });
 
-    const initialize = async () => {
-      if (mounted) {
-        await initializeAuth();
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      console.log("AuthProvider: Checking admin status for", userId);
+      const { data, error } = await supabase
+        .from("admin_users")
+        .select("role")
+        .eq("id", userId)
+        .single();
+
+      if (error) {
+        console.error("Admin check error:", error);
+        return false;
       }
-    };
+      return !!data;
+    } catch (error) {
+      console.error("Admin check failed:", error);
+      return false;
+    }
+  };
 
-    initialize();
+  const initializeAuth = async () => {
+    try {
+      console.log("AuthProvider: Initializing auth");
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error("Session error:", error);
+        setState(prev => ({ ...prev, isLoading: false }));
+        return;
+      }
+
+      if (session?.user) {
+        const isAdmin = await checkAdminStatus(session.user.id);
+        setState({
+          user: session.user,
+          isLoading: false,
+          isAdmin
+        });
+      } else {
+        setState({
+          user: null,
+          isLoading: false,
+          isAdmin: false
+        });
+      }
+    } catch (error) {
+      console.error("Auth initialization error:", error);
+      setState(prev => ({ ...prev, isLoading: false }));
+    }
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    console.log("AuthProvider: Setting up");
+    
+    initializeAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+
+        console.log("Auth state changed:", { event, userId: session?.user?.id });
+
+        if (session?.user) {
+          const isAdmin = await checkAdminStatus(session.user.id);
+          setState({
+            user: session.user,
+            isLoading: false,
+            isAdmin
+          });
+        } else {
+          setState({
+            user: null,
+            isLoading: false,
+            isAdmin: false
+          });
+        }
+      }
+    );
 
     return () => {
       mounted = false;
+      subscription.unsubscribe();
     };
-  }, [initializeAuth]);
-
-  useAuthStateChange(updateAuthState);
+  }, []);
 
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      await updateAuthState(null, false);
+      setState({
+        user: null,
+        isLoading: false,
+        isAdmin: false
+      });
     } catch (error) {
-      console.error("AuthProvider: Sign out error:", error);
+      console.error("Sign out error:", error);
     }
   };
 
-  const value = {
-    ...state,
-    signOut
-  };
-
-  console.log("AuthProvider: Rendering with state:", {
-    userId: state.user?.id,
-    isLoading: state.isLoading,
-    isAdmin: state.isAdmin,
-    timestamp: new Date().toISOString()
-  });
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ ...state, signOut }}>
       {children}
     </AuthContext.Provider>
   );
