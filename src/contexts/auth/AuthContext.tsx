@@ -28,38 +28,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("AuthProvider: Executing admin query...");
       const { data, error } = await supabase
         .from("admin_users")
-        .select("role")
+        .select("*")  // Changed to select all columns for debugging
         .eq("id", userId)
-        .maybeSingle();
+        .single();  // Changed from maybeSingle to single for more direct error handling
       
-      console.log("AuthProvider: Query response:", { data, error });
+      console.log("AuthProvider: Raw query response:", { data, error, timestamp: new Date().toISOString() });
       
       if (error) {
-        if (error.code === 'PGRST116') {
-          console.log("AuthProvider: No admin record found for user");
-          return false;
-        }
-        console.error("Admin check error:", error);
-        console.error("Error details:", {
+        console.error("AuthProvider: Admin check query error:", {
           code: error.code,
           message: error.message,
-          details: error.details
+          details: error.details,
+          hint: error.hint,
+          timestamp: new Date().toISOString()
         });
         return false;
       }
 
-      const isAdmin = !!data;
-      console.log("AuthProvider: Admin check result:", { isAdmin, role: data?.role });
-      return isAdmin;
-    } catch (error) {
-      console.error("Admin check failed with exception:", error);
-      if (error instanceof Error) {
-        console.error("Error details:", {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        });
+      if (!data) {
+        console.log("AuthProvider: No admin record found");
+        return false;
       }
+
+      console.log("AuthProvider: Admin record found:", {
+        userId,
+        role: data.role,
+        timestamp: new Date().toISOString()
+      });
+
+      return true;
+    } catch (error) {
+      console.error("AuthProvider: Admin check failed with exception:", {
+        error,
+        userId,
+        timestamp: new Date().toISOString(),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       return false;
     }
   };
@@ -108,12 +112,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         if (!mounted) return;
 
-        console.log("Auth state changed:", { event, userId: session?.user?.id });
+        console.log("Auth state changed:", { 
+          event, 
+          userId: session?.user?.id,
+          timestamp: new Date().toISOString()
+        });
 
         if (session?.user) {
           console.log("AuthProvider: Processing auth state change for user:", session.user.id);
           const isAdmin = await checkAdminStatus(session.user.id);
-          console.log("AuthProvider: Updated admin status:", isAdmin);
+          console.log("AuthProvider: Updated admin status:", {
+            userId: session.user.id,
+            isAdmin,
+            timestamp: new Date().toISOString()
+          });
           setState({
             user: session.user,
             isLoading: false,
