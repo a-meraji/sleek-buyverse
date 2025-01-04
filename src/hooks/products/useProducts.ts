@@ -1,41 +1,43 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/auth/AuthContext";
 import { Product } from "@/types";
 
 export const useProducts = () => {
-  const { user, isLoading: isAuthLoading } = useAuth();
-
   return useQuery({
-    queryKey: ["products", user?.id],
+    queryKey: ['products'],
     queryFn: async () => {
-      console.log("useProducts: Fetching products", {
-        isAuthenticated: !!user,
-        userId: user?.id,
-        timestamp: new Date().toISOString(),
-      });
+      console.log('useProducts: Starting products fetch...');
+      
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            *,
+            product_variants (*),
+            product_images (*)
+          `)
+          .order('created_at', { ascending: false });
 
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          product_variants (*),
-          product_images (*)
-        `)
-        .order("created_at", { ascending: false });
+        if (error) {
+          console.error('useProducts: Error fetching products:', error);
+          throw error;
+        }
 
-      if (error) {
-        console.error("useProducts: Error fetching products:", error);
+        const validProducts = data?.filter(p => p.id && p.name && p.image_url) || [];
+        
+        console.log('useProducts: Fetch successful:', {
+          totalProducts: data?.length || 0,
+          validProducts: validProducts.length,
+          timestamp: new Date().toISOString()
+        });
+
+        return validProducts as Product[];
+      } catch (error) {
+        console.error('useProducts: Unexpected error:', error);
         throw error;
       }
-
-      console.log("useProducts: Fetch successful", {
-        productsCount: data?.length || 0,
-        timestamp: new Date().toISOString(),
-      });
-
-      return (data || []) as Product[];
     },
-    enabled: !isAuthLoading,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    retry: 2,
   });
 };

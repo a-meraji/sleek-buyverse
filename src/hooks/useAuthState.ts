@@ -15,7 +15,6 @@ export const useAuthState = () => {
   });
 
   useEffect(() => {
-    console.log('useAuthState: Hook initialized');
     let mounted = true;
     
     const initializeAuth = async () => {
