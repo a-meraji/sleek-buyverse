@@ -17,6 +17,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   const [variants, setVariants] = useState([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
   const updateProduct = useProductUpdate();
 
   // Fetch variants and images for this product
@@ -51,12 +52,17 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     }
   }, [product, productData]);
 
+  const handleClose = () => {
+    setIsOpen(false);
+    onClose();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
     console.log('Submitting form with data:', { formData, variants });
     updateProduct.mutate({ formData, variants }, {
-      onSuccess: () => onClose(),
+      onSuccess: () => handleClose(),
     });
   };
 
@@ -95,7 +101,9 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
 
   return (
     <>
-      <Dialog open={!!product} onOpenChange={() => onClose()}>
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
@@ -117,7 +125,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
               }}
               onRemoveImage={handleRemoveImage}
               onSubmit={handleSubmit}
-              onClose={onClose}
+              onClose={handleClose}
               isSubmitting={updateProduct.isPending}
             />
           )}

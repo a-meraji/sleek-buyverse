@@ -21,14 +21,18 @@ export function ProductDialogs({
 }: ProductDialogsProps) {
   return (
     <>
-      <EditProductDialog
-        product={isEditDialogOpen ? selectedProduct : null}
-        onClose={onEditDialogClose}
-      />
+      {isEditDialogOpen && (
+        <EditProductDialog
+          product={selectedProduct}
+          onClose={onEditDialogClose}
+        />
+      )}
 
       <DeleteProductDialog
         open={isDeleteDialogOpen}
-        onOpenChange={onDeleteDialogClose}
+        onOpenChange={(open) => {
+          if (!open) onDeleteDialogClose();
+        }}
         product={selectedProduct}
         onConfirmDelete={onConfirmDelete}
       />
