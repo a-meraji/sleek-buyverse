@@ -30,14 +30,18 @@ const Cart = () => {
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
   const total = cartItems?.reduce((sum, item) => {
-    const variantPrice = item.product?.product_variants?.[0]?.price ?? 0;
-    return sum + (variantPrice * item.quantity);
+    const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
+    const discount = item.product?.discount;
+    const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+    const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
+    return sum + (discountedPrice * item.quantity);
   }, 0) ?? 0;
 
   console.log('Cart page render:', {
     isAuthenticated: !!session?.user?.id,
     cartItemsCount: cartItems?.length,
-    total
+    total,
+    cartItems
   });
 
   if (isSessionLoading || isLoading) {
