@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
-import { ImageSelector } from "./ImageSelector";
 import { EditProductContent } from "./product/EditProductContent";
 import { useProductUpdate } from "./product/useProductUpdate";
 import { useProductDelete } from "./products/useProductDelete";
 import { useToast } from "@/hooks/use-toast";
+import { DialogHeader } from "./product/dialog/DialogHeader";
+import { ImageSelectorWrapper } from "./product/dialog/ImageSelectorWrapper";
 
 interface EditProductDialogProps {
   product: Product | null;
@@ -26,7 +25,6 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   const deleteProduct = useProductDelete();
   const { toast } = useToast();
 
-  // Fetch variants and images for this product
   const { data: productData } = useQuery({
     queryKey: ["product-details", product?.id],
     queryFn: async () => {
@@ -38,19 +36,8 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
         supabase.from("product_images").select("*").eq("product_id", product.id)
       ]);
 
-      if (variantsResponse.error) {
-        console.error('Error fetching variants:', variantsResponse.error);
-        throw variantsResponse.error;
-      }
-      if (imagesResponse.error) {
-        console.error('Error fetching images:', imagesResponse.error);
-        throw imagesResponse.error;
-      }
-
-      console.log('Fetched product details:', {
-        variants: variantsResponse.data,
-        images: imagesResponse.data
-      });
+      if (variantsResponse.error) throw variantsResponse.error;
+      if (imagesResponse.error) throw imagesResponse.error;
 
       return {
         variants: variantsResponse.data,
@@ -99,7 +86,6 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
-    console.log('Submitting form with data:', { formData, variants });
     updateProduct.mutate({ formData, variants }, {
       onSuccess: () => handleClose(),
     });
@@ -110,11 +96,9 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   };
 
   const handleImageSelect = (url: string) => {
-    console.log('Selected image URL:', url);
     if (isSelectingMainImage) {
       handleFormChange({ image_url: url });
     } else {
-      // Add new image to product_images array
       const newImage = {
         id: crypto.randomUUID(),
         product_id: formData?.id || '',
@@ -147,18 +131,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
         }}
       >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="flex flex-row items-center justify-between">
-            <DialogTitle>Edit Product</DialogTitle>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDelete}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete Product
-            </Button>
-          </DialogHeader>
+          <DialogHeader onDelete={handleDelete} />
           
           {formData && (
             <EditProductContent
@@ -183,8 +156,8 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
         </DialogContent>
       </Dialog>
 
-      <ImageSelector
-        open={showImageSelector}
+      <ImageSelectorWrapper
+        showImageSelector={showImageSelector}
         onClose={() => setShowImageSelector(false)}
         onSelect={handleImageSelect}
       />

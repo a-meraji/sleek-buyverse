@@ -28,11 +28,10 @@ export function ProductActionsCell({
       <div className="flex gap-2">
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={(e) => handleAction(e, () => onEdit(product))}
         >
           <Pencil className="h-4 w-4" />
-          <span className="ml-2">Edit</span>
         </Button>
       </div>
     </TableCell>
