@@ -93,7 +93,7 @@ export function AdminProducts() {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         product={selectedProduct}
-        onClose={() => {
+        onConfirmDelete={() => {
           setSelectedProduct(null);
           setIsDeleteDialogOpen(false);
         }}
