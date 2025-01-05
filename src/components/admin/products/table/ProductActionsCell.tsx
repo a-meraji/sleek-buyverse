@@ -20,6 +20,17 @@ export function ProductActionsCell({
   onEdit, 
   onDelete 
 }: ProductActionsCellProps) {
+  const handleAction = (
+    e: React.MouseEvent,
+    action: () => void
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Close dropdown first, then perform action after animation
+    setTimeout(action, 150);
+  };
+
   return (
     <TableCell>
       <DropdownMenu>
@@ -30,20 +41,14 @@ export function ProductActionsCell({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem
-            onClick={(e) => {
-              e.preventDefault();
-              onEdit(product);
-            }}
+            onClick={(e) => handleAction(e, () => onEdit(product))}
           >
             <Pencil className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-destructive"
-            onClick={(e) => {
-              e.preventDefault();
-              onDelete(product);
-            }}
+            onClick={(e) => handleAction(e, () => onDelete(product))}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
