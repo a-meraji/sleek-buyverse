@@ -1,14 +1,10 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { ProductTableRow } from "./products/ProductTableRow";
-import { ProductTableHeader } from "./products/ProductTableHeader";
-import { Table, TableBody } from "@/components/ui/table";
-import { EditProductDialog } from "./EditProductDialog";
-import { DeleteProductDialog } from "./products/DeleteProductDialog";
-import { ProductSearchBar } from "./products/ProductSearchBar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductSearchBar } from "./products/ProductSearchBar";
+import { ProductHeader } from "./products/ProductHeader";
+import { ProductTable } from "./products/ProductTable";
+import { ProductDialogs } from "./products/ProductDialogs";
 
 export function AdminProducts() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -43,56 +39,39 @@ export function AdminProducts() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Products</h2>
-        <Button onClick={() => setIsEditDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Product
-        </Button>
-      </div>
+      <ProductHeader 
+        onAddProduct={() => setIsEditDialogOpen(true)} 
+      />
 
       <ProductSearchBar 
         searchTerm={searchTerm} 
         onSearchChange={setSearchTerm} 
       />
 
-      <div className="border rounded-lg">
-        <Table>
-          <ProductTableHeader />
-          <TableBody>
-            {filteredProducts?.map((product) => (
-              <ProductTableRow
-                key={product.id}
-                product={product}
-                variants={productVariants?.filter(v => v.product_id === product.id) || []}
-                onEdit={(product) => {
-                  setSelectedProduct(product);
-                  setIsEditDialogOpen(true);
-                }}
-                onDelete={(product) => {
-                  setSelectedProduct(product);
-                  setIsDeleteDialogOpen(true);
-                }}
-                expandedProductId={expandedProductId}
-                onExpand={setExpandedProductId}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <EditProductDialog
-        product={selectedProduct}
-        onClose={() => {
-          setSelectedProduct(null);
-          setIsEditDialogOpen(false);
+      <ProductTable
+        products={filteredProducts}
+        productVariants={productVariants}
+        expandedProductId={expandedProductId}
+        onExpand={setExpandedProductId}
+        onEdit={(product) => {
+          setSelectedProduct(product);
+          setIsEditDialogOpen(true);
+        }}
+        onDelete={(product) => {
+          setSelectedProduct(product);
+          setIsDeleteDialogOpen(true);
         }}
       />
 
-      <DeleteProductDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        product={selectedProduct}
+      <ProductDialogs
+        selectedProduct={selectedProduct}
+        isEditDialogOpen={isEditDialogOpen}
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        onEditDialogClose={() => {
+          setSelectedProduct(null);
+          setIsEditDialogOpen(false);
+        }}
+        onDeleteDialogOpenChange={setIsDeleteDialogOpen}
         onConfirmDelete={() => {
           setSelectedProduct(null);
           setIsDeleteDialogOpen(false);
