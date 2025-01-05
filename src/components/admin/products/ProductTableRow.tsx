@@ -35,6 +35,16 @@ export function ProductTableRow({
     onExpand(isExpanded ? null : product.id);
   };
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
+    onEdit(product);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
+    onDelete(product);
+  };
+
   return (
     <TableRow>
       <TableCell>
@@ -98,14 +108,14 @@ export function ProductTableRow({
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => onEdit(product)}
+            onClick={handleEditClick}
           >
             Edit
           </Button>
           <Button
             variant="destructive"
             size="sm"
-            onClick={() => onDelete(product)}
+            onClick={handleDeleteClick}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
