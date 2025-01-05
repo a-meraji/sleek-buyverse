@@ -9,6 +9,7 @@ export interface Product {
   image_url: string;
   category?: string;
   sku?: string;
+  discount?: number | null;
   product_variants?: ProductVariant[];
   product_images?: ProductImage[];
 }
