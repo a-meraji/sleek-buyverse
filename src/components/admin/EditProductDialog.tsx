@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
 import { ImageSelector } from "./ImageSelector";
 import { EditProductContent } from "./product/EditProductContent";
 import { useProductUpdate } from "./product/useProductUpdate";
+import { useProductDelete } from "./products/useProductDelete";
+import { useToast } from "@/hooks/use-toast";
 
 interface EditProductDialogProps {
   product: Product | null;
@@ -19,6 +23,8 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
   const updateProduct = useProductUpdate();
+  const deleteProduct = useProductDelete();
+  const { toast } = useToast();
 
   // Fetch variants and images for this product
   const { data: productData } = useQuery({
@@ -68,6 +74,26 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     setIsOpen(false);
     setShowImageSelector(false);
     onClose();
+  };
+
+  const handleDelete = async () => {
+    if (!product?.id) return;
+    
+    try {
+      await deleteProduct.mutateAsync(product.id);
+      toast({
+        title: "Product deleted",
+        description: "The product has been successfully deleted.",
+      });
+      handleClose();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete product. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -121,8 +147,17 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
         }}
       >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center justify-between">
             <DialogTitle>Edit Product</DialogTitle>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              className="flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Product
+            </Button>
           </DialogHeader>
           
           {formData && (
