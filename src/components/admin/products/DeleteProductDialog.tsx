@@ -11,20 +11,22 @@ import {
 import { Product } from "@/types/product";
 
 interface DeleteProductDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   product: Product | null;
   onClose: () => void;
-  onConfirm: (productId: string) => void;
 }
 
 export function DeleteProductDialog({ 
+  open,
+  onOpenChange,
   product, 
-  onClose, 
-  onConfirm 
+  onClose 
 }: DeleteProductDialogProps) {
   if (!product) return null;
 
   return (
-    <AlertDialog open={!!product} onOpenChange={() => onClose()}>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -36,7 +38,10 @@ export function DeleteProductDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => onConfirm(product.id)}
+            onClick={() => {
+              onClose();
+              onOpenChange(false);
+            }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Delete
