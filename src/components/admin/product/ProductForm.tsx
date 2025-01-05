@@ -1,6 +1,5 @@
 import { Product } from "@/types";
-import { ProductDetailsFields } from "./ProductDetailsFields";
-import { CategorySelector } from "./CategorySelector";
+import { FormFields } from "./form/FormFields";
 import { FormActions } from "./FormActions";
 import { ProductImageSection } from "./form/ProductImageSection";
 
@@ -38,20 +37,9 @@ export function ProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <ProductDetailsFields
-        name={formData?.name ?? ""}
-        description={formData?.description ?? ""}
-        sku={formData?.sku ?? ""}
-        discount={formData?.discount ?? null}
-        onNameChange={(value) => onChange({ name: value })}
-        onDescriptionChange={(value) => onChange({ description: value })}
-        onSkuChange={(value) => onChange({ sku: value })}
-        onDiscountChange={(value) => onChange({ discount: value })}
-      />
-
-      <CategorySelector
-        value={formData?.category ?? ""}
-        onChange={(value) => onChange({ category: value })}
+      <FormFields 
+        formData={formData}
+        onChange={onChange}
       />
 
       <ProductImageSection

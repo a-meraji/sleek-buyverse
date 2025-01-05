@@ -31,17 +31,20 @@ export function ProductTableRow({
   const isExpanded = expandedProductId === product.id;
   const hasValidDiscount = typeof product.discount === 'number' && product.discount > 0 && product.discount <= 100;
 
-  const handleExpandClick = () => {
+  const handleExpandClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onExpand(isExpanded ? null : product.id);
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.preventDefault();
+    e.stopPropagation();
     onEdit(product);
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.preventDefault();
+    e.stopPropagation();
     onDelete(product);
   };
 
