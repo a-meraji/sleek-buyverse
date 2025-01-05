@@ -25,7 +25,7 @@ export interface Product {
   stock?: number;
   category?: string;
   sku?: string;
-  discount: number | null;
+  discount?: number | null;
   product_variants?: ProductVariant[];
   product_images?: ProductImage[];
 }
