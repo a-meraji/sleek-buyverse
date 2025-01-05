@@ -40,6 +40,18 @@ export function AdminProducts() {
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleEditClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsEditDialogOpen(true);
+    setIsDeleteDialogOpen(false);
+  };
+
+  const handleDeleteClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDeleteDialogOpen(true);
+    setIsEditDialogOpen(false);
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -51,6 +63,7 @@ export function AdminProducts() {
         <Button onClick={() => {
           setSelectedProduct(null);
           setIsEditDialogOpen(true);
+          setIsDeleteDialogOpen(false);
         }}>
           <Plus className="h-4 w-4 mr-2" />
           Add Product
@@ -71,16 +84,8 @@ export function AdminProducts() {
                 key={product.id}
                 product={product}
                 variants={productVariants?.filter(v => v.product_id === product.id) || []}
-                onEdit={(product) => {
-                  setSelectedProduct(product);
-                  setIsEditDialogOpen(true);
-                  setIsDeleteDialogOpen(false);
-                }}
-                onDelete={(product) => {
-                  setSelectedProduct(product);
-                  setIsDeleteDialogOpen(true);
-                  setIsEditDialogOpen(false);
-                }}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
                 expandedProductId={expandedProductId}
                 onExpand={setExpandedProductId}
               />
@@ -95,6 +100,7 @@ export function AdminProducts() {
           setSelectedProduct(null);
           setIsEditDialogOpen(false);
         }}
+        open={isEditDialogOpen}
       />
 
       <DeleteProductDialog
@@ -103,6 +109,7 @@ export function AdminProducts() {
           setSelectedProduct(null);
           setIsDeleteDialogOpen(false);
         }}
+        open={isDeleteDialogOpen}
         onConfirm={(productId) => {
           console.log('Deleting product:', productId);
           setIsDeleteDialogOpen(false);
