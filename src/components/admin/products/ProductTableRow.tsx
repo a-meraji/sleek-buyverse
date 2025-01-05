@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Trash2, ChevronDown, ChevronUp, Percent } from "lucide-react";
 import { Product } from "@/types/product";
 import { ProductVariant } from "@/types/variant";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface ProductTableRowProps {
@@ -30,6 +29,7 @@ export function ProductTableRow({
   const totalStock = variants.reduce((sum, variant) => sum + variant.stock, 0);
   
   const isExpanded = expandedProductId === product.id;
+  const hasValidDiscount = typeof product.discount === 'number' && product.discount > 0 && product.discount <= 100;
 
   const handleExpandClick = () => {
     onExpand(isExpanded ? null : product.id);
@@ -44,7 +44,17 @@ export function ProductTableRow({
           className="h-12 w-12 object-cover rounded"
         />
       </TableCell>
-      <TableCell>{product.name}</TableCell>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          {product.name}
+          {hasValidDiscount && (
+            <Badge className="bg-red-500 text-white">
+              <Percent className="h-3 w-3 mr-1" />
+              {product.discount}% OFF
+            </Badge>
+          )}
+        </div>
+      </TableCell>
       <TableCell>{product.sku}</TableCell>
       <TableCell>${minPrice.toFixed(2)}</TableCell>
       <TableCell>{product.category}</TableCell>
