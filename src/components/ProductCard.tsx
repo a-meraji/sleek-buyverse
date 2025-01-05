@@ -51,7 +51,6 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
         <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
           {hasValidDiscount && (
             <Badge className="absolute top-2 left-2 bg-red-500 text-white z-10">
-              <Percent className="h-4 w-4 mr-1" />
               {discount}% OFF
             </Badge>
           )}

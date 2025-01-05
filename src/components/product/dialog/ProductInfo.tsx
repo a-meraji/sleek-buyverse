@@ -1,4 +1,6 @@
-import { ProductVariant } from "@/types/variant";
+import { ProductVariant } from "@/types";
+import { Badge } from "@/components/ui/badge";
+import { Percent } from "lucide-react";
 
 interface ProductInfoProps {
   name: string;
@@ -6,31 +8,36 @@ interface ProductInfoProps {
   discount?: number | null;
 }
 
-export function ProductInfo({ name, variants, discount }: ProductInfoProps) {
+export function ProductInfo({ name, variants = [], discount }: ProductInfoProps) {
+  // Calculate the minimum price from variants
   const minPrice = variants?.length 
     ? Math.min(...variants.map(v => v.price))
-    : null;
+    : 0;
 
+  // Calculate discounted price if discount exists and is valid
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-  const discountedPrice = hasValidDiscount && minPrice !== null 
-    ? minPrice * (1 - discount / 100) 
-    : minPrice;
+  const discountedPrice = hasValidDiscount ? minPrice * (1 - discount / 100) : minPrice;
 
   return (
-    <>
-      <h3 className="text-lg font-medium">{name}</h3>
-      {minPrice !== null && (
-        <p className="text-sm">
-          {hasValidDiscount ? (
-            <span className="flex items-center gap-2">
-              <span className="text-gray-500 line-through">From ${minPrice.toFixed(2)}</span>
-              <span className="text-red-500">From ${discountedPrice.toFixed(2)}</span>
-            </span>
-          ) : (
-            <span className="text-gray-500">From ${minPrice.toFixed(2)}</span>
-          )}
-        </p>
-      )}
-    </>
+    <div className="space-y-2">
+      <div className="flex items-start justify-between">
+        <h3 className="text-lg font-medium">{name}</h3>
+        {hasValidDiscount && (
+          <Badge className="bg-red-500 text-white">
+            {discount}% OFF
+          </Badge>
+        )}
+      </div>
+      <div className="space-y-1">
+        {hasValidDiscount ? (
+          <>
+            <p className="text-xl text-red-500">From ${discountedPrice.toFixed(2)}</p>
+            <p className="text-gray-500 line-through">From ${minPrice.toFixed(2)}</p>
+          </>
+        ) : (
+          <p className="text-xl">From ${minPrice.toFixed(2)}</p>
+        )}
+      </div>
+    </div>
   );
 }
