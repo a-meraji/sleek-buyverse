@@ -18,7 +18,7 @@ export function ProductHeader() {
       </div>
 
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <div className="p-6">
             <h2 className="text-lg font-semibold mb-4">Add New Product</h2>
             <ProductForm onClose={() => setShowAddDialog(false)} />
