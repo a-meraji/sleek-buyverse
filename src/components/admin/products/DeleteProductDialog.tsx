@@ -14,17 +14,19 @@ interface DeleteProductDialogProps {
   product: Product | null;
   onClose: () => void;
   onConfirm: (productId: string) => void;
+  open: boolean;
 }
 
 export function DeleteProductDialog({ 
   product, 
   onClose, 
-  onConfirm 
+  onConfirm,
+  open 
 }: DeleteProductDialogProps) {
   if (!product) return null;
 
   return (
-    <AlertDialog open={!!product} onOpenChange={() => onClose()}>
+    <AlertDialog open={open} onOpenChange={() => onClose()}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>

@@ -10,9 +10,10 @@ import { useProductUpdate } from "./product/useProductUpdate";
 interface EditProductDialogProps {
   product: Product | null;
   onClose: () => void;
+  open: boolean;
 }
 
-export function EditProductDialog({ product, onClose }: EditProductDialogProps) {
+export function EditProductDialog({ product, onClose, open }: EditProductDialogProps) {
   const [formData, setFormData] = useState<Product | null>(null);
   const [variants, setVariants] = useState([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
@@ -97,7 +98,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
 
   return (
     <>
-      <Dialog open={!!product} onOpenChange={() => onClose()}>
+      <Dialog open={open} onOpenChange={() => onClose()}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
