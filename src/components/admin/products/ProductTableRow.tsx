@@ -1,10 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Product } from "@/types/product";
 import { ProductVariant } from "@/types/variant";
-import { cn } from "@/lib/utils";
+import { ProductVariantsCell } from "./table/ProductVariantsCell";
+import { ProductActionsCell } from "./table/ProductActionsCell";
 
 interface ProductTableRowProps {
   product: Product;
@@ -27,26 +25,7 @@ export function ProductTableRow({
     ? Math.min(...variants.map(v => v.price))
     : 0;
   const totalStock = variants.reduce((sum, variant) => sum + variant.stock, 0);
-  
   const isExpanded = expandedProductId === product.id;
-
-  const handleExpandClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onExpand(isExpanded ? null : product.id);
-  };
-
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onEdit(product);
-  };
-
-  const handleDeleteClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onDelete(product);
-  };
 
   return (
     <TableRow className="cursor-default">
@@ -61,59 +40,17 @@ export function ProductTableRow({
       <TableCell>{product.sku}</TableCell>
       <TableCell>${minPrice.toFixed(2)}</TableCell>
       <TableCell>{product.category}</TableCell>
-      <TableCell>
-        <div className="relative">
-          <div 
-            className={cn(
-              "flex flex-wrap gap-1 transition-all duration-300",
-              !isExpanded && "max-h-8 overflow-hidden"
-            )}
-          >
-            {variants.map((variant) => (
-              <Badge 
-                key={`${variant.id}`} 
-                variant="secondary"
-                className="whitespace-nowrap"
-              >
-                {variant.color} - {variant.size} (${variant.price})
-              </Badge>
-            ))}
-          </div>
-          {variants.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExpandClick}
-              className="absolute -bottom-2 right-0 h-6 w-6 p-0"
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </Button>
-          )}
-        </div>
-      </TableCell>
+      <ProductVariantsCell
+        variants={variants}
+        isExpanded={isExpanded}
+        onExpand={() => onExpand(isExpanded ? null : product.id)}
+      />
       <TableCell>{totalStock}</TableCell>
-      <TableCell>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={handleEditClick}
-        >
-          Edit
-        </Button>
-      </TableCell>
-      <TableCell>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={handleDeleteClick}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </TableCell>
+      <ProductActionsCell
+        product={product}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
     </TableRow>
   );
 }
