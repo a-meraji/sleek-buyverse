@@ -14,7 +14,7 @@ export const useProducts = () => {
       
       let query = supabase
         .from('products')
-        .select('*, product_variants(*)');
+        .select('*, product_variants(*), discount');
 
       if (searchQuery) {
         query = query.ilike('name', `%${searchQuery}%`);
@@ -27,7 +27,7 @@ export const useProducts = () => {
         throw error;
       }
       
-      console.log('Fetched products:', data);
+      console.log('Fetched products with discount:', data);
       return data || [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes

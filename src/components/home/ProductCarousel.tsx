@@ -45,6 +45,7 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
                           name={product.name}
                           image={product.image_url}
                           product_variants={product.product_variants}
+                          discount={product.discount}
                         />
                       </CardContent>
                     </Card>
