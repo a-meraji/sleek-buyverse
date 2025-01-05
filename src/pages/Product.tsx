@@ -106,7 +106,8 @@ const Product = () => {
         .select(`
           *,
           product_variants (*),
-          product_images (*)
+          product_images (*),
+          discount
         `)
         .eq('id', id)
         .single();
@@ -116,7 +117,7 @@ const Product = () => {
         throw productError;
       }
 
-      console.log('Product fetched successfully:', productData);
+      console.log('Product fetched successfully with discount:', productData);
       return productData;
     },
     staleTime: 1000 * 60 * 5,

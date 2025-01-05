@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { ColorSelector } from "./ColorSelector";
 import { useState } from "react";
+import { Percent } from "lucide-react";
 
 interface ProductDetailsProps {
   product: Product;
@@ -42,12 +43,35 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
     ? Math.min(...variants.map(v => v.price))
     : 0;
 
+  // Calculate discounted price if discount exists and is valid
+  const hasValidDiscount = typeof product.discount === 'number' && product.discount > 0 && product.discount <= 100;
+  const discountedPrice = hasValidDiscount ? minPrice * (1 - product.discount / 100) : minPrice;
+
   const colors = [...new Set(variants?.map(v => v.color) || [])];
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">{product.name}</h1>
-      <p className="text-xl">From ${minPrice.toFixed(2)}</p>
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold">{product.name}</h1>
+        {hasValidDiscount && (
+          <Badge className="bg-red-500 text-white">
+            <Percent className="h-4 w-4 mr-1" />
+            {product.discount}% OFF
+          </Badge>
+        )}
+      </div>
+      
+      <div className="space-y-1">
+        {hasValidDiscount ? (
+          <>
+            <p className="text-xl text-red-500">From ${discountedPrice.toFixed(2)}</p>
+            <p className="text-gray-500 line-through">From ${minPrice.toFixed(2)}</p>
+          </>
+        ) : (
+          <p className="text-xl">From ${minPrice.toFixed(2)}</p>
+        )}
+      </div>
+
       <p className="text-gray-600">{product.description}</p>
       
       {isLoadingVariants ? (
