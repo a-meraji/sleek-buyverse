@@ -7,8 +7,10 @@ export interface Product {
   description?: string;
   price: number;
   image_url: string;
+  stock?: number;
   category?: string;
   sku?: string;
+  discount: number | null;
   product_variants?: ProductVariant[];
   product_images?: ProductImage[];
 }
