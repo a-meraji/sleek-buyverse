@@ -38,6 +38,11 @@ export function ProductOverviewDialog({
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
 
+  // Find the selected variant based on size and color
+  const selectedVariant = variants.find(v => 
+    v.size === selectedSize && v.color === selectedColor
+  );
+
   useEffect(() => {
     if (userId) {
       const checkFavorite = async () => {
@@ -128,6 +133,7 @@ export function ProductOverviewDialog({
               name={productName} 
               variants={variants} 
               discount={discount}
+              selectedVariant={selectedVariant}
             />
             
             <VariantSelectionPanel

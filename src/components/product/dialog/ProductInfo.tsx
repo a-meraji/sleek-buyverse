@@ -1,14 +1,14 @@
 import { ProductVariant } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Percent } from "lucide-react";
 
 interface ProductInfoProps {
   name: string;
   variants?: ProductVariant[];
   discount?: number | null;
+  selectedVariant?: ProductVariant | null;
 }
 
-export function ProductInfo({ name, variants = [], discount }: ProductInfoProps) {
+export function ProductInfo({ name, variants = [], discount, selectedVariant }: ProductInfoProps) {
   // Calculate the minimum price from variants
   const minPrice = variants?.length 
     ? Math.min(...variants.map(v => v.price))
@@ -16,7 +16,10 @@ export function ProductInfo({ name, variants = [], discount }: ProductInfoProps)
 
   // Calculate discounted price if discount exists and is valid
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-  const discountedPrice = hasValidDiscount ? minPrice * (1 - discount / 100) : minPrice;
+  
+  // Use selected variant price if available, otherwise use minPrice
+  const basePrice = selectedVariant ? selectedVariant.price : minPrice;
+  const discountedPrice = hasValidDiscount ? basePrice * (1 - discount / 100) : basePrice;
 
   return (
     <div className="space-y-2">
@@ -31,11 +34,20 @@ export function ProductInfo({ name, variants = [], discount }: ProductInfoProps)
       <div className="space-y-1">
         {hasValidDiscount ? (
           <>
-            <p className="text-xl text-red-500">From ${discountedPrice.toFixed(2)}</p>
-            <p className="text-gray-500 line-through">From ${minPrice.toFixed(2)}</p>
+            <p className="text-xl text-red-500">
+              {selectedVariant ? '$' : 'From $'}
+              {discountedPrice.toFixed(2)}
+            </p>
+            <p className="text-gray-500 line-through">
+              {selectedVariant ? '$' : 'From $'}
+              {basePrice.toFixed(2)}
+            </p>
           </>
         ) : (
-          <p className="text-xl">From ${minPrice.toFixed(2)}</p>
+          <p className="text-xl">
+            {selectedVariant ? '$' : 'From $'}
+            {basePrice.toFixed(2)}
+          </p>
         )}
       </div>
     </div>
