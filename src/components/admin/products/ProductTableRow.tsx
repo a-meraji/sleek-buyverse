@@ -31,22 +31,25 @@ export function ProductTableRow({
   const isExpanded = expandedProductId === product.id;
 
   const handleExpandClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     onExpand(isExpanded ? null : product.id);
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     onEdit(product);
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     onDelete(product);
   };
 
   return (
-    <TableRow>
+    <TableRow className="cursor-default">
       <TableCell>
         <img
           src={product.image_url}
@@ -94,11 +97,12 @@ export function ProductTableRow({
       </TableCell>
       <TableCell>{totalStock}</TableCell>
       <TableCell>
-        <div className="flex gap-2">
+        <div className="flex gap-2 relative z-10">
           <Button 
             variant="outline" 
             size="sm"
             onClick={handleEditClick}
+            className="relative z-20"
           >
             Edit
           </Button>
@@ -106,6 +110,7 @@ export function ProductTableRow({
             variant="destructive"
             size="sm"
             onClick={handleDeleteClick}
+            className="relative z-20"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
