@@ -49,6 +49,7 @@ export function ProductGrid({ products, isLoading, error }: ProductGridProps) {
           name={product.name}
           image={product.image_url}
           product_variants={product.product_variants}
+          discount={product.discount}
         />
       ))}
     </div>
