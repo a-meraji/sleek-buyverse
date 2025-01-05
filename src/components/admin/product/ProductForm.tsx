@@ -1,7 +1,7 @@
 import { Product } from "@/types";
-import { ProductDetailsFields } from "../product/ProductDetailsFields";
-import { CategorySelector } from "../product/CategorySelector";
-import { FormActions } from "../product/FormActions";
+import { ProductDetailsFields } from "./ProductDetailsFields";
+import { CategorySelector } from "./CategorySelector";
+import { FormActions } from "./FormActions";
 import { ProductImageSection } from "./form/ProductImageSection";
 
 interface ProductFormProps {
@@ -47,9 +47,9 @@ export function ProductForm({
       />
 
       <ProductImageSection
-        imageUrl={formData?.image_url}
+        mainImage={formData?.image_url}
         productName={formData?.name}
-        onChooseImage={onChooseImage}
+        onChooseMainImage={onChooseImage}
         onAddAdditionalImage={onAddAdditionalImage}
       />
 
