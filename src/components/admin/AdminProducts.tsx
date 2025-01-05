@@ -1,110 +1,98 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody } from "@/components/ui/table";
-import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
-import { ProductForm } from "./ProductForm";
-import { EditProductDialog } from "./EditProductDialog";
-import { ProductSearchBar } from "./products/ProductSearchBar";
-import { ProductTableHeader } from "./products/ProductTableHeader";
+import { Plus } from "lucide-react";
 import { ProductTableRow } from "./products/ProductTableRow";
+import { ProductTableHeader } from "./products/ProductTableHeader";
+import { Table, TableBody } from "@/components/ui/table";
+import { EditProductDialog } from "./EditProductDialog";
 import { DeleteProductDialog } from "./products/DeleteProductDialog";
-import { useProductDelete } from "./products/useProductDelete";
+import { ProductSearchBar } from "./products/ProductSearchBar";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function AdminProducts() {
-  const [showForm, setShowForm] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
-  const deleteProduct = useProductDelete();
 
-  const { data: productsData, isLoading } = useQuery({
-    queryKey: ["admin-products"],
-    queryFn: async () => {
-      // Fetch products
-      const { data: products, error: productsError } = await supabase
-        .from("products")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (productsError) throw productsError;
-
-      // Fetch variants for all products
-      const { data: variants, error: variantsError } = await supabase
-        .from("product_variants")
-        .select("*");
-
-      if (variantsError) throw variantsError;
-
-      // Group variants by product
-      const variantsByProduct = variants.reduce((acc, variant) => {
-        if (!acc[variant.product_id]) {
-          acc[variant.product_id] = [];
-        }
-        acc[variant.product_id].push(variant);
-        return acc;
-      }, {} as Record<string, any[]>);
-
-      return {
-        products,
-        variantsByProduct,
-      };
-    },
+  const { data: products, isLoading } = useQuery(["products"], async () => {
+    const { data } = await supabase.from("products").select("*");
+    return data;
   });
 
-  const filteredProducts = productsData?.products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku?.toLowerCase().includes(searchTerm.toLowerCase())
+  const { data: productVariants } = useQuery(["productVariants"], async () => {
+    const { data } = await supabase.from("product_variants").select("*");
+    return data;
+  });
+
+  const filteredProducts = products?.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDeleteConfirm = (productId: string) => {
-    deleteProduct.mutate(productId, {
-      onSuccess: () => setProductToDelete(null),
-    });
-  };
-
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <ProductSearchBar
-          value={searchTerm}
-          onChange={setSearchTerm}
-        />
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Product
+        <h2 className="text-2xl font-bold">Products</h2>
+        <Button onClick={() => setIsEditDialogOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Product
         </Button>
       </div>
 
-      {showForm && <ProductForm onClose={() => setShowForm(false)} />}
+      <ProductSearchBar 
+        searchTerm={searchTerm} 
+        onSearchChange={setSearchTerm} 
+      />
 
-      <Table>
-        <ProductTableHeader />
-        <TableBody>
-          {filteredProducts?.map((product) => (
-            <ProductTableRow
-              key={product.id}
-              product={product}
-              variants={productsData?.variantsByProduct[product.id] || []}
-              onEdit={setSelectedProduct}
-              onDelete={setProductToDelete}
-            />
-          ))}
-        </TableBody>
-      </Table>
+      <div className="border rounded-lg">
+        <Table>
+          <ProductTableHeader />
+          <TableBody>
+            {filteredProducts?.map((product) => (
+              <ProductTableRow
+                key={product.id}
+                product={product}
+                variants={productVariants[product.id] || []}
+                onEdit={(product) => {
+                  setSelectedProduct(product);
+                  setIsEditDialogOpen(true);
+                }}
+                onDelete={(product) => {
+                  setSelectedProduct(product);
+                  setIsDeleteDialogOpen(true);
+                }}
+                expandedProductId={expandedProductId}
+                onExpand={setExpandedProductId}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <EditProductDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
         product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
+        onClose={() => {
+          setSelectedProduct(null);
+          setIsEditDialogOpen(false);
+        }}
       />
 
       <DeleteProductDialog
-        product={productToDelete}
-        onClose={() => setProductToDelete(null)}
-        onConfirm={handleDeleteConfirm}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        product={selectedProduct}
+        onClose={() => {
+          setSelectedProduct(null);
+          setIsDeleteDialogOpen(false);
+        }}
       />
     </div>
   );
