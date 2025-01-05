@@ -17,14 +17,20 @@ export function AdminProducts() {
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: products, isLoading } = useQuery(["products"], async () => {
-    const { data } = await supabase.from("products").select("*");
-    return data;
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data } = await supabase.from("products").select("*");
+      return data;
+    }
   });
 
-  const { data: productVariants } = useQuery(["productVariants"], async () => {
-    const { data } = await supabase.from("product_variants").select("*");
-    return data;
+  const { data: productVariants } = useQuery({
+    queryKey: ["productVariants"],
+    queryFn: async () => {
+      const { data } = await supabase.from("product_variants").select("*");
+      return data;
+    }
   });
 
   const filteredProducts = products?.filter(product =>
@@ -58,7 +64,7 @@ export function AdminProducts() {
               <ProductTableRow
                 key={product.id}
                 product={product}
-                variants={productVariants[product.id] || []}
+                variants={productVariants?.filter(v => v.product_id === product.id) || []}
                 onEdit={(product) => {
                   setSelectedProduct(product);
                   setIsEditDialogOpen(true);
@@ -76,8 +82,6 @@ export function AdminProducts() {
       </div>
 
       <EditProductDialog
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
         product={selectedProduct}
         onClose={() => {
           setSelectedProduct(null);
