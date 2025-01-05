@@ -42,20 +42,9 @@ export const VariantSelectionPanel = ({
       
       {selectedVariant && (
         <div className="space-y-2">
-          {selectedVariant.price !== finalSelectedVariantPrice ? (
-            <>
-              <p className="text-lg font-medium text-red-500">
-                ${finalSelectedVariantPrice.toFixed(2)}
-              </p>
-              <p className="text-gray-500 line-through">
-                ${selectedVariant.price.toFixed(2)}
-              </p>
-            </>
-          ) : (
-            <p className="text-lg font-medium">
-              ${selectedVariant.price.toFixed(2)}
-            </p>
-          )}
+          <p className="text-lg font-medium">
+            Selected variant: ${finalSelectedVariantPrice.toFixed(2)}
+          </p>
           {isOutOfStock && (
             <Badge variant="destructive" className="w-fit">
               Out of Stock
