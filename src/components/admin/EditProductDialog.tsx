@@ -93,8 +93,6 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     }
   };
 
-  if (!product || !formData) return null;
-
   return (
     <>
       <Dialog open={!!product} onOpenChange={() => onClose()}>
@@ -103,24 +101,26 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
             <DialogTitle>Edit Product</DialogTitle>
           </DialogHeader>
           
-          <EditProductContent
-            formData={formData}
-            variants={variants}
-            onFormChange={handleFormChange}
-            onVariantsChange={setVariants}
-            onImageSelect={() => {
-              setIsSelectingMainImage(true);
-              setShowImageSelector(true);
-            }}
-            onAddAdditionalImage={() => {
-              setIsSelectingMainImage(false);
-              setShowImageSelector(true);
-            }}
-            onRemoveImage={handleRemoveImage}
-            onSubmit={handleSubmit}
-            onClose={onClose}
-            isSubmitting={updateProduct.isPending}
-          />
+          {formData && (
+            <EditProductContent
+              formData={formData}
+              variants={variants}
+              onFormChange={handleFormChange}
+              onVariantsChange={setVariants}
+              onImageSelect={() => {
+                setIsSelectingMainImage(true);
+                setShowImageSelector(true);
+              }}
+              onAddAdditionalImage={() => {
+                setIsSelectingMainImage(false);
+                setShowImageSelector(true);
+              }}
+              onRemoveImage={handleRemoveImage}
+              onSubmit={handleSubmit}
+              onClose={onClose}
+              isSubmitting={updateProduct.isPending}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
