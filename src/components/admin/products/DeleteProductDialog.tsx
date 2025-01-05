@@ -14,16 +14,21 @@ interface DeleteProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product: Product | null;
-  onClose: () => void;
+  onConfirmDelete: () => void;
 }
 
 export function DeleteProductDialog({ 
   open,
   onOpenChange,
   product, 
-  onClose 
+  onConfirmDelete 
 }: DeleteProductDialogProps) {
   if (!product) return null;
+
+  const handleDelete = () => {
+    onConfirmDelete();
+    onOpenChange(false);
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -38,10 +43,7 @@ export function DeleteProductDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => {
-              onClose();
-              onOpenChange(false);
-            }}
+            onClick={handleDelete}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Delete
