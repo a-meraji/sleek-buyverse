@@ -47,9 +47,11 @@ export function ProductForm({
         name={formData.name ?? ""}
         description={formData.description ?? ""}
         sku={formData.sku ?? ""}
+        discount={formData.discount ?? null}
         onNameChange={(value) => onFormChange({ name: value })}
         onDescriptionChange={(value) => onFormChange({ description: value })}
         onSkuChange={(value) => onFormChange({ sku: value })}
+        onDiscountChange={(value) => onFormChange({ discount: value })}
       />
 
       <CategorySelector

@@ -1,8 +1,8 @@
 import { Product } from "@/types";
-import { ImagePreview } from "./ImagePreview";
-import { ProductDetailsFields } from "./ProductDetailsFields";
-import { CategorySelector } from "./CategorySelector";
-import { FormActions } from "./FormActions";
+import { ProductDetailsFields } from "../ProductDetailsFields";
+import { CategorySelector } from "../CategorySelector";
+import { FormActions } from "../FormActions";
+import { ProductImageSection } from "./ProductImageSection";
 
 interface ProductFormProps {
   formData: Product;
@@ -34,9 +34,11 @@ export function ProductForm({
         name={formData?.name ?? ""}
         description={formData?.description ?? ""}
         sku={formData?.sku ?? ""}
+        discount={formData?.discount ?? null}
         onNameChange={(value) => onChange({ name: value })}
         onDescriptionChange={(value) => onChange({ description: value })}
         onSkuChange={(value) => onChange({ sku: value })}
+        onDiscountChange={(value) => onChange({ discount: value })}
       />
 
       <CategorySelector
@@ -44,7 +46,7 @@ export function ProductForm({
         onChange={(value) => onChange({ category: value })}
       />
 
-      <ImagePreview
+      <ProductImageSection
         imageUrl={formData?.image_url}
         productName={formData?.name}
         onChooseImage={onChooseImage}
