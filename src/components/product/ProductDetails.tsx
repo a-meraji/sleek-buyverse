@@ -49,6 +49,12 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
 
   const colors = [...new Set(variants?.map(v => v.color) || [])];
 
+  // Calculate the actual price for the selected variant
+  const selectedVariantPrice = selectedVariant?.price ?? 0;
+  const finalSelectedVariantPrice = hasValidDiscount 
+    ? selectedVariantPrice * (1 - product.discount / 100) 
+    : selectedVariantPrice;
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -63,10 +69,7 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
       
       <div className="space-y-1">
         {hasValidDiscount ? (
-          <>
-            <p className="text-xl text-red-500">From ${discountedPrice.toFixed(2)}</p>
-            <p className="text-gray-500 line-through">From ${minPrice.toFixed(2)}</p>
-          </>
+          <p className="text-xl text-red-500">From ${discountedPrice.toFixed(2)}</p>
         ) : (
           <p className="text-xl">From ${minPrice.toFixed(2)}</p>
         )}
@@ -93,7 +96,7 @@ export const ProductDetails = ({ product, userId, selectedSize, onSizeSelect }: 
           {selectedVariant && (
             <div className="space-y-2">
               <p className="text-lg font-medium">
-                Selected variant: ${selectedVariant.price.toFixed(2)}
+                Selected variant: ${finalSelectedVariantPrice.toFixed(2)}
               </p>
               {isOutOfStock && (
                 <Badge variant="destructive" className="w-fit">
