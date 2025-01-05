@@ -21,7 +21,18 @@ export function useProductDelete() {
         throw variantsError;
       }
 
-      // Then delete the product
+      // Then delete all product images
+      const { error: imagesError } = await supabase
+        .from('product_images')
+        .delete()
+        .eq('product_id', productId);
+
+      if (imagesError) {
+        console.error('Error deleting images:', imagesError);
+        throw imagesError;
+      }
+
+      // Finally delete the product
       const { error: productError } = await supabase
         .from('products')
         .delete()

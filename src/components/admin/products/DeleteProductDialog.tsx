@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Product } from "@/types/product";
+import { useProductDelete } from "./useProductDelete";
 
 interface DeleteProductDialogProps {
   open: boolean;
@@ -23,9 +24,12 @@ export function DeleteProductDialog({
   product, 
   onConfirmDelete 
 }: DeleteProductDialogProps) {
+  const deleteProduct = useProductDelete();
+
   if (!product) return null;
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    await deleteProduct.mutate(product.id);
     onConfirmDelete();
     onOpenChange(false);
   };
