@@ -26,7 +26,7 @@ export function ProductActionsCell({
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    action(); // Remove setTimeout to prevent race conditions
+    action();
   };
 
   return (

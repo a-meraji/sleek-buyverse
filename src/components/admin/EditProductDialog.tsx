@@ -1,23 +1,28 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
 import { ImageSelector } from "./ImageSelector";
 import { EditProductContent } from "./product/EditProductContent";
 import { useProductUpdate } from "./product/useProductUpdate";
+import { DeleteProductDialog } from "./products/DeleteProductDialog";
 
 interface EditProductDialogProps {
   product: Product | null;
   onClose: () => void;
+  onDelete?: (product: Product) => void;
 }
 
-export function EditProductDialog({ product, onClose }: EditProductDialogProps) {
+export function EditProductDialog({ product, onClose, onDelete }: EditProductDialogProps) {
   const [formData, setFormData] = useState<Product | null>(null);
   const [variants, setVariants] = useState([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const updateProduct = useProductUpdate();
 
   // Fetch variants and images for this product
@@ -111,14 +116,29 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     }
   };
 
+  const handleDelete = () => {
+    if (product && onDelete) {
+      onDelete(product);
+    }
+    handleClose();
+  };
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => {
         if (!open) handleClose();
       }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+          <DialogHeader className="flex flex-row justify-between items-center">
             <DialogTitle>Edit Product</DialogTitle>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setShowDeleteDialog(true)}
+              className="h-8"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </DialogHeader>
           
           {formData && (
@@ -143,6 +163,13 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
           )}
         </DialogContent>
       </Dialog>
+
+      <DeleteProductDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        product={product}
+        onConfirmDelete={handleDelete}
+      />
 
       <ImageSelector
         open={showImageSelector}
