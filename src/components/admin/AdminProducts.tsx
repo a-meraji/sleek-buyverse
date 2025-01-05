@@ -59,9 +59,7 @@ export function AdminProducts() {
 
   return (
     <div className="space-y-4">
-      <ProductHeader 
-        onAddProduct={() => setIsEditDialogOpen(true)} 
-      />
+      <ProductHeader />
 
       <ProductSearchBar 
         searchTerm={searchTerm} 

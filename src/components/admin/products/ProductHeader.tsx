@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useState } from "react";
-import { ProductForm } from "../product/form/ProductForm";
+import { ProductForm } from "../ProductForm";
 
 export function ProductHeader() {
   const [showAddDialog, setShowAddDialog] = useState(false);
