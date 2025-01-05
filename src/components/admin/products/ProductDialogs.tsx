@@ -25,7 +25,6 @@ export function ProductDialogs({
         <EditProductDialog
           product={selectedProduct}
           onClose={onEditDialogClose}
-          onDelete={onConfirmDelete}
         />
       )}
 
