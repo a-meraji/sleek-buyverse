@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Product } from "@/types/product";
 import { ProductVariant } from "@/types/variant";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface ProductTableRowProps {
@@ -31,8 +30,19 @@ export function ProductTableRow({
   
   const isExpanded = expandedProductId === product.id;
 
-  const handleExpandClick = () => {
+  const handleExpandClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onExpand(isExpanded ? null : product.id);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEdit(product);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(product);
   };
 
   return (
@@ -88,14 +98,14 @@ export function ProductTableRow({
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => onEdit(product)}
+            onClick={handleEditClick}
           >
             Edit
           </Button>
           <Button
             variant="destructive"
             size="sm"
-            onClick={() => onDelete(product)}
+            onClick={handleDeleteClick}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
