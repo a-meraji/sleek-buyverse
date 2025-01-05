@@ -1,8 +1,8 @@
 import { Product } from "@/types";
-import { ProductDetailsFields } from "../ProductDetailsFields";
-import { CategorySelector } from "../CategorySelector";
-import { FormActions } from "../FormActions";
-import { ProductImageSection } from "./ProductImageSection";
+import { ProductDetailsFields } from "../product/ProductDetailsFields";
+import { CategorySelector } from "../product/CategorySelector";
+import { FormActions } from "../product/FormActions";
+import { ProductImageSection } from "./form/ProductImageSection";
 
 interface ProductFormProps {
   formData: Product;
