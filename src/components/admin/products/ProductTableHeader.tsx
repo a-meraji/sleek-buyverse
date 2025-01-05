@@ -15,7 +15,8 @@ export function ProductTableHeader() {
         <TableHead>Category</TableHead>
         <TableHead>Variants</TableHead>
         <TableHead>Total Stock</TableHead>
-        <TableHead>Actions</TableHead>
+        <TableHead>Edit</TableHead>
+        <TableHead>Delete</TableHead>
       </TableRow>
     </TableHeader>
   );

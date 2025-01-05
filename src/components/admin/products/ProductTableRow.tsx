@@ -97,24 +97,22 @@ export function ProductTableRow({
       </TableCell>
       <TableCell>{totalStock}</TableCell>
       <TableCell>
-        <div className="flex gap-2 relative z-10">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleEditClick}
-            className="relative z-20"
-          >
-            Edit
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDeleteClick}
-            className="relative z-20"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleEditClick}
+        >
+          Edit
+        </Button>
+      </TableCell>
+      <TableCell>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleDeleteClick}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </TableCell>
     </TableRow>
   );
