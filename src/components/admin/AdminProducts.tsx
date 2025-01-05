@@ -48,7 +48,10 @@ export function AdminProducts() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Products</h2>
-        <Button onClick={() => setIsEditDialogOpen(true)}>
+        <Button onClick={() => {
+          setSelectedProduct(null);
+          setIsEditDialogOpen(true);
+        }}>
           <Plus className="h-4 w-4 mr-2" />
           Add Product
         </Button>
@@ -71,10 +74,12 @@ export function AdminProducts() {
                 onEdit={(product) => {
                   setSelectedProduct(product);
                   setIsEditDialogOpen(true);
+                  setIsDeleteDialogOpen(false);
                 }}
                 onDelete={(product) => {
                   setSelectedProduct(product);
                   setIsDeleteDialogOpen(true);
+                  setIsEditDialogOpen(false);
                 }}
                 expandedProductId={expandedProductId}
                 onExpand={setExpandedProductId}
@@ -99,7 +104,6 @@ export function AdminProducts() {
           setIsDeleteDialogOpen(false);
         }}
         onConfirm={(productId) => {
-          // Handle delete confirmation
           console.log('Deleting product:', productId);
           setIsDeleteDialogOpen(false);
         }}

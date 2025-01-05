@@ -22,6 +22,7 @@ export function useProductUpdate() {
           category: formData.category,
           image_url: formData.image_url,
           sku: formData.sku,
+          discount: formData.discount,
         })
         .eq("id", formData.id);
 
