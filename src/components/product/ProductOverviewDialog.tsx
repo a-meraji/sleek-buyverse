@@ -20,6 +20,7 @@ interface ProductOverviewDialogProps {
   productImage: string;
   userId: string | null;
   variants?: ProductVariant[];
+  discount?: number | null;
 }
 
 export function ProductOverviewDialog({
@@ -29,7 +30,8 @@ export function ProductOverviewDialog({
   productName,
   productImage,
   userId,
-  variants = []
+  variants = [],
+  discount
 }: ProductOverviewDialogProps) {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -122,7 +124,11 @@ export function ProductOverviewDialog({
         <ScrollArea className="h-full max-h-[calc(90vh-120px)]">
           <div className="grid gap-4 py-4 px-1">
             <ProductImage image={productImage} name={productName} />
-            <ProductInfo name={productName} variants={variants} />
+            <ProductInfo 
+              name={productName} 
+              variants={variants} 
+              discount={discount}
+            />
             
             <VariantSelectionPanel
               variants={variants}
