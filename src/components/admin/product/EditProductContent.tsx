@@ -31,15 +31,19 @@ export function EditProductContent({
   onClose,
   isSubmitting,
 }: EditProductContentProps) {
+  console.log('Current form data:', formData);
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <ProductDetailsFields
         name={formData.name}
         description={formData.description ?? ""}
         sku={formData.sku ?? ""}
+        discount={formData.discount}
         onNameChange={(value) => onFormChange({ name: value })}
         onDescriptionChange={(value) => onFormChange({ description: value })}
         onSkuChange={(value) => onFormChange({ sku: value })}
+        onDiscountChange={(value) => onFormChange({ discount: value })}
       />
 
       <CategorySelector
