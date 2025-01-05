@@ -17,32 +17,31 @@ const Index = () => {
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
       try {
+        // First, fetch products
         const { data: productsData, error: productsError } = await supabase
           .from('products')
-          .select('*')
+          .select(`
+            *,
+            product_variants (
+              id,
+              size,
+              color,
+              stock,
+              price
+            )
+          `)
           .limit(8)
           .order('created_at', { ascending: false });
 
-        if (productsError) throw productsError;
+        if (productsError) {
+          console.error('Error fetching products:', productsError);
+          throw productsError;
+        }
 
-        // Fetch variants separately to ensure RLS policies are properly applied
-        const { data: variantsData, error: variantsError } = await supabase
-          .from('product_variants')
-          .select('*')
-          .in('product_id', productsData.map(p => p.id));
-
-        if (variantsError) throw variantsError;
-
-        // Combine products with their variants
-        const productsWithVariants = productsData.map(product => ({
-          ...product,
-          product_variants: variantsData.filter(v => v.product_id === product.id)
-        }));
-
-        console.log('Products with variants fetched successfully:', productsWithVariants);
-        return productsWithVariants;
+        console.log('Products fetched successfully:', productsData);
+        return productsData;
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error in products query:', error);
         throw error;
       }
     },
