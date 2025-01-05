@@ -26,13 +26,25 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     queryFn: async () => {
       if (!product?.id) return null;
       
+      console.log('Fetching product details:', product.id);
       const [variantsResponse, imagesResponse] = await Promise.all([
         supabase.from("product_variants").select("*").eq("product_id", product.id),
         supabase.from("product_images").select("*").eq("product_id", product.id)
       ]);
 
-      if (variantsResponse.error) throw variantsResponse.error;
-      if (imagesResponse.error) throw imagesResponse.error;
+      if (variantsResponse.error) {
+        console.error('Error fetching variants:', variantsResponse.error);
+        throw variantsResponse.error;
+      }
+      if (imagesResponse.error) {
+        console.error('Error fetching images:', imagesResponse.error);
+        throw imagesResponse.error;
+      }
+
+      console.log('Fetched product details:', {
+        variants: variantsResponse.data,
+        images: imagesResponse.data
+      });
 
       return {
         variants: variantsResponse.data,

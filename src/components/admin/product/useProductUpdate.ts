@@ -26,7 +26,10 @@ export function useProductUpdate() {
         })
         .eq("id", formData.id);
 
-      if (productError) throw productError;
+      if (productError) {
+        console.error('Error updating product:', productError);
+        throw productError;
+      }
 
       // Delete cart items referencing the variants we're about to update
       const { error: cartError } = await supabase
@@ -34,7 +37,10 @@ export function useProductUpdate() {
         .delete()
         .eq("product_id", formData.id);
 
-      if (cartError) throw cartError;
+      if (cartError) {
+        console.error('Error deleting cart items:', cartError);
+        throw cartError;
+      }
 
       // Handle variants
       const { error: deleteError } = await supabase
@@ -42,7 +48,10 @@ export function useProductUpdate() {
         .delete()
         .eq("product_id", formData.id);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('Error deleting variants:', deleteError);
+        throw deleteError;
+      }
 
       const variantsData = variants.map(variant => ({
         product_id: formData.id,
@@ -56,7 +65,10 @@ export function useProductUpdate() {
         .from("product_variants")
         .insert(variantsData);
 
-      if (variantsError) throw variantsError;
+      if (variantsError) {
+        console.error('Error creating variants:', variantsError);
+        throw variantsError;
+      }
 
       // Handle additional images
       if (formData.product_images && formData.product_images.length > 0) {
@@ -66,7 +78,10 @@ export function useProductUpdate() {
           .delete()
           .eq("product_id", formData.id);
 
-        if (deleteImagesError) throw deleteImagesError;
+        if (deleteImagesError) {
+          console.error('Error deleting images:', deleteImagesError);
+          throw deleteImagesError;
+        }
 
         // Then insert new images
         const imagesData = formData.product_images.map((image, index) => ({
@@ -79,11 +94,15 @@ export function useProductUpdate() {
           .from("product_images")
           .insert(imagesData);
 
-        if (imagesError) throw imagesError;
+        if (imagesError) {
+          console.error('Error creating images:', imagesError);
+          throw imagesError;
+        }
       }
     },
     onSuccess: (_, { formData }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-product-variants"] });
       queryClient.invalidateQueries({ queryKey: ["product-details", formData.id] });
       toast({
         title: "Success",

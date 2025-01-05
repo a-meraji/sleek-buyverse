@@ -89,11 +89,14 @@ export function ProductForm({ onClose }: ProductFormProps) {
         .single();
 
       if (productError) {
+        console.error('Error creating product:', productError);
         if (productError.code === '23505' && productError.message.includes('products_sku_key')) {
           throw new Error("A product with this SKU already exists. Please use a different SKU.");
         }
         throw productError;
       }
+
+      console.log('Product created:', product);
 
       // Insert additional images if any
       if (additionalImages.length > 0) {
@@ -107,7 +110,10 @@ export function ProductForm({ onClose }: ProductFormProps) {
           .from("product_images")
           .insert(imagesData);
 
-        if (imagesError) throw imagesError;
+        if (imagesError) {
+          console.error('Error creating product images:', imagesError);
+          throw imagesError;
+        }
       }
 
       const variantsData = variants.map(variant => ({
@@ -122,12 +128,16 @@ export function ProductForm({ onClose }: ProductFormProps) {
         .from("product_variants")
         .insert(variantsData);
 
-      if (variantsError) throw variantsError;
+      if (variantsError) {
+        console.error('Error creating product variants:', variantsError);
+        throw variantsError;
+      }
 
       return product;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-product-variants"] });
       toast({
         title: "Success",
         description: "Product created successfully",

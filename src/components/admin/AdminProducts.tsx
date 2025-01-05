@@ -14,17 +14,29 @@ export function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["admin-products"],
     queryFn: async () => {
-      const { data } = await supabase.from("products").select("*");
+      console.log('Fetching products for admin dashboard');
+      const { data, error } = await supabase.from("products").select("*");
+      if (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+      }
+      console.log('Fetched products:', data);
       return data;
     }
   });
 
   const { data: productVariants } = useQuery({
-    queryKey: ["productVariants"],
+    queryKey: ["admin-product-variants"],
     queryFn: async () => {
-      const { data } = await supabase.from("product_variants").select("*");
+      console.log('Fetching product variants');
+      const { data, error } = await supabase.from("product_variants").select("*");
+      if (error) {
+        console.error('Error fetching variants:', error);
+        throw error;
+      }
+      console.log('Fetched variants:', data);
       return data;
     }
   });
