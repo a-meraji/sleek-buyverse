@@ -22,6 +22,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
     category: "",
     image_url: "",
     sku: "",
+    discount: 0,
   });
   const [additionalImages, setAdditionalImages] = useState<{ image_url: string }[]>([]);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
@@ -76,6 +77,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
         category: formData.category || "",
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
+        discount: formData.discount || 0,
       };
 
       console.log('Creating product with data:', productData);
@@ -176,9 +178,11 @@ export function ProductForm({ onClose }: ProductFormProps) {
           name={formData.name ?? ""}
           description={formData.description ?? ""}
           sku={formData.sku ?? ""}
+          discount={formData.discount}
           onNameChange={(value) => handleFormChange({ name: value })}
           onDescriptionChange={(value) => handleFormChange({ description: value })}
           onSkuChange={(value) => handleFormChange({ sku: value })}
+          onDiscountChange={(value) => handleFormChange({ discount: value })}
         />
 
         <CategorySelector
