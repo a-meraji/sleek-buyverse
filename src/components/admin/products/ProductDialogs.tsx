@@ -7,7 +7,7 @@ interface ProductDialogsProps {
   isEditDialogOpen: boolean;
   isDeleteDialogOpen: boolean;
   onEditDialogClose: () => void;
-  onDeleteDialogOpenChange: (open: boolean) => void;
+  onDeleteDialogClose: () => void;
   onConfirmDelete: () => void;
 }
 
@@ -16,19 +16,21 @@ export function ProductDialogs({
   isEditDialogOpen,
   isDeleteDialogOpen,
   onEditDialogClose,
-  onDeleteDialogOpenChange,
+  onDeleteDialogClose,
   onConfirmDelete
 }: ProductDialogsProps) {
   return (
     <>
-      <EditProductDialog
-        product={selectedProduct}
-        onClose={onEditDialogClose}
-      />
+      {isEditDialogOpen && (
+        <EditProductDialog
+          product={selectedProduct}
+          onClose={onEditDialogClose}
+        />
+      )}
 
       <DeleteProductDialog
         open={isDeleteDialogOpen}
-        onOpenChange={onDeleteDialogOpenChange}
+        onOpenChange={onDeleteDialogClose}
         product={selectedProduct}
         onConfirmDelete={onConfirmDelete}
       />

@@ -29,6 +29,26 @@ export function AdminProducts() {
     }
   });
 
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = (product) => {
+    setSelectedProduct(product);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleEditDialogClose = () => {
+    setIsEditDialogOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleDeleteDialogClose = () => {
+    setIsDeleteDialogOpen(false);
+    setSelectedProduct(null);
+  };
+
   const filteredProducts = products?.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -53,29 +73,17 @@ export function AdminProducts() {
         productVariants={productVariants}
         expandedProductId={expandedProductId}
         onExpand={setExpandedProductId}
-        onEdit={(product) => {
-          setSelectedProduct(product);
-          setIsEditDialogOpen(true);
-        }}
-        onDelete={(product) => {
-          setSelectedProduct(product);
-          setIsDeleteDialogOpen(true);
-        }}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
 
       <ProductDialogs
         selectedProduct={selectedProduct}
         isEditDialogOpen={isEditDialogOpen}
         isDeleteDialogOpen={isDeleteDialogOpen}
-        onEditDialogClose={() => {
-          setSelectedProduct(null);
-          setIsEditDialogOpen(false);
-        }}
-        onDeleteDialogOpenChange={setIsDeleteDialogOpen}
-        onConfirmDelete={() => {
-          setSelectedProduct(null);
-          setIsDeleteDialogOpen(false);
-        }}
+        onEditDialogClose={handleEditDialogClose}
+        onDeleteDialogClose={handleDeleteDialogClose}
+        onConfirmDelete={handleDeleteDialogClose}
       />
     </div>
   );

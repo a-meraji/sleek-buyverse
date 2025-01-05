@@ -26,9 +26,7 @@ export function ProductActionsCell({
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Close dropdown first, then perform action after animation
-    setTimeout(action, 150);
+    action(); // Remove setTimeout to prevent race conditions
   };
 
   return (
