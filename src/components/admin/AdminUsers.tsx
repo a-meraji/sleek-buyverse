@@ -26,11 +26,11 @@ type ProfileData = {
   phone: string | null;
 }
 
-type AdminUserResponse = {
+type SupabaseAdminUserResponse = {
   id: string;
   role: string | null;
   created_at: string;
-  profiles: ProfileData | null;
+  profiles: ProfileData[];
 }
 
 export function AdminUsers() {
@@ -44,7 +44,7 @@ export function AdminUsers() {
           id,
           role,
           created_at,
-          profiles:id (
+          profiles!inner (
             first_name,
             last_name,
             phone
@@ -65,15 +65,17 @@ export function AdminUsers() {
       }
 
       // Map and combine the data
-      const enrichedUsers = (users as AdminUserResponse[]).map((user) => {
+      const enrichedUsers = (users as SupabaseAdminUserResponse[]).map((user) => {
         const authUser = authData.users.find((u) => u.id === user.id);
+        const profile = user.profiles[0]; // Get the first profile since it's returned as an array
+        
         return {
           ...user,
           email: authUser?.email || null,
           last_sign_in_at: authUser?.last_sign_in_at || null,
-          first_name: user.profiles?.first_name || null,
-          last_name: user.profiles?.last_name || null,
-          phone: user.profiles?.phone || null,
+          first_name: profile?.first_name || null,
+          last_name: profile?.last_name || null,
+          phone: profile?.phone || null,
         };
       });
 
