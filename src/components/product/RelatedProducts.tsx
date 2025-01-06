@@ -38,23 +38,24 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
     queryFn: async () => {
       console.log('Fetching popular products');
       
-      // Get products with the most orders
-      const { data, error } = await supabase
+      // First, get the product IDs ordered by frequency
+      const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
-        .select('product_id, count(*)')
-        .group('product_id')
+        .select('product_id, count')
+        .select('product_id, count(*)', { count: 'exact' })
+        .groupBy('product_id')
         .order('count', { ascending: false })
         .limit(8);
 
-      if (error) {
-        console.error('Error fetching popular products:', error);
-        throw error;
+      if (orderError) {
+        console.error('Error fetching popular products:', orderError);
+        throw orderError;
       }
 
-      if (!data.length) return [];
+      if (!orderCounts?.length) return [];
 
       // Get the actual product details
-      const productIds = data.map(item => item.product_id);
+      const productIds = orderCounts.map(item => item.product_id);
       const { data: products, error: productsError } = await supabase
         .from('products')
         .select('*, product_variants(*)')
