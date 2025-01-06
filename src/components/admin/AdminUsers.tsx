@@ -33,6 +33,12 @@ type SupabaseAdminUserResponse = {
   profiles: ProfileData[];
 }
 
+type AuthUser = {
+  id: string;
+  email?: string;
+  last_sign_in_at?: string;
+}
+
 export function AdminUsers() {
   const { data: adminUsers, isLoading } = useQuery({
     queryKey: ["admin-users"],
@@ -66,7 +72,7 @@ export function AdminUsers() {
 
       // Map and combine the data
       const enrichedUsers = (users as SupabaseAdminUserResponse[]).map((user) => {
-        const authUser = authData.users.find((u) => u.id === user.id);
+        const authUser = (authData.users as AuthUser[]).find((u) => u.id === user.id);
         const profile = user.profiles[0]; // Get the first profile since it's returned as an array
         
         return {
