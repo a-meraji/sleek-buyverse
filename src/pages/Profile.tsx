@@ -120,8 +120,8 @@ const Profile = () => {
             <TabsContent value="info" className="space-y-6">
               <ProfileForm userId={user.id} onClose={() => {}} />
               <Button 
-                variant="destructive" 
-                className="w-full bg-red-600 hover:bg-red-700"
+                variant="secondary"
+                className="w-full bg-red-600 hover:bg-red-700 text-white"
                 onClick={handleSignOut}
               >
                 <LogOut className="mr-2 h-4 w-4" />

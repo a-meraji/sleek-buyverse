@@ -34,6 +34,17 @@ export const OrdersList = ({ orders, isLoading }: OrdersListProps) => {
 };
 
 const OrderItem = ({ order }: { order: any }) => {
+  const getBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'shipped':
+        return 'success';
+      case 'processing':
+        return 'warning';
+      default:
+        return 'outline';
+    }
+  };
+
   return (
     <AccordionItem value={order.id} className="border rounded-lg p-4">
       <AccordionTrigger className="hover:no-underline">
@@ -46,10 +57,7 @@ const OrderItem = ({ order }: { order: any }) => {
           </div>
           <div className="text-right">
             <p className="font-medium">${order.total_amount}</p>
-            <Badge variant={
-              order.status === 'shipped' ? 'default' :
-              order.status === 'processing' ? 'secondary' : 'outline'
-            }>
+            <Badge variant={getBadgeVariant(order.status)}>
               {order.status}
             </Badge>
           </div>
@@ -70,7 +78,6 @@ const OrderItem = ({ order }: { order: any }) => {
 };
 
 const OrderItemDetails = ({ item }: { item: any }) => {
-  // Add null check for item.product
   if (!item.product) {
     console.log('Missing product data for order item:', item);
     return (
