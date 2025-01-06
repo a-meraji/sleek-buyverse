@@ -46,8 +46,7 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       // Get the most ordered products using PostgREST syntax for counting
       const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
-        .select('product_id, count:count()')
-        .group('product_id')
+        .select('product_id, count')
         .order('count', { ascending: false })
         .limit(8);
 
