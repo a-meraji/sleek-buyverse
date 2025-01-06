@@ -5,6 +5,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { ReviewDialog } from "./ReviewDialog";
 
 interface OrdersListProps {
   orders: any[];
@@ -78,6 +81,8 @@ const OrderItem = ({ order }: { order: any }) => {
 };
 
 const OrderItemDetails = ({ item }: { item: any }) => {
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+
   if (!item.product) {
     console.log('Missing product data for order item:', item);
     return (
@@ -110,9 +115,28 @@ const OrderItemDetails = ({ item }: { item: any }) => {
             </p>
           )}
           <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-2"
+            onClick={() => setIsReviewDialogOpen(true)}
+          >
+            Write a Review
+          </Button>
         </div>
       </div>
-      <p className="font-medium">${item.price_at_time}</p>
+      <div>
+        <p className="font-medium">${item.price_at_time}</p>
+        <ReviewDialog
+          isOpen={isReviewDialogOpen}
+          onClose={() => setIsReviewDialogOpen(false)}
+          productId={item.product.id}
+          defaultValues={{
+            reviewer_first_name: "",  // These will be populated from the profile data
+            reviewer_last_name: "",
+          }}
+        />
+      </div>
     </div>
   );
 };

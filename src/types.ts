@@ -29,3 +29,15 @@ export interface Product {
   product_variants?: ProductVariant[];
   product_images?: ProductImage[];
 }
+
+export interface Review {
+  id: string;
+  product_id: string;
+  reviewer_first_name: string;
+  reviewer_last_name: string;
+  title: string;
+  review_text: string;
+  rating: number;
+  status: 'pending' | 'rejected' | 'approved';
+  created_at: string;
+}
