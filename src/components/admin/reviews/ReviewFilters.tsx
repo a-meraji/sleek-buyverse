@@ -32,7 +32,7 @@ export function ReviewFilters({
           <SelectTrigger>
             <SelectValue placeholder="Filter by product" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white dark:bg-gray-800 border shadow-md">
             <SelectItem value="all">All Products</SelectItem>
             {products.map((product) => (
               <SelectItem key={product.id} value={product.id}>
@@ -51,7 +51,7 @@ export function ReviewFilters({
           <SelectTrigger>
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white dark:bg-gray-800 border shadow-md">
             <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
