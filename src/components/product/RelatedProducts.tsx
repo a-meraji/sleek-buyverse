@@ -43,11 +43,11 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
     queryFn: async () => {
       console.log('Fetching popular products');
       
-      // Get the most ordered products using PostgREST syntax for counting
+      // First get the product IDs ordered by count
       const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
         .select('product_id, count:count(*)')
-        .group('product_id')
+        .groupBy('product_id')
         .order('count', { ascending: false })
         .limit(8);
 
@@ -56,9 +56,12 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
         throw orderError;
       }
 
-      console.log('Order counts:', orderCounts);
+      console.log('Order counts fetched:', orderCounts);
 
-      if (!orderCounts?.length) return [];
+      if (!orderCounts?.length) {
+        console.log('No order counts found');
+        return [];
+      }
 
       // Get the actual product details
       const productIds = orderCounts.map((item: OrderCount) => item.product_id);
