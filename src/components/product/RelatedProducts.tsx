@@ -1,112 +1,36 @@
-import { Product } from "@/types";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { ProductCarousel } from "../home/ProductCarousel";
+import { useRelatedProducts } from "./related/useRelatedProducts";
+import { usePopularProducts } from "./related/usePopularProducts";
+import { ProductCarouselWrapper } from "./related/ProductCarouselWrapper";
 
 interface RelatedProductsProps {
   currentProductId: string;
   category: string | null;
 }
 
-interface OrderCount {
-  product_id: string;
-  count: number;
-}
-
 export const RelatedProducts = ({ currentProductId, category }: RelatedProductsProps) => {
-  const { data: relatedProducts, isLoading: isLoadingRelated } = useQuery({
-    queryKey: ['related-products', category, currentProductId],
-    queryFn: async () => {
-      console.log('Fetching related products for category:', category);
-      if (!category) return [];
-
-      const { data, error } = await supabase
-        .from('products')
-        .select('*, product_variants(*)')
-        .eq('category', category)
-        .neq('id', currentProductId)
-        .limit(8);
-
-      if (error) {
-        console.error('Error fetching related products:', error);
-        throw error;
-      }
-
-      console.log('Related products fetched:', data);
-      return data;
-    },
-    enabled: !!category,
+  const { data: relatedProducts, isLoading: isLoadingRelated } = useRelatedProducts({
+    currentProductId,
+    category
   });
 
-  const { data: popularProducts, isLoading: isLoadingPopular } = useQuery({
-    queryKey: ['popular-products'],
-    queryFn: async () => {
-      console.log('Fetching popular products');
-      
-      // First get the product IDs with their order counts using the database function
-      const { data: orderCounts, error: orderError } = await supabase
-        .rpc('get_popular_products')
-        .limit(8);
-
-      if (orderError) {
-        console.error('Error fetching popular products:', orderError);
-        throw orderError;
-      }
-
-      console.log('Order counts fetched:', orderCounts);
-
-      if (!orderCounts?.length) {
-        console.log('No order counts found');
-        // If no popular products found, fetch some random products instead
-        const { data: randomProducts, error: productsError } = await supabase
-          .from('products')
-          .select('*, product_variants(*)')
-          .neq('id', currentProductId)
-          .limit(8);
-
-        if (productsError) {
-          console.error('Error fetching random products:', productsError);
-          throw productsError;
-        }
-
-        console.log('Random products fetched as fallback:', randomProducts);
-        return randomProducts;
-      }
-
-      // Get the actual product details
-      const productIds = orderCounts.map(item => item.product_id);
-      const { data: products, error: productsError } = await supabase
-        .from('products')
-        .select('*, product_variants(*)')
-        .in('id', productIds)
-        .neq('id', currentProductId);
-
-      if (productsError) {
-        console.error('Error fetching product details:', productsError);
-        throw productsError;
-      }
-
-      console.log('Popular products fetched:', products);
-      return products;
-    },
-  });
+  const { data: popularProducts, isLoading: isLoadingPopular } = usePopularProducts(currentProductId);
 
   if (isLoadingRelated || isLoadingPopular) return null;
 
   // If there are related products, show them
   if (relatedProducts && relatedProducts.length > 0) {
     return (
-      <ProductCarousel
+      <ProductCarouselWrapper
         title="Related Products"
         products={relatedProducts}
       />
     );
   }
 
-  // If no related products but we have popular/random products, show those instead
+  // If no related products but we have popular products, show those instead
   if (popularProducts && popularProducts.length > 0) {
     return (
-      <ProductCarousel
+      <ProductCarouselWrapper
         title="Popular Products"
         products={popularProducts}
       />
