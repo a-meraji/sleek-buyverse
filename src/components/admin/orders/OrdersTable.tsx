@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/table";
 import { OrderStatus, OrderStatusSelect } from "./OrderStatusSelect";
 import { OrderDetailsDialog } from "./OrderDetailsDialog";
-import { Package } from "lucide-react";
+import { Package, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface OrdersTableProps {
   orders: Array<{
@@ -47,7 +48,8 @@ export function OrdersTable({ orders }: OrdersTableProps) {
           <TableHead>Status</TableHead>
           <TableHead>Total Amount</TableHead>
           <TableHead>Date</TableHead>
-          <TableHead>Order Details</TableHead>
+          <TableHead>Order Items</TableHead>
+          <TableHead className="w-[50px]">Details</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -93,7 +95,13 @@ export function OrdersTable({ orders }: OrdersTableProps) {
               ) : (
                 <span className="text-sm text-muted-foreground">No items</span>
               )}
-              <OrderDetailsDialog order={order} />
+            </TableCell>
+            <TableCell>
+              <OrderDetailsDialog order={order}>
+                <Button variant="ghost" size="icon">
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </OrderDetailsDialog>
             </TableCell>
           </TableRow>
         ))}
