@@ -42,8 +42,10 @@ export const ProductDetails = ({
   });
 
   const selectedVariant = variants?.find(v => v.size === selectedSize && v.color === selectedColor);
+  
+  // Calculate minimum price from all variants
   const minPrice = variants?.length 
-    ? Math.min(...variants.map(v => v.price))
+    ? Math.min(...variants.map(v => Number(v.price)))
     : 0;
 
   const hasValidDiscount = typeof product.discount === 'number' && product.discount > 0 && product.discount <= 100;
