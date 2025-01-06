@@ -80,6 +80,13 @@ export function AdminProducts() {
   const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const paginatedProducts = filteredProducts?.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
 
+  // Add debug logs
+  console.log('Filtered products length:', filteredProducts?.length);
+  console.log('Total pages:', totalPages);
+  console.log('Current page:', currentPage);
+  console.log('Products per page:', PRODUCTS_PER_PAGE);
+  console.log('Paginated products:', paginatedProducts?.length);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     setExpandedProductId(null); // Reset expanded row when changing pages
