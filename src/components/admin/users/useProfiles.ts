@@ -1,25 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileData } from "./types";
+import { Profile } from "./types";
 
 export function useProfiles() {
   return useQuery({
-    queryKey: ["profiles"],
+    queryKey: ["admin-profiles"],
     queryFn: async () => {
       console.log("Fetching profiles...");
-      
-      const { data: profilesData, error } = await supabase
+      const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*");
 
       if (error) {
         console.error("Error fetching profiles:", error);
         throw error;
       }
 
-      console.log("Profiles data:", profilesData);
-      return profilesData as ProfileData[];
+      console.log("Fetched profiles:", profiles);
+      return profiles as Profile[];
     },
   });
 }
