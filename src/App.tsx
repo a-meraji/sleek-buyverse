@@ -11,6 +11,10 @@ import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
+import ContactUs from "./pages/ContactUs";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import ReturnsExchanges from "./pages/ReturnsExchanges";
+import FAQ from "./pages/FAQ";
 import { ChatButton } from "./components/chat/ChatButton";
 import { Footer } from "./components/home/Footer";
 import { CartProvider } from "./contexts/cart/CartContext";
@@ -42,6 +46,10 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/contact" element={<ContactUs />} />
+                <Route path="/shipping" element={<ShippingPolicy />} />
+                <Route path="/returns" element={<ReturnsExchanges />} />
+                <Route path="/faq" element={<FAQ />} />
               </Routes>
             </div>
             <Footer />
