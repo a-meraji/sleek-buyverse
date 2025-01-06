@@ -5,6 +5,7 @@ import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminChat } from "@/components/admin/AdminChat";
+import { AdminReviews } from "@/components/admin/AdminReviews";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -47,6 +48,7 @@ export default function Admin() {
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="reviews">Reviews</TabsTrigger>
           <TabsTrigger value="chat">Chat</TabsTrigger>
         </TabsList>
         <TabsContent value="analytics" className="space-y-4">
@@ -60,6 +62,9 @@ export default function Admin() {
         </TabsContent>
         <TabsContent value="users" className="space-y-4">
           <AdminUsers />
+        </TabsContent>
+        <TabsContent value="reviews" className="space-y-4">
+          <AdminReviews />
         </TabsContent>
         <TabsContent value="chat" className="space-y-4">
           <AdminChat />
