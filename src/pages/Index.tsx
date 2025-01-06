@@ -8,6 +8,7 @@ import HeroBanner from "@/components/home/HeroBanner";
 import { ProductCarousel } from "@/components/home/ProductCarousel";
 import { StyleShowcase } from "@/components/home/StyleShowcase";
 import { ReviewsScroll } from "@/components/home/ReviewsScroll";
+import { usePopularProducts } from "@/components/product/related/usePopularProducts";
 import { Product } from "@/types";
 
 const Index = () => {
@@ -48,6 +49,9 @@ const Index = () => {
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     retry: 1,
   });
+
+  // Fetch popular products
+  const { data: popularProducts } = usePopularProducts('');
 
   if (isLoading) {
     return (
@@ -97,7 +101,10 @@ const Index = () => {
           <>
             <ProductCarousel title="New Arrivals" products={products} />
             <StyleShowcase />
-            <ProductCarousel title="Popular Products" products={products} />
+            <ProductCarousel 
+              title="Popular Products" 
+              products={popularProducts || []} 
+            />
             <ReviewsScroll />
             <div className="py-16 px-6 text-center">
               <Link to="/products">
