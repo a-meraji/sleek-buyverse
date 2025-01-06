@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
 import { EditProductContent } from "./product/EditProductContent";
@@ -9,6 +9,19 @@ import { useProductDelete } from "./products/useProductDelete";
 import { useToast } from "@/hooks/use-toast";
 import { DialogHeader } from "./product/dialog/DialogHeader";
 import { ImageSelectorWrapper } from "./product/dialog/ImageSelectorWrapper";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface EditProductDialogProps {
   product: Product | null;
@@ -131,6 +144,41 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
         }}
       >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="absolute right-4 top-4 flex items-center gap-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="border-gray-200 hover:bg-red-500 hover:text-white transition-colors px-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the product and all associated data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                    className="bg-red-500 hover:bg-red-600"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </div>
+          
           <DialogHeader onDelete={handleDelete} />
           
           {formData && (
