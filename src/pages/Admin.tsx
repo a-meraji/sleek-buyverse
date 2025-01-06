@@ -6,11 +6,13 @@ import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { AdminReviews } from "@/components/admin/AdminReviews";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Store } from "lucide-react";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -51,11 +53,19 @@ export default function Admin() {
 
   return (
     <div className="container mx-auto py-10">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          Role: {adminStatus.role || "Unknown"}
-        </p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          <p className="text-muted-foreground">
+            Role: {adminStatus.role || "Unknown"}
+          </p>
+        </div>
+        <Link to="/">
+          <Button variant="outline" className="gap-2">
+            <Store className="h-4 w-4" />
+            Go to Store
+          </Button>
+        </Link>
       </div>
       <Tabs defaultValue="analytics" className="space-y-4">
         <TabsList>
