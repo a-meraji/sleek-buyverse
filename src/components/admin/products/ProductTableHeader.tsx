@@ -11,7 +11,6 @@ export function ProductTableHeader() {
         <TableHead>Image</TableHead>
         <TableHead>Name</TableHead>
         <TableHead>SKU</TableHead>
-        <TableHead>Price</TableHead>
         <TableHead>Category</TableHead>
         <TableHead>Variants</TableHead>
         <TableHead>Total Stock</TableHead>
