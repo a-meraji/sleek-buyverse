@@ -8,6 +8,7 @@ import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -29,6 +30,30 @@ const Profile = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Fetch user orders
+  const { data: orders } = useQuery({
+    queryKey: ['user-orders', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (
+            *,
+            products (*)
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   const handleSignOut = async () => {
     try {
@@ -62,21 +87,64 @@ const Profile = () => {
           <h1 className="text-3xl font-bold mb-8">Profile</h1>
           
           <Tabs defaultValue="info" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="info">Information</TabsTrigger>
-              <TabsTrigger value="favorites">Favorites</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 bg-secondary">
+              <TabsTrigger 
+                value="info"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Information
+              </TabsTrigger>
+              <TabsTrigger 
+                value="orders"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Orders
+              </TabsTrigger>
+              <TabsTrigger 
+                value="favorites"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Favorites
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="info" className="space-y-6">
               <ProfileForm userId={user.id} onClose={() => {}} />
               <Button 
                 variant="destructive" 
-                className="w-full"
+                className="w-full bg-red-600 hover:bg-red-700"
                 onClick={handleSignOut}
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign Out
               </Button>
+            </TabsContent>
+
+            <TabsContent value="orders" className="space-y-4">
+              {orders?.length ? (
+                <div className="space-y-4">
+                  {orders.map((order) => (
+                    <div key={order.id} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
+                          <p className="text-sm text-gray-500">
+                            {new Date(order.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">${order.total_amount}</p>
+                          <p className="text-sm capitalize text-gray-500">{order.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  No orders found
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="favorites">
