@@ -39,24 +39,25 @@ export const ProductsHeader = ({
   };
 
   return (
-    <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
-      <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+    <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
+      <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-gray-900">
         {searchQuery ? `Search Results for "${searchQuery}"` : "All Products"}
       </h1>
 
-      <div className="flex items-center gap-4">
-        <div className="flex gap-2">
+      <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:items-center md:gap-4">
+        <div className="grid grid-cols-2 gap-2 md:flex md:gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => handleFilterClick('newest')}
             className={cn(
-              "gap-2",
+              "gap-1 md:gap-2 text-xs md:text-sm",
               currentSort === 'newest' && "bg-primary text-white hover:bg-primary/90"
             )}
           >
-            <Clock className="h-4 w-4" />
-            New Arrivals
+            <Clock className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="hidden md:inline">New Arrivals</span>
+            <span className="md:hidden">New</span>
           </Button>
           
           <Button
@@ -64,12 +65,13 @@ export const ProductsHeader = ({
             size="sm"
             onClick={() => handleFilterClick('popular')}
             className={cn(
-              "gap-2",
+              "gap-1 md:gap-2 text-xs md:text-sm",
               currentSort === 'popular' && "bg-primary text-white hover:bg-primary/90"
             )}
           >
-            <Star className="h-4 w-4" />
-            Popular
+            <Star className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="hidden md:inline">Popular</span>
+            <span className="md:hidden">Popular</span>
           </Button>
           
           <Button
@@ -77,63 +79,67 @@ export const ProductsHeader = ({
             size="sm"
             onClick={() => handleFilterClick('discount')}
             className={cn(
-              "gap-2",
+              "gap-1 md:gap-2 text-xs md:text-sm",
               isDiscounted && "bg-primary text-white hover:bg-primary/90"
             )}
           >
-            <Tag className="h-4 w-4" />
-            Special Offers
+            <Tag className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="hidden md:inline">Special Offers</span>
+            <span className="md:hidden">Offers</span>
           </Button>
         </div>
 
-        <Menu as="div" className="relative inline-block text-left">
-          <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-            Sort
-            <ChevronDown className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" />
-          </Menu.Button>
+        <div className="flex items-center justify-between md:justify-start gap-2">
+          <Menu as="div" className="relative inline-block text-left">
+            <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
+              Sort
+              <ChevronDown className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" />
+            </Menu.Button>
 
-          <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    onClick={() => setSortOrder('asc')}
-                    className={`${
-                      active ? 'bg-gray-100' : ''
-                    } block px-4 py-2 text-sm text-gray-900 w-full text-left`}
-                  >
-                    Price: Low to High
-                  </button>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    onClick={() => setSortOrder('desc')}
-                    className={`${
-                      active ? 'bg-gray-100' : ''
-                    } block px-4 py-2 text-sm text-gray-900 w-full text-left`}
-                  >
-                    Price: High to Low
-                  </button>
-                )}
-              </Menu.Item>
-            </div>
-          </Menu.Items>
-        </Menu>
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      onClick={() => setSortOrder('asc')}
+                      className={`${
+                        active ? 'bg-gray-100' : ''
+                      } block px-4 py-2 text-sm text-gray-900 w-full text-left`}
+                    >
+                      Price: Low to High
+                    </button>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      onClick={() => setSortOrder('desc')}
+                      className={`${
+                        active ? 'bg-gray-100' : ''
+                      } block px-4 py-2 text-sm text-gray-900 w-full text-left`}
+                    >
+                      Price: High to Low
+                    </button>
+                  )}
+                </Menu.Item>
+              </div>
+            </Menu.Items>
+          </Menu>
 
-        <button type="button" className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
-          <span className="sr-only">View grid</span>
-          <Grid className="h-5 w-5" />
-        </button>
-        <button
-          type="button"
-          onClick={() => setMobileFiltersOpen(true)}
-          className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
-        >
-          <span className="sr-only">Filters</span>
-          <Filter className="h-5 w-5" />
-        </button>
+          <button type="button" className="p-2 text-gray-400 hover:text-gray-500">
+            <span className="sr-only">View grid</span>
+            <Grid className="h-5 w-5" />
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => setMobileFiltersOpen(true)}
+            className="p-2 text-gray-400 hover:text-gray-500 md:hidden"
+          >
+            <span className="sr-only">Filters</span>
+            <Filter className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
