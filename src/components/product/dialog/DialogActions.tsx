@@ -9,6 +9,7 @@ interface DialogActionsProps {
   productName: string;
   disabled?: boolean;
   variants?: ProductVariant[];
+  relatedProductId?: string; // Add this prop
 }
 
 export function DialogActions({
@@ -18,7 +19,8 @@ export function DialogActions({
   selectedColor,
   productName,
   disabled,
-  variants
+  variants,
+  relatedProductId // Add this prop
 }: DialogActionsProps) {
   return (
     <div className="mt-4">
@@ -30,6 +32,7 @@ export function DialogActions({
         productName={productName}
         disabled={disabled}
         variants={variants}
+        relatedProductId={relatedProductId} // Pass the prop
       />
     </div>
   );

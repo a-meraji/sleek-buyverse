@@ -6,6 +6,7 @@ interface AddToCartParams {
   userId: string | null;
   productId: string;
   onSuccess: () => void;
+  relatedProductId?: string; // Add this parameter
 }
 
 export function useAddToCart() {
@@ -13,10 +14,12 @@ export function useAddToCart() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, productId }: AddToCartParams) => {
+    mutationFn: async ({ userId, productId, relatedProductId }: AddToCartParams) => {
       if (!userId) {
         throw new Error('User not authenticated');
       }
+
+      console.log('Adding to cart with related product:', relatedProductId);
 
       // First check if item already exists in cart
       const { data: existingItem, error: fetchError } = await supabase
@@ -35,7 +38,10 @@ export function useAddToCart() {
         // Update quantity if item exists
         const { error: updateError } = await supabase
           .from('cart_items')
-          .update({ quantity: existingItem.quantity + 1 })
+          .update({ 
+            quantity: existingItem.quantity + 1,
+            related_product_id: relatedProductId // Add the related product ID
+          })
           .eq('id', existingItem.id);
 
         if (updateError) {
@@ -49,7 +55,8 @@ export function useAddToCart() {
           .insert({
             user_id: userId,
             product_id: productId,
-            quantity: 1
+            quantity: 1,
+            related_product_id: relatedProductId // Add the related product ID
           });
 
         if (insertError) {

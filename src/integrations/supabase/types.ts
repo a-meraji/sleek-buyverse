@@ -212,6 +212,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          related_product_id: string | null
           shipping_address: Json | null
           status: string
           total_amount: number
@@ -221,6 +222,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          related_product_id?: string | null
           shipping_address?: Json | null
           status?: string
           total_amount?: number
@@ -230,13 +232,22 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          related_product_id?: string | null
           shipping_address?: Json | null
           status?: string
           total_amount?: number
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_related_product_id_fkey"
+            columns: ["related_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_images: {
         Row: {
