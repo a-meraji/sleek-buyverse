@@ -8,6 +8,7 @@ import { ProductDetails } from "@/components/product/ProductDetails";
 import { ProductImageCarousel } from "@/components/product/ProductImageCarousel";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { RelatedProducts } from "@/components/product/RelatedProducts";
 
 const Product = () => {
   const { id } = useParams();
@@ -180,6 +181,13 @@ const Product = () => {
               </Button>
             </div>
           </div>
+        </div>
+
+        <div className="mt-16">
+          <RelatedProducts 
+            currentProductId={product.id} 
+            category={product.category} 
+          />
         </div>
       </main>
     </div>
