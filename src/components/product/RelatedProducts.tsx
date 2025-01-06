@@ -8,6 +8,11 @@ interface RelatedProductsProps {
   category: string | null;
 }
 
+interface OrderCount {
+  product_id: string;
+  count: number;
+}
+
 export const RelatedProducts = ({ currentProductId, category }: RelatedProductsProps) => {
   const { data: relatedProducts, isLoading: isLoadingRelated } = useQuery({
     queryKey: ['related-products', category, currentProductId],
@@ -43,10 +48,11 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
         .from('order_items')
         .select(`
           product_id,
-          count:count(*)
+          count
         `)
+        .select('product_id, count(*) as count')
         .order('count', { ascending: false })
-        .limit(8);
+        .limit(8) as { data: OrderCount[] | null; error: any };
 
       if (orderError) {
         console.error('Error fetching popular products:', orderError);
