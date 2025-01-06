@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -15,36 +15,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const ORDER_STATUSES = ['pending', 'processing', 'shipped'] as const;
 type OrderStatus = typeof ORDER_STATUSES[number];
 
 export function AdminOrders() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin-orders"],
     queryFn: async () => {
+      console.log('Fetching orders for admin dashboard');
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
-        .select("*");
+        .select("*, user:profiles(*)");
 
-      if (ordersError) throw ordersError;
+      if (ordersError) {
+        console.error('Error fetching orders:', ordersError);
+        throw ordersError;
+      }
 
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) throw userError;
-
-      const ordersWithUser = ordersData.map(order => ({
-        ...order,
-        user: {
-          email: user?.email || 'Unknown User'
-        }
-      }));
-
-      return ordersWithUser;
+      console.log('Fetched orders:', ordersData);
+      return ordersData;
     },
   });
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    console.log('Updating order status:', { orderId, newStatus });
     const { error } = await supabase
       .from('orders')
       .update({ status: newStatus })
@@ -52,6 +51,17 @@ export function AdminOrders() {
 
     if (error) {
       console.error('Error updating order status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update order status",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Order status updated successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
     }
   };
 
@@ -73,7 +83,9 @@ export function AdminOrders() {
           <TableRow key={order.id}>
             <TableCell>{order.id.slice(0, 8)}</TableCell>
             <TableCell>
-              {order.user?.email || 'Unknown User'}
+              {order.user?.first_name 
+                ? `${order.user.first_name} ${order.user.last_name || ''}`
+                : 'Unknown User'}
             </TableCell>
             <TableCell>
               <Select
