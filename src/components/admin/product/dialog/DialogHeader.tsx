@@ -20,13 +20,14 @@ interface DialogHeaderProps {
 export function DialogHeader({ onDelete }: DialogHeaderProps) {
   return (
     <BaseDialogHeader className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-6">
         <DialogTitle>Edit Product</DialogTitle>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button 
               variant="outline" 
-              className="border-red-500 hover:bg-red-500 hover:text-white transition-colors"
+              size="sm"
+              className="border-gray-200 hover:bg-red-500 hover:text-white transition-colors px-2"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
