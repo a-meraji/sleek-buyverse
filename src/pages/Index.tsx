@@ -5,66 +5,61 @@ import HeroBanner from "@/components/home/HeroBanner";
 import { LoadingState } from "@/components/home/LoadingState";
 import { ErrorState } from "@/components/home/ErrorState";
 import { MainContent } from "@/components/home/MainContent";
-import { usePopularProducts } from "@/components/product/related/usePopularProducts";
 import { Product } from "@/types";
 
 const Index = () => {
-  const { data: products, isLoading, error } = useQuery<Product[]>({
+  // Fetch latest products
+  const { data: products, isLoading: productsLoading, error: productsError } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      console.log('Fetching products from Supabase...');
-      try {
-        const { data: productsData, error: productsError } = await supabase
-          .from('products')
-          .select('*')
-          .limit(8)
-          .order('created_at', { ascending: false });
-
-        if (productsError) throw productsError;
-
-        const { data: variantsData, error: variantsError } = await supabase
-          .from('product_variants')
-          .select('*')
-          .in('product_id', productsData.map(p => p.id));
-
-        if (variantsError) throw variantsError;
-
-        const productsWithVariants = productsData.map(product => ({
-          ...product,
-          product_variants: variantsData.filter(v => v.product_id === product.id)
-        }));
-
-        console.log('Products with variants fetched successfully:', productsWithVariants);
-        return productsWithVariants;
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-      }
-    },
-    staleTime: 1000 * 60 * 5,
-    retry: 1,
-  });
-
-  const { data: popularProducts } = usePopularProducts('');
-
-  const { data: popularProductsDetails } = useQuery({
-    queryKey: ['popular-products-details', popularProducts],
-    queryFn: async () => {
-      if (!popularProducts?.length) return [];
-      
-      const { data, error } = await supabase
+      console.log('Fetching latest products...');
+      const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select('*, product_variants(*)')
-        .in('id', popularProducts.map(p => p.product_id));
+        .limit(8)
+        .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (productsError) throw productsError;
+      console.log('Latest products fetched:', productsData);
+      return productsData;
     },
-    enabled: !!popularProducts?.length,
   });
 
+  // Fetch popular products
+  const { data: popularProducts, isLoading: popularLoading } = useQuery({
+    queryKey: ['popular-products-home'],
+    queryFn: async () => {
+      console.log('Fetching popular products...');
+      
+      // First get popular product IDs
+      const { data: popularIds, error: popularError } = await supabase
+        .rpc('get_popular_products')
+        .limit(8);
+
+      if (popularError) throw popularError;
+      
+      if (!popularIds?.length) {
+        console.log('No popular products found');
+        return [];
+      }
+
+      // Then fetch the full product details
+      const { data: popularProductsData, error: productsError } = await supabase
+        .from('products')
+        .select('*, product_variants(*)')
+        .in('id', popularIds.map(p => p.product_id));
+
+      if (productsError) throw productsError;
+      
+      console.log('Popular products fetched:', popularProductsData);
+      return popularProductsData;
+    },
+  });
+
+  const isLoading = productsLoading || popularLoading;
+  
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState />;
+  if (productsError) return <ErrorState />;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -73,7 +68,7 @@ const Index = () => {
         <HeroBanner />
         <MainContent 
           products={products || []} 
-          popularProducts={popularProductsDetails || []}
+          popularProducts={popularProducts || []}
         />
       </main>
     </div>

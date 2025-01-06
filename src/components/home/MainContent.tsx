@@ -12,6 +12,8 @@ interface MainContentProps {
 export const MainContent = ({ products, popularProducts }: MainContentProps) => {
   if (!products?.length) return null;
 
+  console.log('MainContent rendering with popularProducts:', popularProducts);
+
   return (
     <>
       <ProductCarousel title="New Arrivals" products={products} />
