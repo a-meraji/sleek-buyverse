@@ -20,6 +20,13 @@ export function TimeRangeControls({
   onCustomDateRangeChange,
   onClearCustomDateRange,
 }: TimeRangeControlsProps) {
+  const clearDate = (type: 'from' | 'to') => {
+    onCustomDateRangeChange({
+      ...customDateRange,
+      [type]: undefined,
+    });
+  };
+
   return (
     <div className="flex justify-end mb-4 gap-4">
       <Select 
@@ -40,61 +47,93 @@ export function TimeRangeControls({
       </Select>
 
       <div className="flex items-center gap-2">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={`justify-start text-left font-normal ${
-                !customDateRange.from && "text-muted-foreground"
-              }`}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {customDateRange.from ? (
-                customDateRange.to ? (
-                  <>
-                    {format(customDateRange.from, "LLL dd, y")} -{" "}
-                    {format(customDateRange.to, "LLL dd, y")}
-                  </>
+        <div className="relative flex items-center">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={`w-[130px] pl-2 pr-8 justify-start text-left font-normal ${
+                  !customDateRange.from && "text-muted-foreground"
+                }`}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {customDateRange.from ? (
+                  format(customDateRange.from, "PP")
                 ) : (
-                  format(customDateRange.from, "LLL dd, y")
-                )
-              ) : (
-                <span>Custom date range</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent 
-            className="w-auto p-0" 
-            align="end"
-          >
-            <Calendar
-              initialFocus
-              mode="range"
-              defaultMonth={customDateRange.from}
-              selected={{
-                from: customDateRange.from,
-                to: customDateRange.to,
-              }}
-              onSelect={(range) => {
-                if (range?.from && range?.to) {
-                  onCustomDateRangeChange(range);
+                  "From"
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={customDateRange.from}
+                onSelect={(date) =>
+                  onCustomDateRangeChange({
+                    ...customDateRange,
+                    from: date,
+                  })
                 }
-              }}
-              numberOfMonths={2}
-              className="rounded-md border bg-white dark:bg-gray-800"
-            />
-          </PopoverContent>
-        </Popover>
+                initialFocus
+                className="rounded-md border bg-white dark:bg-gray-800"
+              />
+            </PopoverContent>
+          </Popover>
+          {customDateRange.from && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-1 h-8 w-8 p-0"
+              onClick={() => clearDate('from')}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
 
-        {(customDateRange.from || customDateRange.to) && (
-          <Button
-            variant="ghost"
-            className="h-8 w-8 p-0"
-            onClick={onClearCustomDateRange}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
+        <div className="relative flex items-center">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={`w-[130px] pl-2 pr-8 justify-start text-left font-normal ${
+                  !customDateRange.to && "text-muted-foreground"
+                }`}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {customDateRange.to ? (
+                  format(customDateRange.to, "PP")
+                ) : (
+                  "To"
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={customDateRange.to}
+                onSelect={(date) =>
+                  onCustomDateRangeChange({
+                    ...customDateRange,
+                    to: date,
+                  })
+                }
+                initialFocus
+                className="rounded-md border bg-white dark:bg-gray-800"
+              />
+            </PopoverContent>
+          </Popover>
+          {customDateRange.to && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-1 h-8 w-8 p-0"
+              onClick={() => clearDate('to')}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
