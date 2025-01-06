@@ -34,7 +34,7 @@ export function EditProductContent({
   console.log('Current form data:', formData);
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-6">
       <ProductDetailsFields
         name={formData.name}
         description={formData.description ?? ""}
@@ -66,7 +66,7 @@ export function EditProductContent({
         onRemoveImage={onRemoveImage}
       />
 
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-4 pt-6">
         <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>

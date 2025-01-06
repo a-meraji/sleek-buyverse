@@ -23,9 +23,6 @@ export function ProductTableRow({
   expandedProductId,
   onExpand
 }: ProductTableRowProps) {
-  const minPrice = variants.length 
-    ? Math.min(...variants.map(v => v.price))
-    : 0;
   const totalStock = variants.reduce((sum, variant) => sum + variant.stock, 0);
   const isExpanded = expandedProductId === product.id;
   const hasValidDiscount = typeof product.discount === 'number' && product.discount > 0 && product.discount <= 100;
@@ -52,7 +49,6 @@ export function ProductTableRow({
       </TableCell>
       <TableCell>{product.name}</TableCell>
       <TableCell>{product.sku}</TableCell>
-      <TableCell>${minPrice.toFixed(2)}</TableCell>
       <TableCell>{product.category}</TableCell>
       <ProductVariantsCell
         variants={variants}
