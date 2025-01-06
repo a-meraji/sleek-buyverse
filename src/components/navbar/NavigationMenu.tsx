@@ -34,8 +34,17 @@ export const NavigationMenu = () => {
           <Link to="/about" className="p-2 hover:bg-accent rounded-md">
             About
           </Link>
-          <Link to="/about" className="p-2 hover:bg-accent rounded-md">
-            Admin Dashboard
+          <Link to="/faq" className="p-2 hover:bg-accent rounded-md">
+            FAQ
+          </Link>
+          <Link to="/contact-us" className="p-2 hover:bg-accent rounded-md">
+            Contact Us
+          </Link>
+          <Link to="/shipping-policy" className="p-2 hover:bg-accent rounded-md">
+            Shipping Policy
+          </Link>
+          <Link to="/returns-exchanges" className="p-2 hover:bg-accent rounded-md">
+            Returns & Exchanges
           </Link>
         </div>
       </SheetContent>
