@@ -1,41 +1,54 @@
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/home/Footer";
+import { Container } from "@/components/ui/container";
 
 const ShippingPolicy = () => {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Shipping Policy</h1>
-        <div className="prose prose-lg max-w-none">
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Shipping Methods</h2>
-            <ul className="list-disc pl-6 space-y-2">
+    <Container>
+      <div className="py-16 sm:py-24">
+        <div className="mx-auto max-w-2xl">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Shipping Policy</h1>
+          <div className="mt-6 space-y-6 text-gray-600">
+            <p>
+              We offer reliable shipping services to ensure your products reach you safely and on time.
+              Below you'll find detailed information about our shipping policies and procedures.
+            </p>
+            
+            <h2 className="text-2xl font-semibold text-gray-900">Processing Time</h2>
+            <p>
+              Orders are typically processed within 1-2 business days after payment confirmation.
+              During peak seasons or promotional periods, processing time may be extended.
+            </p>
+            
+            <h2 className="text-2xl font-semibold text-gray-900">Shipping Methods</h2>
+            <p>
+              We offer various shipping options to meet your needs:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
               <li>Standard Shipping (5-7 business days)</li>
               <li>Express Shipping (2-3 business days)</li>
-              <li>Next Day Delivery (order before 2 PM)</li>
+              <li>Next Day Delivery (where available)</li>
             </ul>
-          </section>
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Shipping Rates</h2>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Free shipping on orders over $50</li>
-              <li>Standard Shipping: $5.99</li>
-              <li>Express Shipping: $12.99</li>
-              <li>Next Day Delivery: $24.99</li>
-            </ul>
-          </section>
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">International Shipping</h2>
+            
+            <h2 className="text-2xl font-semibold text-gray-900">Shipping Costs</h2>
             <p>
-              We currently ship to select international destinations. Shipping rates and
-              delivery times vary by location.
+              Shipping costs are calculated based on your location, selected shipping method,
+              and order weight. The exact cost will be displayed at checkout before payment.
             </p>
-          </section>
+            
+            <h2 className="text-2xl font-semibold text-gray-900">International Shipping</h2>
+            <p>
+              We ship internationally to select countries. International orders may be subject
+              to import duties and taxes, which are the responsibility of the recipient.
+            </p>
+            
+            <h2 className="text-2xl font-semibold text-gray-900">Order Tracking</h2>
+            <p>
+              Once your order ships, you'll receive a tracking number via email to monitor
+              your package's journey to you.
+            </p>
+          </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </Container>
   );
 };
 
