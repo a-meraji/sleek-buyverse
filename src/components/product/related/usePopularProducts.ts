@@ -7,7 +7,7 @@ export const usePopularProducts = (currentProductId: string) => {
     queryFn: async () => {
       console.log('Fetching popular products');
       
-      // Get popular product IDs using the database function
+      // Get popular product IDs using the updated database function
       const { data: popularProducts, error: popularError } = await supabase
         .rpc('get_popular_products')
         .limit(8);

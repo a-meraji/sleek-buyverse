@@ -174,6 +174,7 @@ export type Database = {
           price_at_time: number
           product_id: string | null
           quantity: number
+          variant_id: string | null
         }
         Insert: {
           created_at?: string
@@ -182,6 +183,7 @@ export type Database = {
           price_at_time: number
           product_id?: string | null
           quantity?: number
+          variant_id?: string | null
         }
         Update: {
           created_at?: string
@@ -190,6 +192,7 @@ export type Database = {
           price_at_time?: number
           product_id?: string | null
           quantity?: number
+          variant_id?: string | null
         }
         Relationships: [
           {
@@ -206,13 +209,19 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       orders: {
         Row: {
           created_at: string
           id: string
-          related_product_id: string | null
           shipping_address: Json | null
           status: string
           total_amount: number
@@ -222,7 +231,6 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          related_product_id?: string | null
           shipping_address?: Json | null
           status?: string
           total_amount?: number
@@ -232,22 +240,13 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          related_product_id?: string | null
           shipping_address?: Json | null
           status?: string
           total_amount?: number
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "orders_related_product_id_fkey"
-            columns: ["related_product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       product_images: {
         Row: {

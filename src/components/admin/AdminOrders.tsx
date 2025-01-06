@@ -7,25 +7,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+
+const ORDER_STATUSES = ['pending', 'processing', 'shipped'] as const;
+type OrderStatus = typeof ORDER_STATUSES[number];
 
 export function AdminOrders() {
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin-orders"],
     queryFn: async () => {
-      // First get orders
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
         .select("*");
 
       if (ordersError) throw ordersError;
 
-      // Get current user data
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError) throw userError;
 
-      // For now, just return orders with the current user's email
       const ordersWithUser = ordersData.map(order => ({
         ...order,
         user: {
@@ -36,6 +43,17 @@ export function AdminOrders() {
       return ordersWithUser;
     },
   });
+
+  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating order status:', error);
+    }
+  };
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -57,7 +75,23 @@ export function AdminOrders() {
             <TableCell>
               {order.user?.email || 'Unknown User'}
             </TableCell>
-            <TableCell className="capitalize">{order.status}</TableCell>
+            <TableCell>
+              <Select
+                defaultValue={order.status}
+                onValueChange={(value) => handleStatusChange(order.id, value as OrderStatus)}
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ORDER_STATUSES.map((status) => (
+                    <SelectItem key={status} value={status} className="capitalize">
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </TableCell>
             <TableCell>${order.total_amount}</TableCell>
             <TableCell>
               {new Date(order.created_at).toLocaleDateString()}
