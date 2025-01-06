@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { ReviewDialog } from "./ReviewDialog";
+import { Star } from "lucide-react";
 
 interface OrdersListProps {
   orders: any[];
@@ -118,10 +119,18 @@ const OrderItemDetails = ({ item }: { item: any }) => {
           <Button
             variant="outline"
             size="sm"
-            className="mt-2"
+            className="mt-2 flex flex-col items-center gap-1"
             onClick={() => setIsReviewDialogOpen(true)}
           >
-            Write a Review
+            <span>Rate this product</span>
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className="w-4 h-4 text-gray-300"
+                />
+              ))}
+            </div>
           </Button>
         </div>
       </div>
@@ -132,7 +141,7 @@ const OrderItemDetails = ({ item }: { item: any }) => {
           onClose={() => setIsReviewDialogOpen(false)}
           productId={item.product.id}
           defaultValues={{
-            reviewer_first_name: "",  // These will be populated from the profile data
+            reviewer_first_name: "",
             reviewer_last_name: "",
           }}
         />
