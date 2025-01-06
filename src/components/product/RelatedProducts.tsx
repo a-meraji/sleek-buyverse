@@ -41,8 +41,10 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       // Get the product IDs ordered by frequency
       const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
-        .select('product_id, count(*)')
-        .group('product_id')
+        .select(`
+          product_id,
+          count:count(*)
+        `)
         .order('count', { ascending: false })
         .limit(8);
 
