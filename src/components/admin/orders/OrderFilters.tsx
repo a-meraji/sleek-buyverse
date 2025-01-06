@@ -14,9 +14,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Search } from "lucide-react";
 import { format } from "date-fns";
 import { OrderStatus } from "./OrderStatusSelect";
+import { useState } from "react";
 
 interface OrderFiltersProps {
   filters: {
@@ -31,19 +32,41 @@ interface OrderFiltersProps {
 }
 
 export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
+  const [searchInput, setSearchInput] = useState(filters.search);
+
+  const handleSearch = () => {
+    onFiltersChange({ ...filters, search: searchInput });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="space-y-4 mb-4">
       <div className="flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
           <Label htmlFor="search">Search</Label>
-          <Input
-            id="search"
-            placeholder="Search by Order ID or Customer name"
-            value={filters.search}
-            onChange={(e) =>
-              onFiltersChange({ ...filters, search: e.target.value })
-            }
-          />
+          <div className="relative">
+            <Input
+              id="search"
+              placeholder="Search by Order ID or Customer name"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="pr-10"
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+              onClick={handleSearch}
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <div className="w-[200px]">
           <Label>Status</Label>
