@@ -5,7 +5,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Package, MapPin, Truck, Calendar } from "lucide-react";
 import { OrderStatus } from "./OrderStatusSelect";
 
@@ -15,7 +14,7 @@ interface OrderDetailsDialogProps {
     status: OrderStatus;
     total_amount: number;
     created_at: string;
-    shipping_address: any;
+    shipping_address?: any;
     order_items?: Array<{
       id: string;
       product: {
@@ -35,13 +34,14 @@ interface OrderDetailsDialogProps {
       phone?: string;
     } | null;
   };
+  children: React.ReactNode;
 }
 
-export function OrderDetailsDialog({ order }: OrderDetailsDialogProps) {
+export function OrderDetailsDialog({ order, children }: OrderDetailsDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">View Details</Button>
+        {children}
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
