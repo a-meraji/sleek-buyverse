@@ -57,7 +57,20 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
 
       if (!orderCounts?.length) {
         console.log('No order counts found');
-        return [];
+        // If no popular products found, fetch some random products instead
+        const { data: randomProducts, error: productsError } = await supabase
+          .from('products')
+          .select('*, product_variants(*)')
+          .neq('id', currentProductId)
+          .limit(8);
+
+        if (productsError) {
+          console.error('Error fetching random products:', productsError);
+          throw productsError;
+        }
+
+        console.log('Random products fetched as fallback:', randomProducts);
+        return randomProducts;
       }
 
       // Get the actual product details
@@ -65,7 +78,8 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       const { data: products, error: productsError } = await supabase
         .from('products')
         .select('*, product_variants(*)')
-        .in('id', productIds);
+        .in('id', productIds)
+        .neq('id', currentProductId);
 
       if (productsError) {
         console.error('Error fetching product details:', productsError);
@@ -89,7 +103,7 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
     );
   }
 
-  // If no related products but we have popular products, show those instead
+  // If no related products but we have popular/random products, show those instead
   if (popularProducts && popularProducts.length > 0) {
     return (
       <ProductCarousel
