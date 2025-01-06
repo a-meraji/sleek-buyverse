@@ -6,7 +6,7 @@ interface AddToCartParams {
   userId: string | null;
   productId: string;
   onSuccess: () => void;
-  relatedProductId?: string; // Add this parameter
+  relatedProductId?: string;
 }
 
 export function useAddToCart() {
@@ -40,7 +40,7 @@ export function useAddToCart() {
           .from('cart_items')
           .update({ 
             quantity: existingItem.quantity + 1,
-            related_product_id: relatedProductId // Add the related product ID
+            related_product_id: relatedProductId
           })
           .eq('id', existingItem.id);
 
@@ -48,6 +48,11 @@ export function useAddToCart() {
           console.error('Error updating cart:', updateError);
           throw updateError;
         }
+
+        toast({
+          title: "Cart Updated",
+          description: "Item quantity has been increased in your cart",
+        });
       } else {
         // Insert new item if it doesn't exist
         const { error: insertError } = await supabase
@@ -56,13 +61,18 @@ export function useAddToCart() {
             user_id: userId,
             product_id: productId,
             quantity: 1,
-            related_product_id: relatedProductId // Add the related product ID
+            related_product_id: relatedProductId
           });
 
         if (insertError) {
           console.error('Error inserting to cart:', insertError);
           throw insertError;
         }
+
+        toast({
+          title: "Added to Cart",
+          description: "Item has been added to your cart",
+        });
       }
     },
     onSuccess: (_, { onSuccess }) => {
