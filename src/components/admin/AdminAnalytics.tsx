@@ -178,7 +178,7 @@ export function AdminAnalytics() {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
+            <PopoverContent className="w-auto p-0 bg-background border" align="end">
               <Calendar
                 initialFocus
                 mode="range"
