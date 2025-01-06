@@ -94,7 +94,7 @@ export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-[130px] justify-start text-left font-normal ${
+                  className={`w-[130px] justify-start text-left font-normal bg-white ${
                     !filters.dateRange.from && "text-muted-foreground"
                   }`}
                 >
@@ -124,7 +124,7 @@ export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-[130px] justify-start text-left font-normal ${
+                  className={`w-[130px] justify-start text-left font-normal bg-white ${
                     !filters.dateRange.to && "text-muted-foreground"
                   }`}
                 >
