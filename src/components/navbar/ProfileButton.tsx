@@ -61,14 +61,25 @@ export function ProfileButton({ user, setUser }: ProfileButtonProps) {
           <User className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/profile')}>
+      <DropdownMenuContent 
+        align="end"
+        className="bg-white dark:bg-gray-800 border shadow-lg z-50"
+      >
+        <DropdownMenuLabel className="text-gray-900 dark:text-gray-100">
+          {user.email}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+        <DropdownMenuItem 
+          onClick={() => navigate('/profile')}
+          className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+        >
           Profile Settings
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+        <DropdownMenuItem 
+          onClick={handleSignOut}
+          className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+        >
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out
         </DropdownMenuItem>
