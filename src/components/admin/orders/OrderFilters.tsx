@@ -61,7 +61,7 @@ export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
             <Button
               size="icon"
               variant="ghost"
-              className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+              className="absolute right-0 top-0 h-full px-3 bg-gray-100 hover:bg-gray-200 transition-colors rounded-l-none"
               onClick={handleSearch}
             >
               <Search className="h-4 w-4" />
