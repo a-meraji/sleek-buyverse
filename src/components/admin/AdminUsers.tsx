@@ -20,6 +20,19 @@ type AdminUser = {
   phone: string | null;
 };
 
+type ProfileData = {
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+}
+
+type AdminUserResponse = {
+  id: string;
+  role: string | null;
+  created_at: string;
+  profiles: ProfileData | null;
+}
+
 export function AdminUsers() {
   const { data: adminUsers, isLoading } = useQuery({
     queryKey: ["admin-users"],
@@ -31,7 +44,7 @@ export function AdminUsers() {
           id,
           role,
           created_at,
-          profiles (
+          profiles:id (
             first_name,
             last_name,
             phone
@@ -52,7 +65,7 @@ export function AdminUsers() {
       }
 
       // Map and combine the data
-      const enrichedUsers = users.map((user) => {
+      const enrichedUsers = (users as AdminUserResponse[]).map((user) => {
         const authUser = authData.users.find((u) => u.id === user.id);
         return {
           ...user,
