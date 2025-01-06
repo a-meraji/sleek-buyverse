@@ -10,7 +10,7 @@ interface AddToCartButtonProps {
   productName: string;
   disabled?: boolean;
   variants?: ProductVariant[];
-  relatedProductId?: string; // Add this prop
+  relatedProductId?: string;
 }
 
 export function AddToCartButton({
@@ -21,16 +21,29 @@ export function AddToCartButton({
   productName,
   disabled,
   variants,
-  relatedProductId // Add this prop
+  relatedProductId
 }: AddToCartButtonProps) {
   const addToCart = useAddToCart();
 
   const handleAddToCart = () => {
-    console.log('Adding to cart with related product:', relatedProductId);
+    // Find the selected variant
+    const selectedVariant = variants?.find(
+      v => v.size === selectedSize && v.color === selectedColor
+    );
+
+    console.log('Adding to cart:', {
+      productId,
+      variantId: selectedVariant?.id,
+      selectedSize,
+      selectedColor,
+      relatedProductId
+    });
+
     addToCart.mutate({
       userId,
       productId,
-      relatedProductId, // Pass the related product ID
+      variantId: selectedVariant?.id,
+      relatedProductId,
       onSuccess: () => {
         console.log('Successfully added to cart');
       }

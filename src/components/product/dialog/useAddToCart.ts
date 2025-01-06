@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 interface AddToCartParams {
   userId: string | null;
   productId: string;
+  variantId?: string;
   onSuccess: () => void;
   relatedProductId?: string;
 }
@@ -14,18 +15,19 @@ export function useAddToCart() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, productId, relatedProductId }: AddToCartParams) => {
+    mutationFn: async ({ userId, productId, variantId, relatedProductId }: AddToCartParams) => {
       if (!userId) {
         throw new Error('User not authenticated');
       }
 
-      console.log('Adding to cart with related product:', relatedProductId);
+      console.log('Adding to cart:', { userId, productId, variantId, relatedProductId });
 
-      // First check if item already exists in cart
+      // First check if item with same variant already exists in cart
       const { data: existingItem, error: fetchError } = await supabase
         .from('cart_items')
         .select('*')
         .eq('product_id', productId)
+        .eq('variant_id', variantId)
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -35,7 +37,7 @@ export function useAddToCart() {
       }
 
       if (existingItem) {
-        // Update quantity if item exists
+        // Update quantity if item with same variant exists
         const { error: updateError } = await supabase
           .from('cart_items')
           .update({ 
@@ -54,12 +56,13 @@ export function useAddToCart() {
           description: "Item quantity has been increased in your cart",
         });
       } else {
-        // Insert new item if it doesn't exist
+        // Insert new item if it doesn't exist or has different variant
         const { error: insertError } = await supabase
           .from('cart_items')
           .insert({
             user_id: userId,
             product_id: productId,
+            variant_id: variantId,
             quantity: 1,
             related_product_id: relatedProductId
           });
