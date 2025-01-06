@@ -28,17 +28,38 @@ export function AdminOrders() {
     queryKey: ["admin-orders"],
     queryFn: async () => {
       console.log('Fetching orders for admin dashboard');
+      
+      // First, fetch orders
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
-        .select("*, user:profiles(*)");
+        .select("*")
+        .order('created_at', { ascending: false });
 
       if (ordersError) {
         console.error('Error fetching orders:', ordersError);
         throw ordersError;
       }
 
-      console.log('Fetched orders:', ordersData);
-      return ordersData;
+      // Then, for each order, fetch the user profile
+      const ordersWithProfiles = await Promise.all(
+        ordersData.map(async (order) => {
+          if (!order.user_id) return { ...order, user: null };
+
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", order.user_id)
+            .single();
+
+          return {
+            ...order,
+            user: profileData
+          };
+        })
+      );
+
+      console.log('Fetched orders with profiles:', ordersWithProfiles);
+      return ordersWithProfiles;
     },
   });
 
