@@ -14,9 +14,9 @@ export const OrderItemDetails = ({ item, showRateButton }: OrderItemDetailsProps
   if (!item.product) {
     console.log('Missing product data for order item:', item);
     return (
-      <div className="flex items-center justify-between border-b pb-4">
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-gray-200 rounded" />
+      <div className="flex items-center justify-between border-b pb-6 px-4">
+        <div className="flex items-center space-x-6">
+          <div className="w-20 h-20 bg-gray-200 rounded-lg" />
           <div>
             <p className="font-medium text-gray-500">Product not available</p>
             <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
@@ -28,26 +28,19 @@ export const OrderItemDetails = ({ item, showRateButton }: OrderItemDetailsProps
   }
 
   return (
-    <div className="flex items-center justify-between border-b pb-4">
-      <div className="flex items-center space-x-4">
-        <img
-          src={item.product.image_url}
-          alt={item.product.name}
-          className="w-16 h-16 object-cover rounded"
-        />
-        <div>
-          <p className="font-medium">{item.product.name}</p>
-          {item.variant && (
-            <p className="text-sm text-gray-500">
-              Size: {item.variant.size}, Color: {item.variant.color}
-            </p>
-          )}
-          <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+    <div className="flex items-start justify-between border-b pb-6 px-4 hover:bg-gray-50/50 transition-colors">
+      <div className="flex space-x-6">
+        <div className="relative">
+          <img
+            src={item.product.image_url}
+            alt={item.product.name}
+            className="w-20 h-20 object-cover rounded-lg shadow-sm"
+          />
           {showRateButton && (
             <Button
               variant="outline"
               size="sm"
-              className="mt-2 px-4 py-2 h-auto flex flex-col items-center gap-1"
+              className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 h-auto flex flex-col items-center gap-0.5 bg-white shadow-sm border-gray-200"
               onClick={() => setIsReviewDialogOpen(true)}
             >
               <div className="flex gap-0.5">
@@ -62,9 +55,18 @@ export const OrderItemDetails = ({ item, showRateButton }: OrderItemDetailsProps
             </Button>
           )}
         </div>
+        <div className="space-y-1">
+          <p className="font-medium text-gray-900">{item.product.name}</p>
+          {item.variant && (
+            <p className="text-sm text-gray-600">
+              Size: {item.variant.size}, Color: {item.variant.color}
+            </p>
+          )}
+          <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+        </div>
       </div>
-      <div>
-        <p className="font-medium">${item.price_at_time}</p>
+      <div className="text-right">
+        <p className="font-medium text-gray-900">${item.price_at_time}</p>
         <ReviewDialog
           isOpen={isReviewDialogOpen}
           onClose={() => setIsReviewDialogOpen(false)}
