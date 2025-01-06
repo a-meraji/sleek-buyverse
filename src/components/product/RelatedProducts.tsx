@@ -10,7 +10,7 @@ interface RelatedProductsProps {
 
 interface OrderCount {
   product_id: string;
-  count: number;
+  count: bigint;
 }
 
 export const RelatedProducts = ({ currentProductId, category }: RelatedProductsProps) => {
@@ -43,16 +43,14 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
     queryFn: async () => {
       console.log('Fetching popular products');
       
-      // Get the product IDs ordered by frequency
+      // Get the most ordered products
       const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
-        .select(`
-          product_id,
-          count
-        `)
-        .select('product_id, count(*) as count')
+        .select('product_id, count')
+        .select('product_id, count(*)')
+        .group('product_id')
         .order('count', { ascending: false })
-        .limit(8) as { data: OrderCount[] | null; error: any };
+        .limit(8);
 
       if (orderError) {
         console.error('Error fetching popular products:', orderError);
