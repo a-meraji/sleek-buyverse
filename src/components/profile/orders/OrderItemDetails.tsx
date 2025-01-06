@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import { ReviewDialog } from "../ReviewDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OrderItemDetailsProps {
   item: any;
@@ -10,6 +11,39 @@ interface OrderItemDetailsProps {
 
 export const OrderItemDetails = ({ item, showRateButton }: OrderItemDetailsProps) => {
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
+
+  useEffect(() => {
+    const checkUserReview = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id || !item.product?.id) return;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!profile) return;
+
+        const { data: reviews } = await supabase
+          .from('reviews')
+          .select('*')
+          .eq('product_id', item.product.id)
+          .eq('reviewer_first_name', profile.first_name)
+          .eq('reviewer_last_name', profile.last_name);
+
+        setHasReviewed(reviews && reviews.length > 0);
+      } catch (error) {
+        console.error('Error checking user review:', error);
+      }
+    };
+
+    if (showRateButton && item.product?.id) {
+      checkUserReview();
+    }
+  }, [showRateButton, item.product?.id]);
 
   if (!item.product) {
     console.log('Missing product data for order item:', item);
@@ -36,7 +70,7 @@ export const OrderItemDetails = ({ item, showRateButton }: OrderItemDetailsProps
             alt={item.product.name}
             className="w-20 h-20 object-cover rounded-lg shadow-sm"
           />
-          {showRateButton && (
+          {showRateButton && !hasReviewed && (
             <Button
               variant="outline"
               size="sm"
