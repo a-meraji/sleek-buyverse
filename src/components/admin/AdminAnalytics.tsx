@@ -1,23 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
-} from "recharts";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { StatsCards } from "./analytics/StatsCards";
+import { RevenueChart } from "./analytics/RevenueChart";
+import { UserSignupsChart } from "./analytics/UserSignupsChart";
+import { TrafficChart } from "./analytics/TrafficChart";
 
 export function AdminAnalytics() {
   const [timeRange, setTimeRange] = useState("7"); // Default to 7 days
@@ -79,6 +67,27 @@ export function AdminAnalytics() {
         return acc;
       }, []) || [];
 
+      // Get site visits within date range
+      const { data: siteVisits } = await supabase
+        .from("site_visits")
+        .select("visited_at")
+        .gte("visited_at", startDate.toISOString())
+        .lte("visited_at", endDate.toISOString())
+        .order("visited_at", { ascending: true });
+
+      // Get daily site visits
+      const dailyVisits = siteVisits?.reduce((acc: any[], visit) => {
+        const date = new Date(visit.visited_at).toLocaleDateString();
+        const existingDay = acc.find(day => day.date === date);
+        
+        if (existingDay) {
+          existingDay.visits += 1;
+        } else {
+          acc.push({ date, visits: 1 });
+        }
+        return acc;
+      }, []) || [];
+
       // Get total counts
       const { count: productsCount } = await supabase
         .from("products")
@@ -93,7 +102,8 @@ export function AdminAnalytics() {
         totalProducts: productsCount,
         totalUsers: usersCount,
         dailyRevenue,
-        dailySignups
+        dailySignups,
+        dailyVisits
       });
 
       return {
@@ -101,7 +111,8 @@ export function AdminAnalytics() {
         totalProducts: productsCount || 0,
         totalUsers: usersCount || 0,
         dailyRevenue,
-        dailySignups
+        dailySignups,
+        dailyVisits
       };
     },
   });
@@ -123,76 +134,15 @@ export function AdminAnalytics() {
         </Select>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">${stats?.totalRevenue.toFixed(2)}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{stats?.totalProducts}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Users</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{stats?.totalUsers}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <StatsCards 
+        totalRevenue={stats?.totalRevenue || 0}
+        totalProducts={stats?.totalProducts || 0}
+        totalUsers={stats?.totalUsers || 0}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Revenue Over Time</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={stats?.dailyRevenue}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Line 
-                type="monotone" 
-                dataKey="revenue" 
-                stroke="#8884d8" 
-                name="Revenue ($)"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>New Users Over Time</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={stats?.dailySignups}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Line 
-                type="monotone" 
-                dataKey="users" 
-                stroke="#82ca9d" 
-                name="New Users"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <RevenueChart data={stats?.dailyRevenue || []} />
+      <UserSignupsChart data={stats?.dailySignups || []} />
+      <TrafficChart data={stats?.dailyVisits || []} />
     </div>
   );
 }
