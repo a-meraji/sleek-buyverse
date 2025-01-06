@@ -46,11 +46,10 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       // Get the most ordered products
       const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
-        .select('product_id, count')
         .select('product_id, count(*)')
-        .group('product_id')
+        .groupBy('product_id')
         .order('count', { ascending: false })
-        .limit(8);
+        .limit(8) as { data: OrderCount[] | null; error: any };
 
       if (orderError) {
         console.error('Error fetching popular products:', orderError);
