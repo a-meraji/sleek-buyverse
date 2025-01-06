@@ -50,8 +50,25 @@ const Index = () => {
     retry: 1,
   });
 
-  // Fetch popular products
-  const { data: popularProducts } = usePopularProducts('');
+  // Fetch popular products with proper error handling
+  const { data: popularProducts, isLoading: isLoadingPopular } = usePopularProducts('');
+
+  // Get the full product details for popular products
+  const { data: popularProductsDetails } = useQuery({
+    queryKey: ['popular-products-details', popularProducts],
+    queryFn: async () => {
+      if (!popularProducts?.length) return [];
+      
+      const { data, error } = await supabase
+        .from('products')
+        .select('*, product_variants(*)')
+        .in('id', popularProducts.map(p => p.product_id));
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!popularProducts?.length,
+  });
 
   if (isLoading) {
     return (
@@ -97,14 +114,16 @@ const Index = () => {
       <Navbar />
       <main className="flex-1">
         <HeroBanner />
-        {products && products.length > 0 ? (
+        {products && products.length > 0 && (
           <>
             <ProductCarousel title="New Arrivals" products={products} />
             <StyleShowcase />
-            <ProductCarousel 
-              title="Popular Products" 
-              products={popularProducts || []} 
-            />
+            {popularProductsDetails && popularProductsDetails.length > 0 && (
+              <ProductCarousel 
+                title="Popular Products" 
+                products={popularProductsDetails} 
+              />
+            )}
             <ReviewsScroll />
             <div className="py-16 px-6 text-center">
               <Link to="/products">
@@ -115,10 +134,6 @@ const Index = () => {
               </Link>
             </div>
           </>
-        ) : (
-          <div className="container mx-auto px-4 py-8 text-center">
-            <p className="text-muted-foreground">No products available</p>
-          </div>
         )}
       </main>
     </div>
