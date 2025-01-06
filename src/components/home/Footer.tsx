@@ -20,17 +20,17 @@ export function Footer() {
             <h3 className="font-bold text-lg">Customer Service</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/contact" className="hover:text-[#1d8757] transition-colors">
+                <Link to="/contact-us" className="hover:text-[#1d8757] transition-colors">
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link to="/shipping" className="hover:text-[#1d8757] transition-colors">
+                <Link to="/shipping-policy" className="hover:text-[#1d8757] transition-colors">
                   Shipping Policy
                 </Link>
               </li>
               <li>
-                <Link to="/returns" className="hover:text-[#1d8757] transition-colors">
+                <Link to="/returns-exchanges" className="hover:text-[#1d8757] transition-colors">
                   Returns & Exchanges
                 </Link>
               </li>
@@ -44,10 +44,26 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="font-bold text-lg">Quick Links</h3>
             <ul className="space-y-2 text-sm">
-              <li>New Arrivals</li>
-              <li>Popular Products</li>
-              <li>Special Offers</li>
-              <li>Gift Cards</li>
+              <li>
+                <Link to="/products?sort=newest" className="hover:text-[#1d8757] transition-colors">
+                  New Arrivals
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?sort=popular" className="hover:text-[#1d8757] transition-colors">
+                  Popular Products
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?discount=true" className="hover:text-[#1d8757] transition-colors">
+                  Special Offers
+                </Link>
+              </li>
+              <li>
+                <Link to="/gift-cards" className="hover:text-[#1d8757] transition-colors">
+                  Gift Cards
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="space-y-4">
