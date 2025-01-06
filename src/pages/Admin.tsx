@@ -7,13 +7,28 @@ import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { AdminReviews } from "@/components/admin/AdminReviews";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Admin() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: adminStatus, isLoading } = useAdmin();
+
+  const { data: pendingReviewsCount } = useQuery({
+    queryKey: ["pending-reviews-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("reviews")
+        .select("*", { count: 'exact', head: true })
+        .eq("status", "pending");
+
+      if (error) throw error;
+      return count || 0;
+    },
+  });
 
   useEffect(() => {
     if (!isLoading && !adminStatus?.isAdmin) {
@@ -48,7 +63,12 @@ export default function Admin() {
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="reviews">Reviews</TabsTrigger>
+          <TabsTrigger value="reviews" className="relative">
+            Reviews
+            {pendingReviewsCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-blue-500" />
+            )}
+          </TabsTrigger>
           <TabsTrigger value="chat">Chat</TabsTrigger>
         </TabsList>
         <TabsContent value="analytics" className="space-y-4">

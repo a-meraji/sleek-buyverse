@@ -6,6 +6,17 @@ import { Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ReviewsTableProps {
   reviews: (Review & {
@@ -18,6 +29,7 @@ interface ReviewsTableProps {
 export function ReviewsTable({ reviews }: ReviewsTableProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
 
   const handleDelete = async (reviewId: string) => {
     const { error } = await supabase
@@ -40,50 +52,73 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
       description: "Review deleted successfully",
     });
     queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+    setReviewToDelete(null);
   };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Product</TableHead>
-          <TableHead>Reviewer</TableHead>
-          <TableHead>Rating</TableHead>
-          <TableHead>Title</TableHead>
-          <TableHead>Review</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {reviews.map((review) => (
-          <TableRow key={review.id}>
-            <TableCell>{review.product.name}</TableCell>
-            <TableCell>
-              {review.reviewer_first_name} {review.reviewer_last_name}
-            </TableCell>
-            <TableCell>{review.rating}/5</TableCell>
-            <TableCell>{review.title}</TableCell>
-            <TableCell className="max-w-md">
-              <p className="truncate">{review.review_text}</p>
-            </TableCell>
-            <TableCell>
-              <ReviewStatusSelect reviewId={review.id} currentStatus={review.status} />
-            </TableCell>
-            <TableCell>{new Date(review.created_at).toLocaleDateString()}</TableCell>
-            <TableCell>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDelete(review.id)}
-              >
-                <Trash className="h-4 w-4 text-destructive" />
-              </Button>
-            </TableCell>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Product</TableHead>
+            <TableHead>Reviewer</TableHead>
+            <TableHead>Rating</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Review</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {reviews.map((review) => (
+            <TableRow key={review.id}>
+              <TableCell>{review.product.name}</TableCell>
+              <TableCell>
+                {review.reviewer_first_name} {review.reviewer_last_name}
+              </TableCell>
+              <TableCell>{review.rating}/5</TableCell>
+              <TableCell>{review.title}</TableCell>
+              <TableCell className="max-w-md">
+                <p className="truncate">{review.review_text}</p>
+              </TableCell>
+              <TableCell>
+                <ReviewStatusSelect reviewId={review.id} currentStatus={review.status} />
+              </TableCell>
+              <TableCell>{new Date(review.created_at).toLocaleDateString()}</TableCell>
+              <TableCell>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setReviewToDelete(review.id)}
+                >
+                  <Trash className="h-4 w-4 text-destructive" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <AlertDialog open={!!reviewToDelete} onOpenChange={() => setReviewToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the review.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => reviewToDelete && handleDelete(reviewToDelete)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

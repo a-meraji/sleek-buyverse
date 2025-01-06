@@ -46,7 +46,7 @@ export function ReviewStatusSelect({ reviewId, currentStatus }: ReviewStatusSele
       <SelectTrigger className="w-32">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-white dark:bg-gray-800">
         <SelectItem value="pending">Pending</SelectItem>
         <SelectItem value="approved">Approved</SelectItem>
         <SelectItem value="rejected">Rejected</SelectItem>
