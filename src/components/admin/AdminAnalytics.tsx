@@ -6,18 +6,34 @@ import { StatsCards } from "./analytics/StatsCards";
 import { RevenueChart } from "./analytics/RevenueChart";
 import { UserSignupsChart } from "./analytics/UserSignupsChart";
 import { TrafficChart } from "./analytics/TrafficChart";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, X } from "lucide-react";
+import { format } from "date-fns";
 
 export function AdminAnalytics() {
   const [timeRange, setTimeRange] = useState("7"); // Default to 7 days
+  const [customDateRange, setCustomDateRange] = useState<{
+    from?: Date;
+    to?: Date;
+  }>({});
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["admin-stats", timeRange],
+    queryKey: ["admin-stats", timeRange, customDateRange],
     queryFn: async () => {
-      console.log("Fetching admin stats for last", timeRange, "days");
+      console.log("Fetching admin stats with timeRange:", timeRange, "and customDateRange:", customDateRange);
       
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - parseInt(timeRange));
+      let startDate: Date;
+      let endDate = new Date();
+
+      if (customDateRange.from && customDateRange.to) {
+        startDate = customDateRange.from;
+        endDate = customDateRange.to;
+      } else {
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - parseInt(timeRange));
+      }
 
       // Get orders within date range
       const { data: orders } = await supabase
@@ -97,15 +113,6 @@ export function AdminAnalytics() {
         .from("profiles")
         .select("*", { count: 'exact', head: true });
 
-      console.log("Stats fetched successfully:", {
-        totalRevenue,
-        totalProducts: productsCount,
-        totalUsers: usersCount,
-        dailyRevenue,
-        dailySignups,
-        dailyVisits
-      });
-
       return {
         totalRevenue,
         totalProducts: productsCount || 0,
@@ -117,12 +124,24 @@ export function AdminAnalytics() {
     },
   });
 
+  const clearCustomDateRange = () => {
+    setCustomDateRange({});
+    setTimeRange("7");
+  };
+
   if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end mb-4">
-        <Select value={timeRange} onValueChange={setTimeRange}>
+      <div className="flex justify-end mb-4 gap-4">
+        <Select 
+          value={timeRange} 
+          onValueChange={(value) => {
+            setTimeRange(value);
+            setCustomDateRange({});
+          }}
+          disabled={!!(customDateRange.from && customDateRange.to)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select time range" />
           </SelectTrigger>
@@ -130,8 +149,65 @@ export function AdminAnalytics() {
             <SelectItem value="7">Last 7 days</SelectItem>
             <SelectItem value="30">Last 30 days</SelectItem>
             <SelectItem value="90">Last 90 days</SelectItem>
+            <SelectItem value="180">Last 180 days</SelectItem>
+            <SelectItem value="365">Last 365 days</SelectItem>
           </SelectContent>
         </Select>
+
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={`justify-start text-left font-normal ${
+                  !customDateRange.from && "text-muted-foreground"
+                }`}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {customDateRange.from ? (
+                  customDateRange.to ? (
+                    <>
+                      {format(customDateRange.from, "LLL dd, y")} -{" "}
+                      {format(customDateRange.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(customDateRange.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Custom date range</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={customDateRange.from}
+                selected={{
+                  from: customDateRange.from,
+                  to: customDateRange.to,
+                }}
+                onSelect={(range) => {
+                  if (range?.from && range?.to) {
+                    setCustomDateRange(range);
+                    setTimeRange("");
+                  }
+                }}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+
+          {(customDateRange.from || customDateRange.to) && (
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0"
+              onClick={clearCustomDateRange}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       <StatsCards 
