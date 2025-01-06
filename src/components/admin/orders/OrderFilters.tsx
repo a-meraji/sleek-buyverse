@@ -100,21 +100,23 @@ export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
         <div className="w-[300px]">
           <Label>Date Range</Label>
           <div className="flex gap-2">
-            <div className="relative">
+            <div className="relative flex items-center">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`w-[130px] justify-start text-left font-normal bg-white truncate ${
+                    className={`w-[130px] pl-2 pr-8 justify-start text-left font-normal bg-white ${
                       !filters.dateRange.from && "text-muted-foreground"
                     }`}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
-                    {filters.dateRange.from ? (
-                      format(filters.dateRange.from, "PP")
-                    ) : (
-                      <span>From</span>
-                    )}
+                    <span className="truncate">
+                      {filters.dateRange.from ? (
+                        format(filters.dateRange.from, "PP")
+                      ) : (
+                        "From"
+                      )}
+                    </span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-white">
@@ -135,28 +137,30 @@ export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-0 top-0 h-full px-2 hover:bg-transparent"
+                  className="ml-1 h-8 w-8 p-0 hover:bg-gray-100"
                   onClick={() => clearDate('from')}
                 >
                   <X className="h-4 w-4" />
                 </Button>
               )}
             </div>
-            <div className="relative">
+            <div className="relative flex items-center">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`w-[130px] justify-start text-left font-normal bg-white truncate ${
+                    className={`w-[130px] pl-2 pr-8 justify-start text-left font-normal bg-white ${
                       !filters.dateRange.to && "text-muted-foreground"
                     }`}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
-                    {filters.dateRange.to ? (
-                      format(filters.dateRange.to, "PP")
-                    ) : (
-                      <span>To</span>
-                    )}
+                    <span className="truncate">
+                      {filters.dateRange.to ? (
+                        format(filters.dateRange.to, "PP")
+                      ) : (
+                        "To"
+                      )}
+                    </span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-white">
@@ -177,7 +181,7 @@ export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-0 top-0 h-full px-2 hover:bg-transparent"
+                  className="ml-1 h-8 w-8 p-0 hover:bg-gray-100"
                   onClick={() => clearDate('to')}
                 >
                   <X className="h-4 w-4" />
