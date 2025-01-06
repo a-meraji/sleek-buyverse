@@ -43,11 +43,9 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
     queryFn: async () => {
       console.log('Fetching popular products');
       
-      // First get the product IDs ordered by count
+      // First get the product IDs with their order counts using a simpler query
       const { data: orderCounts, error: orderError } = await supabase
-        .from('order_items')
-        .select('product_id, count(*)')
-        .order('count', { ascending: false })
+        .rpc('get_popular_products')
         .limit(8);
 
       if (orderError) {
@@ -63,7 +61,7 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       }
 
       // Get the actual product details
-      const productIds = (orderCounts as unknown as OrderCount[]).map(item => item.product_id);
+      const productIds = orderCounts.map(item => item.product_id);
       const { data: products, error: productsError } = await supabase
         .from('products')
         .select('*, product_variants(*)')
