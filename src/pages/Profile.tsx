@@ -9,13 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
+import { OrdersList } from "@/components/profile/OrdersList";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -135,74 +129,8 @@ const Profile = () => {
               </Button>
             </TabsContent>
 
-            <TabsContent value="orders" className="space-y-4">
-              {ordersLoading ? (
-                <div className="text-center py-8">Loading orders...</div>
-              ) : orders?.length ? (
-                <Accordion type="single" collapsible className="space-y-4">
-                  {orders.map((order) => (
-                    <AccordionItem key={order.id} value={order.id} className="border rounded-lg p-4">
-                      <AccordionTrigger className="hover:no-underline">
-                        <div className="flex justify-between items-center w-full">
-                          <div>
-                            <p className="font-medium text-left">Order #{order.id.slice(0, 8)}</p>
-                            <p className="text-sm text-gray-500 text-left">
-                              {new Date(order.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">${order.total_amount}</p>
-                            <Badge variant={
-                              order.status === 'shipped' ? 'default' :
-                              order.status === 'processing' ? 'secondary' : 'outline'
-                            }>
-                              {order.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="mt-4 space-y-4">
-                          {order.order_items?.map((item: any) => (
-                            <div key={item.id} className="flex items-center justify-between border-b pb-4">
-                              <div className="flex items-center space-x-4">
-                                <img
-                                  src={item.product.image_url}
-                                  alt={item.product.name}
-                                  className="w-16 h-16 object-cover rounded"
-                                />
-                                <div>
-                                  <p className="font-medium">{item.product.name}</p>
-                                  {item.variant && (
-                                    <p className="text-sm text-gray-500">
-                                      Size: {item.variant.size}, Color: {item.variant.color}
-                                    </p>
-                                  )}
-                                  <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
-                                </div>
-                              </div>
-                              <p className="font-medium">${item.price_at_time}</p>
-                            </div>
-                          ))}
-                          {order.shipping_address && (
-                            <div className="mt-4">
-                              <h4 className="font-medium mb-2">Shipping Address</h4>
-                              <p className="text-sm text-gray-500">
-                                {order.shipping_address.street}<br />
-                                {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.zipCode}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  No orders found
-                </div>
-              )}
+            <TabsContent value="orders">
+              <OrdersList orders={orders} isLoading={ordersLoading} />
             </TabsContent>
 
             <TabsContent value="favorites">
