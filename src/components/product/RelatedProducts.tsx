@@ -43,7 +43,7 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
     queryFn: async () => {
       console.log('Fetching popular products');
       
-      // First get the product IDs with their order counts using a simpler query
+      // First get the product IDs with their order counts using the database function
       const { data: orderCounts, error: orderError } = await supabase
         .rpc('get_popular_products')
         .limit(8);

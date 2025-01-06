@@ -373,6 +373,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_popular_products: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          product_id: string
+          order_count: number
+        }[]
+      }
       is_admin: {
         Args: {
           user_id: string
