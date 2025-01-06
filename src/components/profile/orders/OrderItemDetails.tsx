@@ -50,7 +50,6 @@ export const OrderItemDetails = ({ item, showRateButton }: OrderItemDetailsProps
               className="mt-2 px-4 py-2 h-auto flex flex-col items-center gap-1"
               onClick={() => setIsReviewDialogOpen(true)}
             >
-              <span className="text-sm">Rate Product</span>
               <div className="flex gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
@@ -59,6 +58,7 @@ export const OrderItemDetails = ({ item, showRateButton }: OrderItemDetailsProps
                   />
                 ))}
               </div>
+              <span className="text-xs font-light">Rate Product</span>
             </Button>
           )}
         </div>
