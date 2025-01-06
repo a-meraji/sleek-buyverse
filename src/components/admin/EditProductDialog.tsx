@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DialogHeader } from "./product/dialog/DialogHeader";
 import { ImageSelectorWrapper } from "./product/dialog/ImageSelectorWrapper";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
