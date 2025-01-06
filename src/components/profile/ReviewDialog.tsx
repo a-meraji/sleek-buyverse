@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,7 @@ interface ReviewDialogProps {
 export const ReviewDialog = ({ isOpen, onClose, productId, defaultValues }: ReviewDialogProps) => {
   const { toast } = useToast();
   const [rating, setRating] = useState(0);
+  const [profileData, setProfileData] = useState<any>(null);
 
   const form = useForm({
     resolver: zodResolver(reviewSchema),
@@ -43,6 +44,34 @@ export const ReviewDialog = ({ isOpen, onClose, productId, defaultValues }: Revi
       rating: 0,
     },
   });
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, phone')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return;
+        }
+
+        if (profile) {
+          setProfileData(profile);
+          form.setValue('reviewer_first_name', profile.first_name || '');
+          form.setValue('reviewer_last_name', profile.last_name || '');
+        }
+      }
+    };
+
+    if (isOpen) {
+      fetchProfileData();
+    }
+  }, [isOpen, form]);
 
   const onSubmit = async (values: z.infer<typeof reviewSchema>) => {
     try {
@@ -71,12 +100,12 @@ export const ReviewDialog = ({ isOpen, onClose, productId, defaultValues }: Revi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] p-0">
+      <DialogContent className="sm:max-w-[425px] max-h-[95vh] p-0">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>Write a Review</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[calc(90vh-8rem)] px-6 pb-6">
+        <ScrollArea className="max-h-[calc(95vh-8rem)] px-6 pb-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
