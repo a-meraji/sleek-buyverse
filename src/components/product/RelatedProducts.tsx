@@ -46,6 +46,7 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       // Get the most ordered products using count aggregation
       const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
+        .select('product_id, count')
         .select('product_id, count(*)')
         .order('count', { ascending: false })
         .limit(8);
