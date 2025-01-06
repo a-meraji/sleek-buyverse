@@ -63,7 +63,10 @@ export function TimeRangeControls({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-background" align="end">
+          <PopoverContent 
+            className="w-auto p-0" 
+            align="end"
+          >
             <Calendar
               initialFocus
               mode="range"
@@ -78,6 +81,7 @@ export function TimeRangeControls({
                 }
               }}
               numberOfMonths={2}
+              className="rounded-md border bg-white dark:bg-gray-800"
             />
           </PopoverContent>
         </Popover>
