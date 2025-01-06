@@ -63,7 +63,7 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       }
 
       // Get the actual product details
-      const productIds = orderCounts.map((item: OrderCount) => item.product_id);
+      const productIds = (orderCounts as unknown as OrderCount[]).map(item => item.product_id);
       const { data: products, error: productsError } = await supabase
         .from('products')
         .select('*, product_variants(*)')
