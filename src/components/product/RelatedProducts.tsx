@@ -46,6 +46,7 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       // Get the most ordered products using count aggregation
       const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
+        .select('product_id, count')
         .select('product_id, count(*)')
         .order('count', { ascending: false })
         .limit(8);
@@ -58,7 +59,7 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
       if (!orderCounts?.length) return [];
 
       // Get the actual product details
-      const productIds = orderCounts.map(item => item.product_id);
+      const productIds = orderCounts.map((item: OrderCount) => item.product_id);
       const { data: products, error: productsError } = await supabase
         .from('products')
         .select('*, product_variants(*)')
