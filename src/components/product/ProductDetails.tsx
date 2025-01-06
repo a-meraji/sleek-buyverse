@@ -58,7 +58,11 @@ export const ProductDetails = ({
 
   return (
     <div className="space-y-6">
-      <ProductHeader name={product.name} discount={product.discount} />
+      <ProductHeader 
+        name={product.name} 
+        discount={product.discount} 
+        productId={product.id}
+      />
       
       <PriceDisplay 
         hasValidDiscount={hasValidDiscount}
