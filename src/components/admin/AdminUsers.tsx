@@ -21,16 +21,10 @@ type AdminUser = {
 };
 
 type ProfileData = {
+  id: string;
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
-}
-
-type SupabaseAdminUserResponse = {
-  id: string;
-  role: string | null;
-  created_at: string;
-  profiles: ProfileData[];
 }
 
 type AuthUser = {
@@ -43,24 +37,27 @@ export function AdminUsers() {
   const { data: adminUsers, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      console.log("Fetching admin users with profiles...");
-      const { data: users, error } = await supabase
+      console.log("Fetching admin users...");
+      
+      // First get admin users
+      const { data: adminUsersData, error: adminError } = await supabase
         .from("admin_users")
-        .select(`
-          id,
-          role,
-          created_at,
-          profiles!inner (
-            first_name,
-            last_name,
-            phone
-          )
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching admin users:", error);
-        throw error;
+      if (adminError) {
+        console.error("Error fetching admin users:", adminError);
+        throw adminError;
+      }
+
+      // Get profiles for these users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("*");
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+        throw profilesError;
       }
 
       // Get user emails from auth metadata
@@ -71,12 +68,12 @@ export function AdminUsers() {
       }
 
       // Map and combine the data
-      const enrichedUsers = (users as SupabaseAdminUserResponse[]).map((user) => {
-        const authUser = (authData.users as AuthUser[]).find((u) => u.id === user.id);
-        const profile = user.profiles[0]; // Get the first profile since it's returned as an array
+      const enrichedUsers = adminUsersData.map((adminUser) => {
+        const authUser = (authData.users as AuthUser[]).find((u) => u.id === adminUser.id);
+        const profile = profilesData.find((p) => p.id === adminUser.id);
         
         return {
-          ...user,
+          ...adminUser,
           email: authUser?.email || null,
           last_sign_in_at: authUser?.last_sign_in_at || null,
           first_name: profile?.first_name || null,
