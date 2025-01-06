@@ -43,11 +43,14 @@ export const RelatedProducts = ({ currentProductId, category }: RelatedProductsP
     queryFn: async () => {
       console.log('Fetching popular products');
       
-      // Get the most ordered products
+      // Get the most ordered products using raw SQL count
       const { data: orderCounts, error: orderError } = await supabase
         .from('order_items')
-        .select('product_id, count(*)')
-        .groupBy('product_id')
+        .select('product_id, count')
+        .select(`
+          product_id,
+          count
+        `)
         .order('count', { ascending: false })
         .limit(8) as { data: OrderCount[] | null; error: any };
 
