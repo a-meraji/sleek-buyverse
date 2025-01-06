@@ -1,5 +1,4 @@
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/home/Footer";
 
 const ReturnsExchanges = () => {
   return (
@@ -34,7 +33,6 @@ const ReturnsExchanges = () => {
           </section>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

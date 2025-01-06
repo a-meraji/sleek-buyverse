@@ -1,5 +1,4 @@
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/home/Footer";
 import { Mail, Phone, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
@@ -73,7 +72,6 @@ const ContactUs = () => {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };
