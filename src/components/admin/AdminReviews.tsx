@@ -7,7 +7,7 @@ import { Product, Review } from "@/types";
 
 export function AdminReviews() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>("pending"); // Changed default from null to "pending"
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ["admin-reviews", selectedProduct, selectedStatus],
