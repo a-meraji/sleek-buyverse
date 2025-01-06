@@ -26,14 +26,14 @@ export function ReviewFilters({
     <div className="flex gap-4">
       <div className="w-[200px]">
         <Select
-          value={selectedProduct || ""}
-          onValueChange={(value) => onProductChange(value || null)}
+          value={selectedProduct || "all"}
+          onValueChange={(value) => onProductChange(value === "all" ? null : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Filter by product" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Products</SelectItem>
+            <SelectItem value="all">All Products</SelectItem>
             {products.map((product) => (
               <SelectItem key={product.id} value={product.id}>
                 {product.name}
@@ -45,14 +45,14 @@ export function ReviewFilters({
 
       <div className="w-[200px]">
         <Select
-          value={selectedStatus || ""}
-          onValueChange={(value) => onStatusChange(value || null)}
+          value={selectedStatus || "all"}
+          onValueChange={(value) => onStatusChange(value === "all" ? null : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Statuses</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
             <SelectItem value="rejected">Rejected</SelectItem>
