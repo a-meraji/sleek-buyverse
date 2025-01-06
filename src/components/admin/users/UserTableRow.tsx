@@ -7,7 +7,7 @@ interface UserTableRowProps {
 
 export function UserTableRow({ user }: UserTableRowProps) {
   return (
-    <TableRow key={user.id}>
+    <TableRow>
       <TableCell>
         {user.first_name || user.last_name
           ? `${user.first_name || ""} ${user.last_name || ""}`
