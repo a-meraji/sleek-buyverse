@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Profile } from "./types";
+import { ProfileData } from "./types";
 
 export function useProfiles() {
   return useQuery({
@@ -17,7 +17,7 @@ export function useProfiles() {
       }
 
       console.log("Fetched profiles:", profiles);
-      return profiles as Profile[];
+      return profiles as ProfileData[];
     },
   });
 }
