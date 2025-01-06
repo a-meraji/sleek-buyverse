@@ -19,20 +19,11 @@ export const OrderItemDetails = ({ item, showRateButton }: OrderItemDetailsProps
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id || !item.product?.id) return;
 
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', session.user.id)
-          .single();
-
-        if (!profile) return;
-
         const { data: reviews } = await supabase
           .from('reviews')
           .select('*')
           .eq('product_id', item.product.id)
-          .eq('reviewer_first_name', profile.first_name)
-          .eq('reviewer_last_name', profile.last_name);
+          .eq('reviewer_id', session.user.id);
 
         setHasReviewed(reviews && reviews.length > 0);
       } catch (error) {

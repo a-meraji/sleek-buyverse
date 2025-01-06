@@ -386,6 +386,7 @@ export type Database = {
           rating: number
           review_text: string
           reviewer_first_name: string
+          reviewer_id: string | null
           reviewer_last_name: string
           status: string
           title: string
@@ -397,6 +398,7 @@ export type Database = {
           rating: number
           review_text: string
           reviewer_first_name: string
+          reviewer_id?: string | null
           reviewer_last_name: string
           status?: string
           title: string
@@ -408,6 +410,7 @@ export type Database = {
           rating?: number
           review_text?: string
           reviewer_first_name?: string
+          reviewer_id?: string | null
           reviewer_last_name?: string
           status?: string
           title?: string
