@@ -106,7 +106,7 @@ export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 bg-white">
                 <Calendar
                   mode="single"
                   selected={filters.dateRange.from}
@@ -136,7 +136,7 @@ export function OrderFilters({ filters, onFiltersChange }: OrderFiltersProps) {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 bg-white">
                 <Calendar
                   mode="single"
                   selected={filters.dateRange.to}
