@@ -31,12 +31,14 @@ interface OrdersTableProps {
       last_name: string;
     } | null;
   }>;
+  sortDirection: "asc" | "desc";
+  onSortChange: (direction: "asc" | "desc") => void;
 }
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, sortDirection, onSortChange }: OrdersTableProps) {
   return (
     <Table>
-      <OrderTableHeader />
+      <OrderTableHeader sortDirection={sortDirection} onSortChange={onSortChange} />
       <TableBody>
         {orders?.map((order) => (
           <OrderTableRow key={order.id} order={order} />
