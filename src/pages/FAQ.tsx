@@ -1,5 +1,4 @@
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/home/Footer";
 import {
   Accordion,
   AccordionContent,
@@ -44,7 +43,6 @@ const FAQ = () => {
           </AccordionItem>
         </Accordion>
       </main>
-      <Footer />
     </div>
   );
 };
