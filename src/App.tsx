@@ -16,8 +16,8 @@ import ShippingPolicy from "./pages/ShippingPolicy";
 import ReturnsExchanges from "./pages/ReturnsExchanges";
 import FAQ from "./pages/FAQ";
 import { ChatButton } from "./components/chat/ChatButton";
-import { Footer } from "./components/home/Footer";
 import { CartProvider } from "./contexts/cart/CartContext";
+import { RootLayout } from "./components/layout/RootLayout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,25 +35,22 @@ const App = () => (
     <CartProvider>
       <TooltipProvider>
         <BrowserRouter>
-          <div className="flex min-h-screen flex-col">
-            <div className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/product/:id" element={<Product />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/contact" element={<ContactUs />} />
-                <Route path="/shipping" element={<ShippingPolicy />} />
-                <Route path="/returns" element={<ReturnsExchanges />} />
-                <Route path="/faq" element={<FAQ />} />
-              </Routes>
-            </div>
-            <Footer />
-          </div>
+          <Routes>
+            <Route element={<RootLayout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/product/:id" element={<Product />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/shipping" element={<ShippingPolicy />} />
+              <Route path="/returns" element={<ReturnsExchanges />} />
+              <Route path="/faq" element={<FAQ />} />
+            </Route>
+          </Routes>
           <ChatButton />
           <Toaster />
           <Sonner />
