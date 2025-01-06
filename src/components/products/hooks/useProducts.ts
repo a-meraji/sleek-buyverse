@@ -1,23 +1,46 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
 
 export const useProducts = () => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
+  const sort = searchParams.get('sort');
+  const discount = searchParams.get('discount') === 'true';
 
-  const { data: products, isLoading, error } = useQuery<Product[]>({
-    queryKey: ['products', searchQuery],
+  const { data: products, isLoading, error } = useQuery({
+    queryKey: ['products', searchQuery, sort, discount],
     queryFn: async () => {
-      console.log('Fetching products with search query:', searchQuery);
+      console.log('Fetching products with filters:', { searchQuery, sort, discount });
       
       let query = supabase
         .from('products')
-        .select('*, product_variants(*), discount');
+        .select('*, product_variants(*)')
 
+      // Apply search filter if present
       if (searchQuery) {
         query = query.ilike('name', `%${searchQuery}%`);
+      }
+
+      // Apply discount filter
+      if (discount) {
+        query = query.not('discount', 'is', null)
+                    .gt('discount', 0);
+      }
+
+      // Apply sorting
+      if (sort === 'newest') {
+        query = query.order('created_at', { ascending: false });
+      } else if (sort === 'popular') {
+        const { data: popularProducts } = await supabase
+          .rpc('get_popular_products')
+          .limit(50);
+
+        if (popularProducts?.length) {
+          const popularIds = popularProducts.map(p => p.product_id);
+          query = query.in('id', popularIds);
+        }
       }
       
       const { data, error } = await query;
@@ -27,7 +50,7 @@ export const useProducts = () => {
         throw error;
       }
       
-      console.log('Fetched products with discount:', data);
+      console.log('Fetched products:', data);
       return data || [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
