@@ -8,7 +8,6 @@ import HeroBanner from "@/components/home/HeroBanner";
 import { ProductCarousel } from "@/components/home/ProductCarousel";
 import { StyleShowcase } from "@/components/home/StyleShowcase";
 import { ReviewsScroll } from "@/components/home/ReviewsScroll";
-import { Footer } from "@/components/home/Footer";
 import { Product } from "@/types";
 
 const Index = () => {
@@ -59,7 +58,6 @@ const Index = () => {
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -86,7 +84,6 @@ const Index = () => {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -117,7 +114,6 @@ const Index = () => {
           </div>
         )}
       </main>
-      <Footer />
     </div>
   );
 };
