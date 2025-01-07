@@ -4,7 +4,7 @@ import { ProductInfo } from "./dialog/ProductInfo";
 import { VariantSelectionPanel } from "./dialog/VariantSelectionPanel";
 import { DialogActions } from "./dialog/DialogActions";
 import { Product } from "@/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface ProductOverviewDialogProps {
   isOpen: boolean;
@@ -26,6 +26,7 @@ export function ProductOverviewDialog({
     product?.product_variants?.[0]?.color || ""
   );
   const [dialogOpen, setDialogOpen] = useState(isOpen);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Sync dialog state with parent's isOpen prop
   useEffect(() => {
@@ -47,6 +48,12 @@ export function ProductOverviewDialog({
     }
   };
 
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop } = e.currentTarget;
+    console.log('Scrolling content, current position:', scrollTop);
+    // You can add custom scroll behavior here if needed
+  };
+
   if (!product) {
     console.log('No product data available');
     return null;
@@ -55,11 +62,15 @@ export function ProductOverviewDialog({
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md overflow-hidden">
-        <div className="flex flex-col max-h-[90vh]">
-          <div className="relative h-[300px] flex-shrink-0">
+        <div 
+          ref={contentRef}
+          className="flex flex-col max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400"
+          onScroll={handleScroll}
+        >
+          <div className="relative">
             <ProductImage image={product.image_url} name={product.name} />
           </div>
-          <div className="p-6 overflow-y-auto">
+          <div className="p-6">
             <ProductInfo 
               name={product.name}
               variants={product.product_variants}
