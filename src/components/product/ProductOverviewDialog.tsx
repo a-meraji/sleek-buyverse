@@ -1,6 +1,6 @@
 import { Dialog, DialogContent as BaseDialogContent } from "@/components/ui/dialog";
 import { ProductVariant } from "@/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DialogTitle } from "./dialog/DialogTitle";
 import { DialogContent } from "./dialog/DialogContent";
 
@@ -27,23 +27,36 @@ export function ProductOverviewDialog({
 }: ProductOverviewDialogProps) {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  // Sync internal open state with prop
+  useEffect(() => {
+    if (isOpen) {
+      setInternalOpen(true);
+    }
+  }, [isOpen]);
 
   const handleClose = () => {
+    console.log('Dialog closing, resetting states');
     setSelectedSize("");
     setSelectedColor("");
+    setInternalOpen(false);
     onClose();
   };
 
   const handleSuccess = () => {
+    console.log('Add to cart success, closing dialog');
     setSelectedSize("");
     setSelectedColor("");
+    setInternalOpen(false);
     onClose();
   };
 
   return (
     <Dialog 
-      open={isOpen} 
+      open={internalOpen} 
       onOpenChange={(open) => {
+        console.log('Dialog open state changing to:', open);
         if (!open) {
           handleClose();
         }
