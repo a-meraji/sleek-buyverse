@@ -20,22 +20,26 @@ export const CartDrawer = () => {
 
   // Cleanup effect for drawer overlay
   useEffect(() => {
-    const cleanup = () => {
-      console.log('Cleaning up cart drawer overlay');
-      const overlay = document.querySelector('[data-vaul-overlay]');
-      if (overlay) {
-        overlay.remove();
-      }
-    };
-
     if (!isOpen) {
+      console.log('Cart drawer closed, scheduling cleanup');
       // Small delay to ensure drawer animation completes
-      setTimeout(cleanup, 300);
-    }
+      const timeoutId = setTimeout(() => {
+        console.log('Executing cart drawer overlay cleanup');
+        const overlays = document.querySelectorAll('[data-vaul-overlay]');
+        overlays.forEach(overlay => {
+          if (overlay.parentNode) {
+            console.log('Removing cart drawer overlay');
+            overlay.parentNode.removeChild(overlay);
+          } else {
+            console.log('Overlay already removed or not found in DOM');
+          }
+        });
+      }, 300);
 
-    return () => {
-      cleanup();
-    };
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
   }, [isOpen]);
 
   console.log('Cart drawer render:', {
