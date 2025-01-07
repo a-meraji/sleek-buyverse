@@ -21,25 +21,14 @@ export const useUnauthenticatedCart = () => {
     setIsLoading(false);
   };
 
-  // Single useEffect for both initial load and updates
   useEffect(() => {
     loadCartItems();
-
-    const handleCartUpdate = () => {
-      console.log('Cart update event received in useUnauthenticatedCart');
-      loadCartItems();
-    };
-
-    window.addEventListener('cartUpdated', handleCartUpdate);
-    return () => {
-      window.removeEventListener('cartUpdated', handleCartUpdate);
-    };
-  }, []); // Empty dependency array as we want this to run only once on mount
+  }, []);
 
   const updateLocalStorageAndState = (updatedCart: CartItem[]) => {
     console.log('Updating cart in localStorage and state:', updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    setCartItems(updatedCart); // Update state immediately
+    setCartItems(updatedCart);
     const event = new CustomEvent('cartUpdated');
     window.dispatchEvent(event);
   };

@@ -10,6 +10,7 @@ export const useAuthenticatedCart = (userId: string) => {
 
   const loadCartItems = async () => {
     try {
+      console.log('Loading authenticated cart items for user:', userId);
       const { data, error } = await supabase
         .from('cart_items')
         .select(`
@@ -90,6 +91,7 @@ export const useAuthenticatedCart = (userId: string) => {
   };
 
   const refreshCart = async () => {
+    console.log('Refreshing authenticated cart');
     await loadCartItems();
   };
 
