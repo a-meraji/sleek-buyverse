@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductOverviewDialog } from "./product/ProductOverviewDialog";
 import { Product } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Percent } from "lucide-react";
 
 interface ProductCardProps {
   id: string;
@@ -18,6 +17,7 @@ interface ProductCardProps {
 export function ProductCard({ id, name, image, product_variants, discount }: ProductCardProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [productData, setProductData] = useState<Product | null>(null);
 
   // Calculate the minimum price from variants
   const minPrice = product_variants?.length 
@@ -38,10 +38,26 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
       setUserId(session?.user?.id ?? null);
     });
 
+    // Fetch full product data when dialog is opened
+    if (isDialogOpen && !productData) {
+      supabase
+        .from('products')
+        .select('*, product_variants(*)')
+        .eq('id', id)
+        .single()
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error fetching product:', error);
+            return;
+          }
+          setProductData(data);
+        });
+    }
+
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [id, isDialogOpen, productData]);
 
   console.log('ProductCard variants:', product_variants);
 
@@ -89,16 +105,14 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
         </Button>
       </div>
 
-      <ProductOverviewDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        productId={id}
-        productName={name}
-        productImage={image}
-        userId={userId}
-        variants={product_variants}
-        discount={discount}
-      />
+      {productData && (
+        <ProductOverviewDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          product={productData}
+          userId={userId}
+        />
+      )}
     </div>
   );
 }

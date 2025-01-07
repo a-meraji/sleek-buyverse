@@ -7,9 +7,9 @@ import { Product } from "@/types";
 import { useState, useEffect } from "react";
 
 interface ProductOverviewDialogProps {
-  product: Product;
   isOpen: boolean;
   onClose: () => void;
+  product: Product;
   userId: string | null;
 }
 
@@ -20,10 +20,10 @@ export function ProductOverviewDialog({
   userId
 }: ProductOverviewDialogProps) {
   const [selectedSize, setSelectedSize] = useState(
-    product.product_variants?.[0]?.size || ""
+    product?.product_variants?.[0]?.size || ""
   );
   const [selectedColor, setSelectedColor] = useState(
-    product.product_variants?.[0]?.color || ""
+    product?.product_variants?.[0]?.color || ""
   );
   const [dialogOpen, setDialogOpen] = useState(isOpen);
 
@@ -47,15 +47,24 @@ export function ProductOverviewDialog({
     }
   };
 
+  if (!product) {
+    console.log('No product data available');
+    return null;
+  }
+
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[900px] p-0">
         <div className="grid md:grid-cols-2 gap-4">
-          <ProductImage product={product} />
+          <ProductImage image={product.image_url} name={product.name} />
           <div className="p-6 space-y-6">
-            <ProductInfo product={product} />
-            <VariantSelectionPanel
+            <ProductInfo 
+              name={product.name}
               variants={product.product_variants}
+              discount={product.discount}
+            />
+            <VariantSelectionPanel
+              variants={product.product_variants || []}
               selectedSize={selectedSize}
               selectedColor={selectedColor}
               onSizeChange={setSelectedSize}
