@@ -10,7 +10,9 @@ export default function HeroBanner() {
         <div className="relative sm:max-w-lg z-10">
          <div className="bg-gradient-to-t from-transparent  to-[#ffffff88] px-4 ">
       <h1 className="text-4xl font-black tracking-tight text-gray-900 sm:text-6xl">
-              Discover Your Style
+              Discover Your <span className="text-[#1d8757]">
+        Style
+              </span>
             </h1>
             <p className="mt-4 text-xl text-gray-500">
               Explore our curated collection of premium fashion pieces designed for the modern lifestyle.
