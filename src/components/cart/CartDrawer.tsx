@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
 import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CartHeader } from "./CartHeader";
 import { CartContent } from "./CartContent";
 
@@ -34,24 +34,24 @@ export const CartDrawer = () => {
     refreshCart
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
+  const handleCartUpdate = useCallback((event: CustomEvent) => {
+    console.log('Cart update event received in CartDrawer:', event.detail);
+    refreshCart();
+    // Only open drawer if explicitly requested
+    if (event.detail?.openDrawer) {
+      setIsOpen(true);
+    }
+  }, [refreshCart]);
+
   // Listen for cart updates
   useEffect(() => {
     console.log('Setting up cart update listener with auth status:', !!session?.user?.id);
     
-    const handleCartUpdate = (event: CustomEvent) => {
-      console.log('Cart update event received in CartDrawer:', event.detail);
-      refreshCart();
-      // Only open drawer if explicitly requested
-      if (event.detail?.openDrawer) {
-        setIsOpen(true);
-      }
-    };
-
     window.addEventListener('cartUpdated', handleCartUpdate as EventListener);
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate as EventListener);
     };
-  }, [refreshCart]);
+  }, [handleCartUpdate]);
 
   // Calculate total with discounts
   const total = cartItems?.reduce((sum, item) => {
