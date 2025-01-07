@@ -25,11 +25,14 @@ export const useUnauthenticatedCart = () => {
     loadCartItems();
   }, []);
 
-  const updateLocalStorageAndState = (updatedCart: CartItem[]) => {
+  const updateLocalStorageAndState = (updatedCart: CartItem[], openDrawer: boolean = false) => {
     console.log('Updating cart in localStorage and state:', updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     setCartItems(updatedCart);
-    const event = new CustomEvent('cartUpdated');
+    
+    const event = new CustomEvent('cartUpdated', {
+      detail: { openDrawer }
+    });
     window.dispatchEvent(event);
   };
 

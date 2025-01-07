@@ -9,6 +9,8 @@ export const useAuthenticatedCart = (userId: string) => {
   const { toast } = useToast();
 
   const loadCartItems = async () => {
+    if (!userId) return;
+    
     try {
       console.log('Loading authenticated cart items for user:', userId);
       const { data, error } = await supabase
@@ -34,10 +36,38 @@ export const useAuthenticatedCart = (userId: string) => {
     }
   };
 
+  // Load cart items when userId changes
   useEffect(() => {
     if (userId) {
       loadCartItems();
     }
+  }, [userId]);
+
+  // Subscribe to real-time updates for cart items
+  useEffect(() => {
+    if (!userId) return;
+
+    console.log('Setting up real-time subscription for cart items');
+    const channel = supabase
+      .channel('cart-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'cart_items',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('Received real-time cart update:', payload);
+          loadCartItems();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [userId]);
 
   const updateQuantity = async (itemId: string, quantity: number) => {
@@ -50,6 +80,11 @@ export const useAuthenticatedCart = (userId: string) => {
       if (error) throw error;
 
       await loadCartItems();
+      
+      const event = new CustomEvent('cartUpdated', {
+        detail: { openDrawer: false }
+      });
+      window.dispatchEvent(event);
       
       toast({
         title: "Cart updated",
@@ -75,6 +110,11 @@ export const useAuthenticatedCart = (userId: string) => {
       if (error) throw error;
 
       await loadCartItems();
+      
+      const event = new CustomEvent('cartUpdated', {
+        detail: { openDrawer: false }
+      });
+      window.dispatchEvent(event);
       
       toast({
         title: "Item removed",

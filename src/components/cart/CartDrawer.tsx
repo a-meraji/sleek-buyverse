@@ -36,17 +36,20 @@ export const CartDrawer = () => {
 
   // Listen for cart updates
   useEffect(() => {
-    console.log('Setting up cart update listener');
+    console.log('Setting up cart update listener with auth status:', !!session?.user?.id);
     
-    const handleCartUpdate = () => {
-      console.log('Cart update event received in CartDrawer');
+    const handleCartUpdate = (event: CustomEvent) => {
+      console.log('Cart update event received in CartDrawer:', event.detail);
       refreshCart();
-      setIsOpen(true);
+      // Only open drawer if explicitly requested
+      if (event.detail?.openDrawer) {
+        setIsOpen(true);
+      }
     };
 
-    window.addEventListener('cartUpdated', handleCartUpdate);
+    window.addEventListener('cartUpdated', handleCartUpdate as EventListener);
     return () => {
-      window.removeEventListener('cartUpdated', handleCartUpdate);
+      window.removeEventListener('cartUpdated', handleCartUpdate as EventListener);
     };
   }, [refreshCart]);
 
