@@ -42,17 +42,26 @@ export function ProductOverviewDialog({
   // Handle dialog state change
   const handleOpenChange = (open: boolean) => {
     console.log('Dialog open state changed:', open);
-    setDialogOpen(open);
     if (!open) {
+      setDialogOpen(false);
       onClose();
+    } else {
+      setDialogOpen(true);
     }
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop } = e.currentTarget;
     console.log('Scrolling content, current position:', scrollTop);
-    // You can add custom scroll behavior here if needed
   };
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      console.log('Cleaning up dialog state');
+      setDialogOpen(false);
+    };
+  }, []);
 
   if (!product) {
     console.log('No product data available');
@@ -60,7 +69,11 @@ export function ProductOverviewDialog({
   }
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
+    <Dialog 
+      open={dialogOpen} 
+      onOpenChange={handleOpenChange}
+      modal={true}
+    >
       <DialogContent className="max-w-md overflow-hidden">
         <div 
           ref={contentRef}
