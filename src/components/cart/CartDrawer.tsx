@@ -8,8 +8,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
 import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
+import { useState, useEffect } from "react";
 
 export const CartDrawer = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -30,6 +32,13 @@ export const CartDrawer = () => {
     removeItem
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
+  // Auto-open drawer when items are added
+  useEffect(() => {
+    if (cartItems?.length) {
+      setIsOpen(true);
+    }
+  }, [cartItems?.length]);
+
   const total = cartItems?.reduce((sum, item) => {
     const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
     const discount = item.product?.discount;
@@ -42,7 +51,8 @@ export const CartDrawer = () => {
     isAuthenticated: !!session?.user?.id,
     cartItemsCount: cartItems?.length,
     total,
-    cartItems
+    cartItems,
+    isOpen
   });
 
   if (isSessionLoading || isLoading) {
@@ -54,7 +64,7 @@ export const CartDrawer = () => {
   }
 
   return (
-    <Drawer.Root>
+    <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
       <Drawer.Trigger asChild>
         <Button variant="outline" size="icon" className="relative">
           <ShoppingCart className="h-4 w-4" />
