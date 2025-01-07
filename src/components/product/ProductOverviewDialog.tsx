@@ -29,27 +29,37 @@ export function ProductOverviewDialog({
   const [selectedColor, setSelectedColor] = useState("");
   const [internalOpen, setInternalOpen] = useState(false);
 
-  // Sync internal open state with prop
+  // Sync internal open state with prop and handle cleanup
   useEffect(() => {
     if (isOpen) {
+      console.log('Opening dialog, setting internal state');
       setInternalOpen(true);
+    } else {
+      console.log('Dialog prop changed to closed, cleaning up');
+      handleClose();
     }
   }, [isOpen]);
 
   const handleClose = () => {
-    console.log('Dialog closing, resetting states');
+    console.log('Dialog closing, cleaning up states and overlay');
     setSelectedSize("");
     setSelectedColor("");
     setInternalOpen(false);
-    onClose();
+    // Ensure we call onClose after state updates
+    setTimeout(() => {
+      onClose();
+    }, 0);
   };
 
   const handleSuccess = () => {
-    console.log('Add to cart success, closing dialog');
+    console.log('Add to cart success, cleaning up dialog');
     setSelectedSize("");
     setSelectedColor("");
     setInternalOpen(false);
-    onClose();
+    // Ensure we call onClose after state updates
+    setTimeout(() => {
+      onClose();
+    }, 0);
   };
 
   return (
