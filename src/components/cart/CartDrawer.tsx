@@ -37,23 +37,19 @@ export const CartDrawer = () => {
   const handleCartUpdate = useCallback((event: CustomEvent) => {
     console.log('Cart update event received in CartDrawer:', event.detail);
     refreshCart();
-    // Only open drawer if explicitly requested
     if (event.detail?.openDrawer) {
       setIsOpen(true);
     }
   }, [refreshCart]);
 
-  // Listen for cart updates
   useEffect(() => {
     console.log('Setting up cart update listener with auth status:', !!session?.user?.id);
-    
     window.addEventListener('cartUpdated', handleCartUpdate as EventListener);
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate as EventListener);
     };
   }, [handleCartUpdate]);
 
-  // Calculate total with discounts
   const total = cartItems?.reduce((sum, item) => {
     const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
     const discount = item.product?.discount;
@@ -91,8 +87,8 @@ export const CartDrawer = () => {
         </Button>
       </Drawer.Trigger>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-[48]" />
-        <Drawer.Content className="bg-background flex flex-col fixed right-0 top-0 h-full w-full sm:w-[400px] rounded-l-lg z-[49]">
+        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+        <Drawer.Content className="bg-background flex flex-col fixed right-0 top-0 h-full w-full sm:w-[400px] rounded-l-lg">
           <CartHeader />
           <CartContent 
             cartItems={cartItems}
