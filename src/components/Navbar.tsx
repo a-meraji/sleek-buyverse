@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchBar } from "./navbar/SearchBar";
 import { NavigationMenu } from "./navbar/NavigationMenu";
 import { ProfileButton } from "./navbar/ProfileButton";
+import { CartDrawer } from "./cart/CartDrawer";
 
 export const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -49,11 +50,8 @@ export const Navbar = () => {
           >
             <Search className="h-5 w-5" />
           </Button>
-          <Link to="/cart">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
-          </Link>
+          
+          <CartDrawer />
           
           <ProfileButton user={user} setUser={setUser} />
           <NavigationMenu />
