@@ -74,11 +74,6 @@ export function useAddToCart() {
           console.error('Error updating cart:', updateError);
           throw updateError;
         }
-
-        toast({
-          title: "Cart Updated",
-          description: "Item quantity has been increased in your cart",
-        });
       } else {
         const { error: insertError } = await supabase
           .from('cart_items')
@@ -94,11 +89,6 @@ export function useAddToCart() {
           console.error('Error inserting to cart:', insertError);
           throw insertError;
         }
-
-        toast({
-          title: "Added to Cart",
-          description: "Item has been added to your cart",
-        });
       }
     },
     onSuccess: (_, { onSuccess }) => {

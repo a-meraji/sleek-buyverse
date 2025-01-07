@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAddToCart } from "./dialog/useAddToCart";
 import { ProductVariant } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddToCartButtonProps {
   productId: string;
@@ -24,6 +25,7 @@ export function AddToCartButton({
   relatedProductId
 }: AddToCartButtonProps) {
   const addToCart = useAddToCart();
+  const { toast } = useToast();
 
   const handleAddToCart = () => {
     // Find the selected variant
@@ -46,6 +48,10 @@ export function AddToCartButton({
       relatedProductId,
       onSuccess: () => {
         console.log('Successfully added to cart');
+        toast({
+          title: "Added to Cart",
+          description: `${productName} has been added to your cart`,
+        });
       }
     });
   };
