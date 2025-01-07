@@ -110,12 +110,37 @@ export function ProductOverviewDialog({
   };
 
   const handleCartSuccess = () => {
+    // Ensure we clean up properly when closing
+    setSelectedSize("");
+    setSelectedColor("");
     onClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open) {
+          // Reset state when dialog closes
+          setSelectedSize("");
+          setSelectedColor("");
+          onClose();
+        }
+      }}
+      modal={true}
+    >
+      <DialogContent 
+        className="sm:max-w-[425px] max-h-[90vh]"
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+        }}
+        onEscapeKeyDown={() => {
+          // Clean up on escape key
+          setSelectedSize("");
+          setSelectedColor("");
+          onClose();
+        }}
+      >
         <DialogHeader>
           <div className="flex justify-between items-center">
             <DialogTitle>Product Overview</DialogTitle>
