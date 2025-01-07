@@ -21,17 +21,37 @@ export const useUnauthenticatedCart = () => {
     setIsLoading(false);
   };
 
+  // Load cart items on mount
   useEffect(() => {
     loadCartItems();
+  }, []);
+
+  // Listen for storage events from other tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'cart') {
+        console.log('Cart storage changed in another tab, reloading cart items');
+        loadCartItems();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const updateLocalStorageAndState = (updatedCart: CartItem[], openDrawer: boolean = false) => {
     console.log('Updating cart in localStorage and state:', updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
+    
+    // Update state immediately
     setCartItems(updatedCart);
     
+    // Dispatch event after state is updated
     const event = new CustomEvent('cartUpdated', {
-      detail: { openDrawer }
+      detail: { 
+        openDrawer,
+        cartItems: updatedCart 
+      }
     });
     window.dispatchEvent(event);
   };

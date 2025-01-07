@@ -41,9 +41,19 @@ export function useAddToCart() {
           related_product_id: relatedProductId
         };
 
-        localCart.push(newItem);
-        localStorage.setItem('cart', JSON.stringify(localCart));
+        const updatedCart = [...localCart, newItem];
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
         console.log('Added item to local cart:', newItem);
+        
+        // Dispatch cart update event with openDrawer flag
+        const event = new CustomEvent('cartUpdated', {
+          detail: { 
+            openDrawer: true,
+            cartItems: updatedCart
+          }
+        });
+        window.dispatchEvent(event);
+        
         return newItem;
       }
 
@@ -90,6 +100,12 @@ export function useAddToCart() {
           throw insertError;
         }
       }
+
+      // Dispatch cart update event
+      const event = new CustomEvent('cartUpdated', {
+        detail: { openDrawer: true }
+      });
+      window.dispatchEvent(event);
     },
     onSuccess: (_, { onSuccess }) => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
