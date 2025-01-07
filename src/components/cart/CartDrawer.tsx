@@ -4,6 +4,7 @@ import { CartHeader } from "./CartHeader";
 import { CartContent } from "./CartContent";
 import { CartTrigger } from "./CartTrigger";
 import { useCartDrawer } from "@/hooks/cart/useCartDrawer";
+import { useEffect } from "react";
 
 export const CartDrawer = () => {
   const {
@@ -16,6 +17,26 @@ export const CartDrawer = () => {
     removeItem,
     total
   } = useCartDrawer();
+
+  // Cleanup effect for drawer overlay
+  useEffect(() => {
+    const cleanup = () => {
+      console.log('Cleaning up cart drawer overlay');
+      const overlay = document.querySelector('[data-vaul-overlay]');
+      if (overlay) {
+        overlay.remove();
+      }
+    };
+
+    if (!isOpen) {
+      // Small delay to ensure drawer animation completes
+      setTimeout(cleanup, 300);
+    }
+
+    return () => {
+      cleanup();
+    };
+  }, [isOpen]);
 
   console.log('Cart drawer render:', {
     isAuthenticated: !!session?.user?.id,
@@ -34,10 +55,20 @@ export const CartDrawer = () => {
   }
 
   return (
-    <Drawer.Root open={isOpen} onOpenChange={setIsOpen} className="z-40">
+    <Drawer.Root 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        console.log('Cart drawer open state changing to:', open);
+        setIsOpen(open);
+      }} 
+      className="z-40"
+    >
       <CartTrigger cartItems={cartItems} />
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-10" />
+        <Drawer.Overlay 
+          className="fixed inset-0 bg-black/40 z-40" 
+          data-testid="cart-overlay"
+        />
         <Drawer.Content className="bg-background flex flex-col fixed right-0 top-0 h-full w-full sm:w-[400px] rounded-l-lg">
           <CartHeader />
           <CartContent 
