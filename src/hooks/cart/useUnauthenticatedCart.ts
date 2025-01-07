@@ -9,23 +9,22 @@ export const useUnauthenticatedCart = () => {
 
   const loadCartItems = () => {
     try {
+      console.log('Loading unauthenticated cart items');
       const storedCart = localStorage.getItem('cart');
       const parsedCart = storedCart ? JSON.parse(storedCart) : [];
       console.log('Loaded unauthenticated cart items:', parsedCart);
       setCartItems(parsedCart);
-      setIsLoading(false);
     } catch (error) {
       console.error('Error loading cart from localStorage:', error);
       setCartItems([]);
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
+  // Single useEffect for both initial load and updates
   useEffect(() => {
     loadCartItems();
-  }, []);
 
-  useEffect(() => {
     const handleCartUpdate = () => {
       console.log('Cart update event received in useUnauthenticatedCart');
       loadCartItems();
@@ -35,7 +34,7 @@ export const useUnauthenticatedCart = () => {
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
     };
-  }, []);
+  }, []); // Empty dependency array as we want this to run only once on mount
 
   const notifyCartUpdate = (updatedCart: CartItem[]) => {
     localStorage.setItem('cart', JSON.stringify(updatedCart));
@@ -46,11 +45,11 @@ export const useUnauthenticatedCart = () => {
 
   const updateQuantity = async (itemId: string, quantity: number) => {
     try {
-      const updatedCart = cartItems.map(item =>
+      const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const updatedCart = currentCart.map((item: CartItem) =>
         item.id === itemId ? { ...item, quantity } : item
       );
       notifyCartUpdate(updatedCart);
-      setCartItems(updatedCart);
       
       toast({
         title: "Cart updated",
@@ -68,9 +67,9 @@ export const useUnauthenticatedCart = () => {
 
   const removeItem = async (itemId: string) => {
     try {
-      const updatedCart = cartItems.filter(item => item.id !== itemId);
+      const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const updatedCart = currentCart.filter((item: CartItem) => item.id !== itemId);
       notifyCartUpdate(updatedCart);
-      setCartItems(updatedCart);
       
       toast({
         title: "Item removed",
