@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CartItem } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 export const useUnauthenticatedCart = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -14,10 +13,10 @@ export const useUnauthenticatedCart = () => {
       const parsedCart = storedCart ? JSON.parse(storedCart) : [];
       console.log('Loaded unauthenticated cart items:', parsedCart);
       setCartItems(parsedCart);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error loading cart from localStorage:', error);
       setCartItems([]);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -26,13 +25,23 @@ export const useUnauthenticatedCart = () => {
     loadCartItems();
   }, []);
 
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      console.log('Cart update event received in useUnauthenticatedCart');
+      loadCartItems();
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, []);
+
   const notifyCartUpdate = (updatedCart: CartItem[]) => {
     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    const event = new CustomEvent('cartUpdated', { 
-      detail: { cartItems: updatedCart } 
-    });
+    const event = new CustomEvent('cartUpdated');
     window.dispatchEvent(event);
-    console.log('Cart updated:', updatedCart);
+    console.log('Cart updated and event dispatched:', updatedCart);
   };
 
   const updateQuantity = async (itemId: string, quantity: number) => {
@@ -78,6 +87,7 @@ export const useUnauthenticatedCart = () => {
   };
 
   const refreshCart = () => {
+    console.log('Refreshing unauthenticated cart');
     loadCartItems();
   };
 
