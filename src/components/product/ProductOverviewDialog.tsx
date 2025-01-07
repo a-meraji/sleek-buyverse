@@ -157,8 +157,8 @@ export function ProductOverviewDialog({
               variants={variants}
               selectedSize={selectedSize}
               selectedColor={selectedColor}
-              onSizeChange={setSelectedSize}
-              onColorChange={setSelectedColor}
+              onSizeSelect={setSelectedSize}
+              onColorSelect={setSelectedColor}
               showOutOfStock={!!(selectedSize && selectedColor)}
             />
 

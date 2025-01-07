@@ -4,28 +4,25 @@ import { SizeSelector } from "../SizeSelector";
 import { ProductVariant } from "@/types";
 
 interface VariantSelectionPanelProps {
-  colors: string[];
-  selectedColor: string;
-  onColorSelect: (color: string) => void;
-  selectedSize: string;
-  onSizeSelect: (size: string) => void;
   variants: ProductVariant[];
-  selectedVariant?: ProductVariant;
-  finalSelectedVariantPrice: number;
+  selectedSize: string;
+  selectedColor: string;
+  onSizeSelect: (size: string) => void;
+  onColorSelect: (color: string) => void;
   showOutOfStock?: boolean;
 }
 
 export const VariantSelectionPanel = ({
-  colors,
-  selectedColor,
-  onColorSelect,
-  selectedSize,
-  onSizeSelect,
   variants,
-  selectedVariant,
-  finalSelectedVariantPrice,
+  selectedSize,
+  selectedColor,
+  onSizeSelect,
+  onColorSelect,
   showOutOfStock = false,
 }: VariantSelectionPanelProps) => {
+  // Get unique colors from variants
+  const colors = Array.from(new Set(variants.map(v => v.color)));
+
   return (
     <>
       <ColorSelector
@@ -40,14 +37,6 @@ export const VariantSelectionPanel = ({
         variants={variants.filter(v => v.color === selectedColor)}
         showOutOfStock={showOutOfStock}
       />
-      
-      {selectedVariant && (
-        <div className="space-y-2">
-          <p className="text-lg font-medium">
-            Selected variant: ${finalSelectedVariantPrice.toFixed(2)}
-          </p>
-        </div>
-      )}
     </>
   );
 };
