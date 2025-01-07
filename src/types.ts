@@ -41,3 +41,11 @@ export interface Review {
   status: 'pending' | 'rejected' | 'approved';
   created_at: string;
 }
+
+export interface CartItem {
+  id: string;
+  product_id: string;
+  variant_id?: string;
+  quantity: number;
+  product?: Product;
+}

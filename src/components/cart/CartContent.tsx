@@ -1,6 +1,6 @@
 import { CartItem } from "./CartItem";
 import { EmptyCart } from "./EmptyCart";
-import { CartItem as CartItemType } from "@/contexts/cart/types";
+import { CartItem as CartItemType } from "@/types";
 
 interface CartContentProps {
   cartItems: CartItemType[] | null;

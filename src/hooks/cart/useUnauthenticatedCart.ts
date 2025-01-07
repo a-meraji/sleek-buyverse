@@ -1,11 +1,20 @@
 import { useState, useEffect } from 'react';
-import { CartItem } from "@/contexts/cart/types";
+import { CartItem } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 
 export const useUnauthenticatedCart = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  const notifyCartUpdate = (updatedCart: CartItem[]) => {
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    const event = new CustomEvent('cartUpdated', { 
+      detail: { cartItems: updatedCart } 
+    });
+    window.dispatchEvent(event);
+    console.log('Cart updated:', updatedCart);
+  };
 
   const loadCartItems = () => {
     try {
@@ -21,29 +30,15 @@ export const useUnauthenticatedCart = () => {
     }
   };
 
-  // Load cart items on mount
   useEffect(() => {
     loadCartItems();
   }, []);
 
-  const notifyCartUpdate = (updatedCart: CartItem[]) => {
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    
-    // Dispatch both storage and custom events
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'cart',
-      newValue: JSON.stringify(updatedCart)
-    }));
-    window.dispatchEvent(new Event('cartUpdated'));
-  };
-
   const updateQuantity = async (itemId: string, quantity: number) => {
     try {
-      const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const updatedCart = storedCart.map((item: CartItem) =>
+      const updatedCart = cartItems.map(item =>
         item.id === itemId ? { ...item, quantity } : item
       );
-      
       notifyCartUpdate(updatedCart);
       setCartItems(updatedCart);
       
@@ -63,11 +58,9 @@ export const useUnauthenticatedCart = () => {
 
   const removeItem = async (itemId: string) => {
     try {
-      const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const filteredCart = storedCart.filter((item: CartItem) => item.id !== itemId);
-      
-      notifyCartUpdate(filteredCart);
-      setCartItems(filteredCart);
+      const updatedCart = cartItems.filter(item => item.id !== itemId);
+      notifyCartUpdate(updatedCart);
+      setCartItems(updatedCart);
       
       toast({
         title: "Item removed",

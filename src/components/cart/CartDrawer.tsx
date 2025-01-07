@@ -36,26 +36,26 @@ export const CartDrawer = () => {
   // Keep track of previous cart items length
   const [prevCartLength, setPrevCartLength] = useState(cartItems?.length || 0);
 
-  // Listen for storage events and manual cart updates
+  // Listen for cart updates
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'cart' && !session?.user?.id) {
-        console.log('Local storage cart updated:', e.newValue);
+    const handleCartUpdate = (event: Event) => {
+      console.log('Cart update event received:', event);
+      if (!session?.user?.id) {
         refreshCart();
       }
     };
 
-    // Listen for both storage events and manual updates
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('cartUpdated', handleStorageChange as EventListener);
+    // Listen for both storage events and custom updates
+    window.addEventListener('storage', handleCartUpdate);
+    window.addEventListener('cartUpdated', handleCartUpdate);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('cartUpdated', handleStorageChange as EventListener);
+      window.removeEventListener('storage', handleCartUpdate);
+      window.removeEventListener('cartUpdated', handleCartUpdate);
     };
   }, [session?.user?.id, refreshCart]);
 
-  // Only open drawer when items are added
+  // Open drawer when items are added
   useEffect(() => {
     const currentLength = cartItems?.length || 0;
     if (currentLength > prevCartLength) {
@@ -68,7 +68,7 @@ export const CartDrawer = () => {
     setPrevCartLength(currentLength);
   }, [cartItems?.length, prevCartLength]);
 
-  // Calculate total
+  // Calculate total with discounts
   const total = cartItems?.reduce((sum, item) => {
     const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
     const discount = item.product?.discount;
