@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
 import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 export const CartDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,13 +39,16 @@ export const CartDrawer = () => {
     }
   }, [cartItems?.length]);
 
-  const total = cartItems?.reduce((sum, item) => {
-    const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
-    const discount = item.product?.discount;
-    const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-    const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-    return sum + (discountedPrice * item.quantity);
-  }, 0) ?? 0;
+  // Memoize the total calculation to prevent unnecessary recalculations
+  const total = useMemo(() => {
+    return cartItems?.reduce((sum, item) => {
+      const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
+      const discount = item.product?.discount;
+      const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+      const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
+      return sum + (discountedPrice * item.quantity);
+    }, 0) ?? 0;
+  }, [cartItems]);
 
   console.log('Cart drawer render:', {
     isAuthenticated: !!session?.user?.id,
