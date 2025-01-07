@@ -12,7 +12,7 @@ export const ChatButton = () => {
   return (
     <>
       <Button
-        className="fixed bottom-4 right-4 rounded-full size-12 shadow-lg"
+        className="fixed bottom-4 right-4 rounded-full size-12 shadow-lg z-50"
         onClick={() => setIsOpen(true)}
       >
         <MessageCircle className="size-6" />
