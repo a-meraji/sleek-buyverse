@@ -8,7 +8,7 @@ export default function HeroBanner() {
     <div className="pb-80 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
       <div className="relative mx-auto max-w-7xl sm:static sm:px-6 lg:px-8 lg:flex">
         <div className="relative sm:max-w-lg">
-         <div className="bg-gradient-to-t from-transparent to-[#ffffff88] px-4 ">
+         <div className="bg-gradient-to-t from-transparent z-[1] to-[#ffffff88] px-4 ">
       <h1 className="text-4xl font-black tracking-tight text-gray-900 sm:text-6xl">
               Discover Your Style
             </h1>
