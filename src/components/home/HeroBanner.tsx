@@ -1,46 +1,101 @@
 import { Button } from "@/components/ui/button";
+import { ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export const HeroBanner = () => {
+export default function HeroBanner() {
   return (
-    <div className="relative h-[600px] overflow-hidden">
-      <div className="absolute inset-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-          <img
-            src="image1.jpg"
-            alt="Product 1"
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-          />
+    <div className="relative overflow-hidden  mt-8">
+    <div className="pb-80 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
+      <div className="relative mx-auto max-w-7xl sm:static sm:px-6 lg:px-8 lg:flex">
+        <div className="relative sm:max-w-lg z-50">
+         <div className="bg-gradient-to-t from-transparent to-[#ffffff88] px-4 ">
+      <h1 className="text-4xl font-black tracking-tight text-gray-900 sm:text-6xl">
+              Discover Your Style
+            </h1>
+            <p className="mt-4 text-xl text-gray-500">
+              Explore our curated collection of premium fashion pieces designed for the modern lifestyle.
+            </p>
+            <div className="mt-10">
+            <Link to="/products">
+                <Button className="bg-primary hover:bg-primary/90 text-white">
+                  <ShoppingBag className="mr-2 h-5 w-5" />
+                  Shop Now
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-          <img
-            src="image2.jpg"
-            alt="Product 2"
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-          />
-        </div>
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-          <img
-            src="image3.jpg"
-            alt="Product 3"
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-          />
-        </div>
-      </div>
-      
-      <div className="absolute inset-0 bg-gradient-to-t from-transparent to-[#ffffff88] px-4 z-10">
-        <div className="h-full flex flex-col items-center justify-center max-w-3xl mx-auto text-center gap-8">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
-            Discover Our Latest Collection
-          </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground">
-            Explore our curated selection of premium products designed for your lifestyle.
-          </p>
-          <Button asChild size="lg">
-            <Link to="/products">Shop Now</Link>
-          </Button>
+
+          {/* Decorative image grid */}
+          <div>
+                {/* Decorative image grid */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none lg:absolute lg:inset-y-0 lg:mx-auto lg:w-full lg:max-w-7xl"
+                >
+                  <div className="absolute transform sm:right-1/2 top-0 sm:translate-x-8 lg:right-1/2 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-8">
+                    <div className="flex items-center space-x-6 lg:space-x-8">
+                      <div className="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
+                        <div className="h-64 w-44 overflow-hidden rounded-lg sm:opacity-0 lg:opacity-100">
+                           <img
+                    src="/home-page-03-hero-image-tile-01.jpg"
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="h-64 w-44 overflow-hidden rounded-lg">
+                  <img
+                    src="/home-page-03-hero-image-tile-02.jpg"
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+              <div className="space-y-4 pt-8">
+                <div className="h-64 w-44 overflow-hidden rounded-lg">
+                  <img
+                    src="/home-page-03-hero-image-tile-03.jpg"
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="h-64 w-44 overflow-hidden rounded-lg">
+                  <img
+                    src="/home-page-03-hero-image-tile-04.jpg"
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="h-64 w-44 overflow-hidden rounded-lg">
+                  <img
+                    src="/home-page-03-hero-image-tile-05.jpg"
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="h-64 w-44 overflow-hidden rounded-lg">
+                  <img
+                    src="/home-page-03-hero-image-tile-06.jpg"
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="h-64 w-44 overflow-hidden rounded-lg">
+                  <img
+                    src="/home-page-03-hero-image-tile-07.jpg"
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+              </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-};
+}
