@@ -60,8 +60,7 @@ export const CartDrawer = () => {
       onOpenChange={(open) => {
         console.log('Cart drawer open state changing to:', open);
         setIsOpen(open);
-      }} 
-      className="z-40"
+      }}
     >
       <CartTrigger cartItems={cartItems} />
       <Drawer.Portal>
@@ -69,7 +68,7 @@ export const CartDrawer = () => {
           className="fixed inset-0 bg-black/40 z-40" 
           data-testid="cart-overlay"
         />
-        <Drawer.Content className="bg-background flex flex-col fixed right-0 top-0 h-full w-full sm:w-[400px] rounded-l-lg">
+        <Drawer.Content className="bg-background flex flex-col fixed right-0 top-0 h-full w-full sm:w-[400px] rounded-l-lg z-40">
           <CartHeader />
           <CartContent 
             cartItems={cartItems}
