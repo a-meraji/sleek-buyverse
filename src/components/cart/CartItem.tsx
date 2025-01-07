@@ -60,11 +60,14 @@ export const CartItem = ({ item, userId, onQuantityChange, onRemove }: CartItemP
           </Button>
         </div>
         
-        {selectedVariant && (
-          <p className="text-sm text-muted-foreground">
-            Size: {selectedVariant.size}, Color: {selectedVariant.color}
-          </p>
-        )}
+        <p className="text-sm text-muted-foreground">
+          {item.product?.description}
+          {selectedVariant && (
+            <span className="block mt-1">
+              Size: {selectedVariant.size}, Color: {selectedVariant.color}
+            </span>
+          )}
+        </p>
 
         <div className="space-y-1">
           {hasValidDiscount ? (
