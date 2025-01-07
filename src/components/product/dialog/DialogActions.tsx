@@ -24,6 +24,12 @@ export function DialogActions({
   relatedProductId,
   onSuccess
 }: DialogActionsProps) {
+  // Find the selected variant and check its stock
+  const selectedVariant = variants?.find(
+    v => v.size === selectedSize && v.color === selectedColor
+  );
+  const isOutOfStock = selectedVariant?.stock <= 0;
+
   return (
     <div className="mt-4">
       <AddToCartButton
@@ -32,7 +38,7 @@ export function DialogActions({
         selectedSize={selectedSize}
         selectedColor={selectedColor}
         productName={productName}
-        disabled={disabled}
+        disabled={disabled || isOutOfStock}
         variants={variants}
         relatedProductId={relatedProductId}
         onSuccess={onSuccess}
