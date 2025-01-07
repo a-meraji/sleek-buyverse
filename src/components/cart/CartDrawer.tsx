@@ -35,10 +35,28 @@ export const CartDrawer = () => {
   // Keep track of previous cart items length
   const [prevCartLength, setPrevCartLength] = useState(cartItems?.length || 0);
 
+  // Listen for storage events (for unauthenticated cart)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'cart' && !session?.user?.id) {
+        console.log('Local storage cart updated:', e.newValue);
+        // Force a re-render when localStorage changes
+        unauthenticatedCart.refreshCart();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [session?.user?.id, unauthenticatedCart]);
+
   // Only open drawer when items are added
   useEffect(() => {
     const currentLength = cartItems?.length || 0;
     if (currentLength > prevCartLength) {
+      console.log('Opening cart drawer - items changed:', { 
+        currentLength, 
+        prevCartLength 
+      });
       setIsOpen(true);
     }
     setPrevCartLength(currentLength);
