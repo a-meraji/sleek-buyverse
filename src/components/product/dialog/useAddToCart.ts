@@ -16,13 +16,38 @@ export function useAddToCart() {
 
   return useMutation({
     mutationFn: async ({ userId, productId, variantId, relatedProductId }: AddToCartParams) => {
-      if (!userId) {
-        throw new Error('User not authenticated');
-      }
-
       console.log('Adding to cart:', { userId, productId, variantId, relatedProductId });
 
-      // First check if item with same variant already exists in cart
+      if (!userId) {
+        // Handle unauthenticated users - store in localStorage
+        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        
+        // Get product details for local storage
+        const { data: product } = await supabase
+          .from('products')
+          .select('*, product_variants(*)')
+          .eq('id', productId)
+          .single();
+
+        if (!product) {
+          throw new Error('Product not found');
+        }
+
+        const newItem = {
+          id: `local-${Date.now()}`,
+          product,
+          variant_id: variantId,
+          quantity: 1,
+          related_product_id: relatedProductId
+        };
+
+        localCart.push(newItem);
+        localStorage.setItem('cart', JSON.stringify(localCart));
+        console.log('Added item to local cart:', newItem);
+        return newItem;
+      }
+
+      // Handle authenticated users - store in Supabase
       const { data: existingItem, error: fetchError } = await supabase
         .from('cart_items')
         .select('*')
@@ -37,7 +62,6 @@ export function useAddToCart() {
       }
 
       if (existingItem) {
-        // Update quantity if item with same variant exists
         const { error: updateError } = await supabase
           .from('cart_items')
           .update({ 
@@ -56,7 +80,6 @@ export function useAddToCart() {
           description: "Item quantity has been increased in your cart",
         });
       } else {
-        // Insert new item if it doesn't exist or has different variant
         const { error: insertError } = await supabase
           .from('cart_items')
           .insert({
@@ -84,19 +107,11 @@ export function useAddToCart() {
     },
     onError: (error: Error) => {
       console.error('Error adding to cart:', error);
-      if (error.message === 'User not authenticated') {
-        toast({
-          title: "Please sign in",
-          description: "You need to be signed in to add items to cart.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to add item to cart. Please try again.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 }
