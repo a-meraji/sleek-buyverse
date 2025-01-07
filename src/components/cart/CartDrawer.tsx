@@ -37,7 +37,7 @@ export const CartDrawer = () => {
     <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
       <CartTrigger cartItems={cartItems} />
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-10" />
         <Drawer.Content className="bg-background flex flex-col fixed right-0 top-0 h-full w-full sm:w-[400px] rounded-l-lg">
           <CartHeader />
           <CartContent 
