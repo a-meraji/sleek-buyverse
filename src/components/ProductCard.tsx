@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { ProductOverviewDialog } from "./product/ProductOverviewDialog";
 import { Product } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { useProductDialog } from "./product/hooks/useProductDialog";
+import { PriceDisplay } from "./product/card/PriceDisplay";
 
 interface ProductCardProps {
   id: string;
@@ -15,51 +15,9 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ id, name, image, product_variants, discount }: ProductCardProps) {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [productData, setProductData] = useState<Product | null>(null);
+  const { userId, isDialogOpen, setIsDialogOpen, productData } = useProductDialog(id);
 
-  // Calculate the minimum price from variants
-  const minPrice = product_variants?.length 
-    ? Math.min(...product_variants.map(v => v.price))
-    : 0;
-
-  // Calculate discounted price if discount exists and is valid
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-  const discountedPrice = hasValidDiscount ? minPrice * (1 - discount / 100) : minPrice;
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserId(session?.user?.id ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('ProductCard auth state changed:', event, session);
-      setUserId(session?.user?.id ?? null);
-    });
-
-    // Fetch full product data when dialog is opened
-    if (isDialogOpen && !productData) {
-      supabase
-        .from('products')
-        .select('*, product_variants(*)')
-        .eq('id', id)
-        .single()
-        .then(({ data, error }) => {
-          if (error) {
-            console.error('Error fetching product:', error);
-            return;
-          }
-          setProductData(data);
-        });
-    }
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [id, isDialogOpen, productData]);
-
-  console.log('ProductCard variants:', product_variants);
 
   return (
     <div className="group relative rounded-lg border p-4 hover:shadow-lg transition-shadow">
@@ -78,22 +36,7 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
         </div>
         <div className="mt-4">
           <h3 className="text-lg font-medium">{name}</h3>
-          <p className="mt-1 text-sm">
-            {product_variants?.length ? (
-              <span className="flex items-center gap-2">
-                {hasValidDiscount ? (
-                  <>
-                    <span className="text-gray-500 line-through">From ${minPrice.toFixed(2)}</span>
-                    <span className="text-red-500">From ${discountedPrice.toFixed(2)}</span>
-                  </>
-                ) : (
-                  <span className="text-gray-500">From ${minPrice.toFixed(2)}</span>
-                )}
-              </span>
-            ) : (
-              "Price not available"
-            )}
-          </p>
+          <PriceDisplay variants={product_variants} discount={discount} />
         </div>
       </Link>
       <div className="mt-4">
