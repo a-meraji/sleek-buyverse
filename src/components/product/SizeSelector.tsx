@@ -5,9 +5,15 @@ interface SizeSelectorProps {
   selectedSize: string;
   onSizeSelect: (size: string) => void;
   variants?: { size: string; stock: number }[];
+  showOutOfStock?: boolean;
 }
 
-export const SizeSelector = ({ selectedSize, onSizeSelect, variants = [] }: SizeSelectorProps) => {
+export const SizeSelector = ({ 
+  selectedSize, 
+  onSizeSelect, 
+  variants = [],
+  showOutOfStock = false
+}: SizeSelectorProps) => {
   const isOutOfStock = (size: string) => {
     const variant = variants.find(v => v.size === size);
     return variant ? variant.stock <= 0 : true;
@@ -30,7 +36,7 @@ export const SizeSelector = ({ selectedSize, onSizeSelect, variants = [] }: Size
           </Button>
         ))}
       </div>
-      {selectedSize && currentVariantStock <= 0 && (
+      {showOutOfStock && selectedSize && currentVariantStock <= 0 && (
         <Badge variant="destructive" className="mt-2">
           Out of Stock
         </Badge>

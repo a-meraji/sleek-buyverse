@@ -61,56 +61,52 @@ export function ProductOverviewDialog({
   }, [userId, productId]);
 
   const handleAddToFavorites = async () => {
-    try {
-      if (!userId) {
-        toast({
-          title: "Please sign in",
-          description: "You need to be signed in to add items to favorites",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (isFavorite) {
-        const { error } = await supabase
-          .from('favorites')
-          .delete()
-          .eq('user_id', userId)
-          .eq('product_id', productId);
-
-        if (error) throw error;
-        setIsFavorite(false);
-        toast({
-          title: "Removed from favorites",
-          description: "Product has been removed from your favorites"
-        });
-      } else {
-        const { error } = await supabase
-          .from('favorites')
-          .upsert({ 
-            user_id: userId,
-            product_id: productId
-          });
-
-        if (error) throw error;
-        setIsFavorite(true);
-        toast({
-          title: "Added to favorites",
-          description: "Product has been added to your favorites"
-        });
-      }
-    } catch (error) {
-      console.error('Error managing favorites:', error);
+    if (!userId) {
       toast({
-        title: "Error",
-        description: "Failed to update favorites",
+        title: "Please sign in",
+        description: "You need to be signed in to add items to favorites",
         variant: "destructive"
+      });
+      return;
+    }
+
+    if (isFavorite) {
+      const { error } = await supabase
+        .from('favorites')
+        .delete()
+        .eq('user_id', userId)
+        .eq('product_id', productId);
+
+      if (error) throw error;
+      setIsFavorite(false);
+      toast({
+        title: "Removed from favorites",
+        description: "Product has been removed from your favorites"
+      });
+    } else {
+      const { error } = await supabase
+        .from('favorites')
+        .upsert({ 
+          user_id: userId,
+          product_id: productId
+        });
+
+      if (error) throw error;
+      setIsFavorite(true);
+      toast({
+        title: "Added to favorites",
+        description: "Product has been added to your favorites"
       });
     }
   };
 
   const handleCartSuccess = () => {
-    // Ensure we clean up properly when closing
+    setSelectedSize("");
+    setSelectedColor("");
+    onClose();
+  };
+
+  const handleClose = () => {
     setSelectedSize("");
     setSelectedColor("");
     onClose();
@@ -121,10 +117,7 @@ export function ProductOverviewDialog({
       open={isOpen} 
       onOpenChange={(open) => {
         if (!open) {
-          // Reset state when dialog closes
-          setSelectedSize("");
-          setSelectedColor("");
-          onClose();
+          handleClose();
         }
       }}
       modal={true}
@@ -134,12 +127,7 @@ export function ProductOverviewDialog({
         onCloseAutoFocus={(event) => {
           event.preventDefault();
         }}
-        onEscapeKeyDown={() => {
-          // Clean up on escape key
-          setSelectedSize("");
-          setSelectedColor("");
-          onClose();
-        }}
+        onEscapeKeyDown={handleClose}
       >
         <DialogHeader>
           <div className="flex justify-between items-center">
@@ -171,6 +159,7 @@ export function ProductOverviewDialog({
               selectedColor={selectedColor}
               onSizeChange={setSelectedSize}
               onColorChange={setSelectedColor}
+              showOutOfStock={!!(selectedSize && selectedColor)}
             />
 
             <div className="flex gap-2 items-center">

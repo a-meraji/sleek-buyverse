@@ -1,73 +1,53 @@
-import { ProductVariant } from "@/types/variant";
-import { VariantSelector } from "./VariantSelector";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { ColorSelector } from "../ColorSelector";
+import { SizeSelector } from "../SizeSelector";
+import { ProductVariant } from "@/types";
 
 interface VariantSelectionPanelProps {
-  variants: ProductVariant[];
-  selectedSize: string;
+  colors: string[];
   selectedColor: string;
-  onSizeChange: (size: string) => void;
-  onColorChange: (color: string) => void;
+  onColorSelect: (color: string) => void;
+  selectedSize: string;
+  onSizeSelect: (size: string) => void;
+  variants: ProductVariant[];
+  selectedVariant?: ProductVariant;
+  finalSelectedVariantPrice: number;
+  showOutOfStock?: boolean;
 }
 
-export function VariantSelectionPanel({
-  variants,
-  selectedSize,
+export const VariantSelectionPanel = ({
+  colors,
   selectedColor,
-  onSizeChange,
-  onColorChange
-}: VariantSelectionPanelProps) {
-  const colors = [...new Set(variants.map(v => v.color))];
-  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
-  
-  useEffect(() => {
-    if (selectedColor) {
-      const sizes = variants
-        .filter(v => v.color === selectedColor)
-        .map(v => v.size);
-      setAvailableSizes(sizes);
-      if (!sizes.includes(selectedSize)) {
-        onSizeChange('');
-      }
-    }
-  }, [selectedColor, variants, selectedSize, onSizeChange]);
-
-  const selectedVariant = variants.find(v => 
-    v.size === selectedSize && v.color === selectedColor
-  );
-  const isOutOfStock = selectedVariant?.stock <= 0;
-
+  onColorSelect,
+  selectedSize,
+  onSizeSelect,
+  variants,
+  selectedVariant,
+  finalSelectedVariantPrice,
+  showOutOfStock = false,
+}: VariantSelectionPanelProps) => {
   return (
-    <div className="space-y-4">
-      {variants.length > 0 ? (
-        <>
-          <VariantSelector
-            label="Color"
-            options={colors}
-            value={selectedColor}
-            onChange={onColorChange}
-          />
-          {selectedColor && (
-            <VariantSelector
-              label="Size"
-              options={availableSizes}
-              value={selectedSize}
-              onChange={onSizeChange}
-              variants={variants.filter(v => v.color === selectedColor)}
-            />
-          )}
-          {isOutOfStock && (
-            <Badge variant="destructive" className="w-fit">
-              Out of Stock
-            </Badge>
-          )}
-        </>
-      ) : (
-        <p className="text-sm text-gray-500">
-          No variants available for this product.
-        </p>
+    <>
+      <ColorSelector
+        colors={colors}
+        selectedColor={selectedColor}
+        onColorSelect={onColorSelect}
+      />
+
+      <SizeSelector 
+        selectedSize={selectedSize} 
+        onSizeSelect={onSizeSelect}
+        variants={variants.filter(v => v.color === selectedColor)}
+        showOutOfStock={showOutOfStock}
+      />
+      
+      {selectedVariant && (
+        <div className="space-y-2">
+          <p className="text-lg font-medium">
+            Selected variant: ${finalSelectedVariantPrice.toFixed(2)}
+          </p>
+        </div>
       )}
-    </div>
+    </>
   );
-}
+};
