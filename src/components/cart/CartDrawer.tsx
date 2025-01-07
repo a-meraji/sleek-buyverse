@@ -32,14 +32,19 @@ export const CartDrawer = () => {
     removeItem
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
-  // Auto-open drawer when items are added
+  // Keep track of previous cart items length
+  const [prevCartLength, setPrevCartLength] = useState(cartItems?.length || 0);
+
+  // Only open drawer when items are added
   useEffect(() => {
-    if (cartItems?.length) {
+    const currentLength = cartItems?.length || 0;
+    if (currentLength > prevCartLength) {
       setIsOpen(true);
     }
+    setPrevCartLength(currentLength);
   }, [cartItems?.length]);
 
-  // Memoize the total calculation to prevent unnecessary recalculations
+  // Memoize the total calculation
   const total = useMemo(() => {
     return cartItems?.reduce((sum, item) => {
       const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
