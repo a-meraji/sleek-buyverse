@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
-import HeroBanner from "@/components/home/HeroBanner";
+import { HeroBanner } from "@/components/home/HeroBanner";
 import { LoadingState } from "@/components/home/LoadingState";
 import { ErrorState } from "@/components/home/ErrorState";
 import { MainContent } from "@/components/home/MainContent";
