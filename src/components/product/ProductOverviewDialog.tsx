@@ -54,10 +54,12 @@ export function ProductOverviewDialog({
 
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[900px] p-0">
-        <div className="grid md:grid-cols-2 gap-4">
-          <ProductImage image={product.image_url} name={product.name} />
-          <div className="p-6 space-y-6">
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] p-0 overflow-hidden">
+        <div className="grid md:grid-cols-2 gap-4 h-full">
+          <div className="relative h-[300px] md:h-full">
+            <ProductImage image={product.image_url} name={product.name} />
+          </div>
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-2rem)]">
             <ProductInfo 
               name={product.name}
               variants={product.product_variants}
