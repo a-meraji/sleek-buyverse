@@ -26,20 +26,25 @@ export const useUnauthenticatedCart = () => {
     loadCartItems();
   }, []);
 
+  const notifyCartUpdate = (updatedCart: CartItem[]) => {
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    
+    // Dispatch both storage and custom events
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'cart',
+      newValue: JSON.stringify(updatedCart)
+    }));
+    window.dispatchEvent(new Event('cartUpdated'));
+  };
+
   const updateQuantity = async (itemId: string, quantity: number) => {
     try {
       const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
       const updatedCart = storedCart.map((item: CartItem) =>
         item.id === itemId ? { ...item, quantity } : item
       );
-      localStorage.setItem('cart', JSON.stringify(updatedCart));
       
-      // Dispatch a storage event for other tabs
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'cart',
-        newValue: JSON.stringify(updatedCart)
-      }));
-      
+      notifyCartUpdate(updatedCart);
       setCartItems(updatedCart);
       
       toast({
@@ -60,14 +65,8 @@ export const useUnauthenticatedCart = () => {
     try {
       const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
       const filteredCart = storedCart.filter((item: CartItem) => item.id !== itemId);
-      localStorage.setItem('cart', JSON.stringify(filteredCart));
       
-      // Dispatch a storage event for other tabs
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'cart',
-        newValue: JSON.stringify(filteredCart)
-      }));
-      
+      notifyCartUpdate(filteredCart);
       setCartItems(filteredCart);
       
       toast({

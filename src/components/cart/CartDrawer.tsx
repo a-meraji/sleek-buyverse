@@ -1,14 +1,14 @@
 import { Drawer } from "vaul";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CartItem } from "./CartItem";
 import { CartSummary } from "./CartSummary";
-import { EmptyCart } from "./EmptyCart";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
 import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
+import { CartHeader } from "./CartHeader";
+import { CartContent } from "./CartContent";
 
 export const CartDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,25 +29,31 @@ export const CartDrawer = () => {
     cartItems,
     isLoading,
     updateQuantity,
-    removeItem
+    removeItem,
+    refreshCart
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
   // Keep track of previous cart items length
   const [prevCartLength, setPrevCartLength] = useState(cartItems?.length || 0);
 
-  // Listen for storage events (for unauthenticated cart)
+  // Listen for storage events and manual cart updates
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'cart' && !session?.user?.id) {
         console.log('Local storage cart updated:', e.newValue);
-        // Force a re-render when localStorage changes
-        unauthenticatedCart.refreshCart();
+        refreshCart();
       }
     };
 
+    // Listen for both storage events and manual updates
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [session?.user?.id, unauthenticatedCart]);
+    window.addEventListener('cartUpdated', handleStorageChange as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('cartUpdated', handleStorageChange as EventListener);
+    };
+  }, [session?.user?.id, refreshCart]);
 
   // Only open drawer when items are added
   useEffect(() => {
@@ -60,18 +66,16 @@ export const CartDrawer = () => {
       setIsOpen(true);
     }
     setPrevCartLength(currentLength);
-  }, [cartItems?.length]);
+  }, [cartItems?.length, prevCartLength]);
 
-  // Memoize the total calculation
-  const total = useMemo(() => {
-    return cartItems?.reduce((sum, item) => {
-      const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
-      const discount = item.product?.discount;
-      const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-      const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-      return sum + (discountedPrice * item.quantity);
-    }, 0) ?? 0;
-  }, [cartItems]);
+  // Calculate total
+  const total = cartItems?.reduce((sum, item) => {
+    const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
+    const discount = item.product?.discount;
+    const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+    const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
+    return sum + (discountedPrice * item.quantity);
+  }, 0) ?? 0;
 
   console.log('Cart drawer render:', {
     isAuthenticated: !!session?.user?.id,
@@ -104,40 +108,13 @@ export const CartDrawer = () => {
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40 z-[48]" />
         <Drawer.Content className="bg-background flex flex-col fixed right-0 top-0 h-full w-full sm:w-[400px] rounded-l-lg z-[49]">
-          <div className="p-4 border-b">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Shopping Cart</h2>
-              <Drawer.Close asChild>
-                <Button variant="ghost" size="icon">
-                  <span className="sr-only">Close</span>
-                  ×
-                </Button>
-              </Drawer.Close>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-auto p-4">
-            {!cartItems?.length ? (
-              <EmptyCart />
-            ) : (
-              <div className="space-y-4">
-                {cartItems.map((item) => (
-                  <CartItem
-                    key={item.id}
-                    item={item}
-                    userId={session?.user?.id || null}
-                    onQuantityChange={(id, currentQuantity, delta) => {
-                      const newQuantity = currentQuantity + delta;
-                      if (newQuantity < 1) return;
-                      updateQuantity(id, newQuantity);
-                    }}
-                    onRemove={removeItem}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
+          <CartHeader />
+          <CartContent 
+            cartItems={cartItems}
+            userId={session?.user?.id || null}
+            updateQuantity={updateQuantity}
+            removeItem={removeItem}
+          />
           {cartItems?.length > 0 && (
             <div className="p-4 border-t">
               <CartSummary
