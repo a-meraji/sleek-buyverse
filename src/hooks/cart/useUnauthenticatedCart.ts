@@ -36,11 +36,12 @@ export const useUnauthenticatedCart = () => {
     };
   }, []); // Empty dependency array as we want this to run only once on mount
 
-  const notifyCartUpdate = (updatedCart: CartItem[]) => {
+  const updateLocalStorageAndState = (updatedCart: CartItem[]) => {
+    console.log('Updating cart in localStorage and state:', updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
+    setCartItems(updatedCart); // Update state immediately
     const event = new CustomEvent('cartUpdated');
     window.dispatchEvent(event);
-    console.log('Cart updated and event dispatched:', updatedCart);
   };
 
   const updateQuantity = async (itemId: string, quantity: number) => {
@@ -49,7 +50,7 @@ export const useUnauthenticatedCart = () => {
       const updatedCart = currentCart.map((item: CartItem) =>
         item.id === itemId ? { ...item, quantity } : item
       );
-      notifyCartUpdate(updatedCart);
+      updateLocalStorageAndState(updatedCart);
       
       toast({
         title: "Cart updated",
@@ -69,7 +70,7 @@ export const useUnauthenticatedCart = () => {
     try {
       const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
       const updatedCart = currentCart.filter((item: CartItem) => item.id !== itemId);
-      notifyCartUpdate(updatedCart);
+      updateLocalStorageAndState(updatedCart);
       
       toast({
         title: "Item removed",
