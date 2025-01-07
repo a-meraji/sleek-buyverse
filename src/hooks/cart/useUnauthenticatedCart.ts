@@ -1,20 +1,12 @@
 import { useState, useEffect } from 'react';
 import { CartItem } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useUnauthenticatedCart = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-
-  const notifyCartUpdate = (updatedCart: CartItem[]) => {
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    const event = new CustomEvent('cartUpdated', { 
-      detail: { cartItems: updatedCart } 
-    });
-    window.dispatchEvent(event);
-    console.log('Cart updated:', updatedCart);
-  };
 
   const loadCartItems = () => {
     try {
@@ -33,6 +25,15 @@ export const useUnauthenticatedCart = () => {
   useEffect(() => {
     loadCartItems();
   }, []);
+
+  const notifyCartUpdate = (updatedCart: CartItem[]) => {
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    const event = new CustomEvent('cartUpdated', { 
+      detail: { cartItems: updatedCart } 
+    });
+    window.dispatchEvent(event);
+    console.log('Cart updated:', updatedCart);
+  };
 
   const updateQuantity = async (itemId: string, quantity: number) => {
     try {

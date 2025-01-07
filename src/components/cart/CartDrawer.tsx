@@ -6,12 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
 import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CartHeader } from "./CartHeader";
 import { CartContent } from "./CartContent";
 
 export const CartDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const initialRenderRef = useRef(true);
+  
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -33,40 +35,24 @@ export const CartDrawer = () => {
     refreshCart
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
-  // Keep track of previous cart items length
-  const [prevCartLength, setPrevCartLength] = useState(cartItems?.length || 0);
-
   // Listen for cart updates
   useEffect(() => {
     const handleCartUpdate = (event: Event) => {
       console.log('Cart update event received:', event);
       if (!session?.user?.id) {
         refreshCart();
+        // Only open drawer if it's a cartUpdated custom event
+        if (event instanceof CustomEvent) {
+          setIsOpen(true);
+        }
       }
     };
 
-    // Listen for both storage events and custom updates
-    window.addEventListener('storage', handleCartUpdate);
     window.addEventListener('cartUpdated', handleCartUpdate);
-
     return () => {
-      window.removeEventListener('storage', handleCartUpdate);
       window.removeEventListener('cartUpdated', handleCartUpdate);
     };
   }, [session?.user?.id, refreshCart]);
-
-  // Open drawer when items are added
-  useEffect(() => {
-    const currentLength = cartItems?.length || 0;
-    if (currentLength > prevCartLength) {
-      console.log('Opening cart drawer - items changed:', { 
-        currentLength, 
-        prevCartLength 
-      });
-      setIsOpen(true);
-    }
-    setPrevCartLength(currentLength);
-  }, [cartItems?.length, prevCartLength]);
 
   // Calculate total with discounts
   const total = cartItems?.reduce((sum, item) => {
