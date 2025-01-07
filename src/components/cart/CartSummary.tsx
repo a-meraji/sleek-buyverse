@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { Drawer } from "vaul";
 
 interface CartSummaryProps {
   total: number;
@@ -7,6 +9,7 @@ interface CartSummaryProps {
 }
 
 export const CartSummary = ({ total, isAuthenticated, itemsExist }: CartSummaryProps) => {
+  const navigate = useNavigate();
   console.log('Rendering cart summary with total:', total);
   
   return (
@@ -18,18 +21,20 @@ export const CartSummary = ({ total, isAuthenticated, itemsExist }: CartSummaryP
         <span className="font-medium">${total.toFixed(2)}</span>
       </div>
       
-      <Button 
-        className="w-full" 
-        size="lg"
-        disabled={!itemsExist}
-        onClick={() => {
-          if (!isAuthenticated) {
-            window.location.href = '/auth';
-          }
-        }}
-      >
-        {isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
-      </Button>
+      <Drawer.Close asChild>
+        <Button 
+          className="w-full" 
+          size="lg"
+          disabled={!itemsExist}
+          onClick={() => {
+            if (!isAuthenticated) {
+              navigate('/auth');
+            }
+          }}
+        >
+          {isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
+        </Button>
+      </Drawer.Close>
     </div>
   );
 };

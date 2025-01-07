@@ -1,5 +1,6 @@
 import { Footer } from "@/components/home/Footer";
 import { Outlet } from "react-router-dom";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 
 export const RootLayout = () => {
   return (
@@ -7,6 +8,7 @@ export const RootLayout = () => {
       <div className="flex-1">
         <Outlet />
       </div>
+      <CartDrawer />
       <Footer />
     </div>
   );
