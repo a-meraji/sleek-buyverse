@@ -34,7 +34,7 @@ export const CartDrawer = () => {
   }
 
   return (
-    <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer.Root open={isOpen} onOpenChange={setIsOpen} className="z-40">
       <CartTrigger cartItems={cartItems} />
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40 z-10" />
