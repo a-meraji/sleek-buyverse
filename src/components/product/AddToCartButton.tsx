@@ -12,6 +12,7 @@ interface AddToCartButtonProps {
   disabled?: boolean;
   variants?: ProductVariant[];
   relatedProductId?: string;
+  onSuccess?: () => void;
 }
 
 export function AddToCartButton({
@@ -22,7 +23,8 @@ export function AddToCartButton({
   productName,
   disabled,
   variants,
-  relatedProductId
+  relatedProductId,
+  onSuccess
 }: AddToCartButtonProps) {
   const addToCart = useAddToCart();
   const { toast } = useToast();
@@ -52,6 +54,7 @@ export function AddToCartButton({
           title: "Added to Cart",
           description: `${productName} has been added to your cart`,
         });
+        onSuccess?.();
       }
     });
   };

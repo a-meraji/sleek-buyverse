@@ -61,16 +61,16 @@ export function ProductOverviewDialog({
   }, [userId, productId]);
 
   const handleAddToFavorites = async () => {
-    if (!userId) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to add items to favorites",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
+      if (!userId) {
+        toast({
+          title: "Please sign in",
+          description: "You need to be signed in to add items to favorites",
+          variant: "destructive"
+        });
+        return;
+      }
+
       if (isFavorite) {
         const { error } = await supabase
           .from('favorites')
@@ -107,6 +107,10 @@ export function ProductOverviewDialog({
         variant: "destructive"
       });
     }
+  };
+
+  const handleCartSuccess = () => {
+    onClose();
   };
 
   return (
@@ -153,6 +157,7 @@ export function ProductOverviewDialog({
                 productName={productName}
                 disabled={!selectedSize || !selectedColor}
                 variants={variants}
+                onSuccess={handleCartSuccess}
               />
               <Link 
                 to={`/product/${productId}`}
