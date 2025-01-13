@@ -1,16 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Drawer } from "vaul";
 
 interface CartSummaryProps {
   total: number;
   isAuthenticated: boolean;
   itemsExist: boolean;
+  onClose: () => void;
 }
 
-export const CartSummary = ({ total, isAuthenticated, itemsExist }: CartSummaryProps) => {
+export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: CartSummaryProps) => {
   const navigate = useNavigate();
   console.log('Rendering cart summary with total:', total);
+  
+  const handleCheckout = () => {
+    onClose();
+    if (!isAuthenticated) {
+      navigate('/auth');
+    }
+    // Handle checkout logic here
+  };
   
   return (
     <div className="bg-secondary p-6 rounded-lg space-y-4">
@@ -21,20 +29,14 @@ export const CartSummary = ({ total, isAuthenticated, itemsExist }: CartSummaryP
         <span className="font-medium">${total.toFixed(2)}</span>
       </div>
       
-      <Drawer.Close asChild>
-        <Button 
-          className="w-full" 
-          size="lg"
-          disabled={!itemsExist}
-          onClick={() => {
-            if (!isAuthenticated) {
-              navigate('/auth');
-            }
-          }}
-        >
-          {isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
-        </Button>
-      </Drawer.Close>
+      <Button 
+        className="w-full" 
+        size="lg"
+        disabled={!itemsExist}
+        onClick={handleCheckout}
+      >
+        {isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
+      </Button>
     </div>
   );
 };

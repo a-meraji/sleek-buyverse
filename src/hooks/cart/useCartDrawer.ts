@@ -28,8 +28,19 @@ export const useCartDrawer = () => {
     refreshCart
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const handleCartUpdate = useCallback((event: CustomEvent) => {
-    console.log('Cart update event received in CartDrawer:', event.detail);
+    console.log('Cart update event received:', event.detail);
     refreshCart();
     if (event.detail?.openDrawer) {
       setIsOpen(true);

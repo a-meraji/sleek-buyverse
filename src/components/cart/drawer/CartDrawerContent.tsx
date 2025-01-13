@@ -10,6 +10,7 @@ interface CartDrawerContentProps {
   removeItem: (id: string) => void;
   total: number;
   isAuthenticated: boolean;
+  onClose: () => void;
 }
 
 export const CartDrawerContent = ({
@@ -18,11 +19,12 @@ export const CartDrawerContent = ({
   updateQuantity,
   removeItem,
   total,
-  isAuthenticated
+  isAuthenticated,
+  onClose
 }: CartDrawerContentProps) => {
   return (
-    <div className="bg-background flex flex-col fixed right-0 top-0 h-full w-full sm:w-[400px] rounded-l-lg z-40">
-      <CartHeader />
+    <div className="flex flex-col h-full">
+      <CartHeader onClose={onClose} />
       <CartContent 
         cartItems={cartItems}
         userId={userId}
@@ -30,11 +32,12 @@ export const CartDrawerContent = ({
         removeItem={removeItem}
       />
       {cartItems?.length > 0 && (
-        <div className="p-4 border-t">
+        <div className="p-4 border-t mt-auto">
           <CartSummary
             total={total}
             isAuthenticated={isAuthenticated}
             itemsExist={!!cartItems?.length}
+            onClose={onClose}
           />
         </div>
       )}
