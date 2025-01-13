@@ -1,19 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-interface ChatSession {
-  id: string;
-  user_id: string | null;
-  admin_id: string | null;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  last_message_at: string;
-  user_email: string | null;
-  unread_count: number;
-}
+import { ChatSession } from "../types/chat";
+import { useUserProfiles } from "./useUserProfiles";
 
 export const useSessionList = () => {
+  const { fetchUserProfile } = useUserProfiles();
+
+  const fetchUnreadCount = async (sessionId: string, currentUserId: string, isAdmin: boolean) => {
+    console.log('Fetching unread count for session:', sessionId);
+    
+    const query = supabase
+      .from('chat_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('session_id', sessionId)
+      .eq('is_read', false);
+
+    // For admins, count unread messages FROM users (where sender is NOT admin)
+    // For users, count unread messages FROM admins (where sender is admin)
+    if (isAdmin) {
+      query.neq('sender_id', currentUserId);
+    } else {
+      query.eq('sender_id', currentUserId);
+    }
+
+    const { count, error } = await query;
+
+    if (error) {
+      console.error('Error counting unread messages:', error);
+      return 0;
+    }
+
+    return count || 0;
+  };
+
   return useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
     queryFn: async () => {
@@ -27,15 +46,12 @@ export const useSessionList = () => {
         return [];
       }
 
-      // Get admin status
       const { data: isAdminData } = await supabase.rpc('is_admin', {
         user_id: currentUserId
       });
       const isAdmin = isAdminData;
-
       console.log('Current user is admin:', isAdmin);
 
-      // First get chat sessions
       const { data: chatSessions, error: sessionsError } = await supabase
         .from('chat_sessions')
         .select('*')
@@ -47,56 +63,15 @@ export const useSessionList = () => {
         throw sessionsError;
       }
 
-      // Then fetch user profiles for each session
       const sessionsWithProfiles = await Promise.all(
         chatSessions.map(async (session) => {
-          if (session.user_id) {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user_id)
-              .single();
-
-            const userEmail = profile?.email || 'Anonymous';
-            console.log(`Found profile for session ${session.id}:`, profile);
-
-            // Count unread messages
-            const query = supabase
-              .from('chat_messages')
-              .select('*')
-              .eq('session_id', session.id)
-              .eq('is_read', false);
-
-            if (isAdmin) {
-              // For admins, count unread messages from users
-              query.neq('sender_id', currentUserId);
-            } else {
-              // For users, count unread messages from admins
-              query.eq('sender_id', currentUserId);
-            }
-
-            const { data: messages, error: messagesError } = await query;
-
-            if (messagesError) {
-              console.error('Error fetching messages:', messagesError);
-              return {
-                ...session,
-                user_email: userEmail,
-                unread_count: 0
-              };
-            }
-
-            return {
-              ...session,
-              user_email: userEmail,
-              unread_count: messages?.length || 0
-            };
-          }
+          const profile = session.user_id ? await fetchUserProfile(session.user_id) : null;
+          const unreadCount = await fetchUnreadCount(session.id, currentUserId, isAdmin);
 
           return {
             ...session,
-            user_email: 'Anonymous',
-            unread_count: 0
+            user_email: profile?.email || 'Anonymous',
+            unread_count: unreadCount
           };
         })
       );
