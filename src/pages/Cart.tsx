@@ -89,6 +89,7 @@ const Cart = () => {
               total={total}
               isAuthenticated={!!session}
               itemsExist={!!cartItems?.length}
+              onClose={() => {}} // Add empty function since Cart page doesn't need to close anything
             />
           </div>
         </div>
