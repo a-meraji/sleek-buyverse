@@ -25,13 +25,26 @@ export const CartDrawer = () => {
       // Small delay to ensure drawer animation completes
       const timeoutId = setTimeout(() => {
         console.log('Executing cart drawer overlay cleanup');
+        // Remove both overlay elements and their containers
         const overlays = document.querySelectorAll('[data-vaul-overlay]');
         overlays.forEach(overlay => {
           if (overlay.parentNode) {
             console.log('Removing cart drawer overlay');
-            overlay.parentNode.removeChild(overlay);
+            // Remove the parent portal container as well
+            const portalContainer = overlay.parentNode;
+            if (portalContainer.parentNode) {
+              portalContainer.parentNode.removeChild(portalContainer);
+            }
           } else {
             console.log('Overlay already removed or not found in DOM');
+          }
+        });
+
+        // Also clean up any remaining portal roots
+        const portalRoots = document.querySelectorAll('[data-vaul-drawer-portal]');
+        portalRoots.forEach(root => {
+          if (root.parentNode) {
+            root.parentNode.removeChild(root);
           }
         });
       }, 300);
