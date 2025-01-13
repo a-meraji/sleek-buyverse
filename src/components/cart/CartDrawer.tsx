@@ -24,47 +24,30 @@ export const CartDrawer = () => {
   // Cleanup effect for drawer overlay
   useEffect(() => {
     if (!isOpen) {
-      console.log('Cart drawer closed, scheduling cleanup');
-      
-      // Prevent multiple cleanups
-      if (cleanupInProgress.current) {
-        console.log('Cleanup already in progress, skipping');
-        return;
-      }
-      
-      cleanupInProgress.current = true;
-
-      // Small delay to ensure drawer animation completes
+      // Let Vaul handle its own cleanup first
       const timeoutId = setTimeout(() => {
-        console.log('Executing cart drawer overlay cleanup');
-        try {
-          // Remove overlay elements if they exist
-          const overlays = document.querySelectorAll('[data-vaul-overlay]');
-          overlays.forEach(overlay => {
-            if (overlay?.parentNode) {
-              console.log('Found overlay to remove');
-              const portalContainer = overlay.parentNode;
-              if (portalContainer?.parentNode) {
-                console.log('Removing overlay container');
-                portalContainer.parentNode.removeChild(portalContainer);
-              }
-            }
-          });
+        // Skip if cleanup is already in progress
+        if (cleanupInProgress.current) {
+          return;
+        }
 
-          // Clean up portal roots if they exist
-          const portalRoots = document.querySelectorAll('[data-vaul-drawer-portal]');
-          portalRoots.forEach(root => {
-            if (root?.parentNode) {
-              console.log('Removing portal root');
-              root.parentNode.removeChild(root);
+        cleanupInProgress.current = true;
+
+        try {
+          // Only remove our custom overlay elements
+          const customOverlays = document.querySelectorAll('[data-testid="cart-overlay"]');
+          customOverlays.forEach(overlay => {
+            const parent = overlay?.parentElement;
+            if (parent?.parentElement && document.body.contains(parent)) {
+              parent.parentElement.removeChild(parent);
             }
           });
         } catch (error) {
-          console.error('Error during cleanup:', error);
+          console.error('Error during cart overlay cleanup:', error);
         } finally {
           cleanupInProgress.current = false;
         }
-      }, 300);
+      }, 500); // Increased delay to ensure Vaul cleanup completes
 
       return () => {
         clearTimeout(timeoutId);
