@@ -52,7 +52,6 @@ export const Navbar = () => {
           </Button>
           
           <CartDrawer />
-          
           <ProfileButton user={user} setUser={setUser} />
           <NavigationMenu />
         </div>
