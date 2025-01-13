@@ -18,7 +18,26 @@ interface SessionCardProps {
 
 export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps) => {
   const [unreadCount, setUnreadCount] = useState(session.unread_count);
+  const [userProfile, setUserProfile] = useState<{ first_name: string | null; last_name: string | null } | null>(null);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (session.user_email) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', session.id)
+          .single();
+        
+        if (profiles) {
+          setUserProfile(profiles);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [session.id, session.user_email]);
 
   useEffect(() => {
     console.log('Session unread count updated:', session.unread_count);
@@ -80,6 +99,10 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
     };
   }, [session.id, queryClient]);
 
+  const displayName = userProfile 
+    ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() 
+    : 'Anonymous';
+
   return (
     <Card
       className={`mb-2 cursor-pointer ${
@@ -89,9 +112,16 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
     >
       <CardHeader className="p-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">
-            {session.user_email || "Anonymous"}
-          </CardTitle>
+          <div className="space-y-1">
+            <CardTitle className="text-sm font-medium">
+              {displayName}
+            </CardTitle>
+            {session.user_email && (
+              <CardDescription className="text-xs text-muted-foreground">
+                {session.user_email}
+              </CardDescription>
+            )}
+          </div>
           {unreadCount > 0 && (
             <Badge 
               variant="default"
@@ -101,7 +131,7 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
             </Badge>
           )}
         </div>
-        <CardDescription className="text-xs">
+        <CardDescription className="text-xs mt-2">
           {new Date(session.last_message_at).toLocaleString()}
         </CardDescription>
       </CardHeader>
