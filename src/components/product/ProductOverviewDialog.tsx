@@ -52,10 +52,11 @@ export function ProductOverviewDialog({
   };
 
   const handleSuccess = () => {
-    console.log('Add to cart success, resetting selection states');
-    // Only reset the selection states, don't close the dialog
+    console.log('Add to cart success, closing dialog');
+    // Reset selection states and close the dialog
     setSelectedSize("");
     setSelectedColor("");
+    handleClose();
   };
 
   return (
