@@ -32,6 +32,10 @@ export default {
           DEFAULT: "#F7F7F7",
           foreground: "#1A1A1A",
         },
+        popover: {
+          DEFAULT: "hsl(0 0% 100%)",
+          foreground: "hsl(0 0% 10%)",
+        },
       },
       keyframes: {
         fadeIn: {
