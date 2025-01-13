@@ -3,6 +3,7 @@ import { CartContent } from "./CartContent";
 import { CartHeader } from "./CartHeader";
 import { useCartDrawer } from "@/hooks/cart/useCartDrawer";
 import { CartTrigger } from "./CartTrigger";
+import { CartDrawerContent } from "./drawer/CartDrawerContent";
 
 export function CartDrawer() {
   const {
@@ -11,7 +12,8 @@ export function CartDrawer() {
     session,
     cartItems,
     updateQuantity,
-    removeItem
+    removeItem,
+    total
   } = useCartDrawer();
 
   return (
@@ -28,15 +30,15 @@ export function CartDrawer() {
             onClick={() => setIsOpen(false)}
           />
           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl">
-            <div className="flex h-full flex-col">
-              <CartHeader onClose={() => setIsOpen(false)} />
-              <CartContent
-                cartItems={cartItems}
-                userId={session?.user?.id || null}
-                updateQuantity={updateQuantity}
-                removeItem={removeItem}
-              />
-            </div>
+            <CartDrawerContent
+              cartItems={cartItems}
+              userId={session?.user?.id || null}
+              updateQuantity={updateQuantity}
+              removeItem={removeItem}
+              total={total}
+              isAuthenticated={!!session?.user}
+              onClose={() => setIsOpen(false)}
+            />
           </div>
         </>
       )}
