@@ -4,7 +4,7 @@ import { CartHeader } from "./CartHeader";
 import { CartContent } from "./CartContent";
 import { CartTrigger } from "./CartTrigger";
 import { useCartDrawer } from "@/hooks/cart/useCartDrawer";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export const CartDrawer = () => {
   const {
@@ -18,39 +18,57 @@ export const CartDrawer = () => {
     total
   } = useCartDrawer();
 
+  // Track if cleanup is in progress
+  const cleanupInProgress = useRef(false);
+
   // Cleanup effect for drawer overlay
   useEffect(() => {
     if (!isOpen) {
       console.log('Cart drawer closed, scheduling cleanup');
+      
+      // Prevent multiple cleanups
+      if (cleanupInProgress.current) {
+        console.log('Cleanup already in progress, skipping');
+        return;
+      }
+      
+      cleanupInProgress.current = true;
+
       // Small delay to ensure drawer animation completes
       const timeoutId = setTimeout(() => {
         console.log('Executing cart drawer overlay cleanup');
-        // Remove both overlay elements and their containers
-        const overlays = document.querySelectorAll('[data-vaul-overlay]');
-        overlays.forEach(overlay => {
-          if (overlay.parentNode) {
-            console.log('Removing cart drawer overlay');
-            // Remove the parent portal container as well
-            const portalContainer = overlay.parentNode;
-            if (portalContainer.parentNode) {
-              portalContainer.parentNode.removeChild(portalContainer);
+        try {
+          // Remove overlay elements if they exist
+          const overlays = document.querySelectorAll('[data-vaul-overlay]');
+          overlays.forEach(overlay => {
+            if (overlay?.parentNode) {
+              console.log('Found overlay to remove');
+              const portalContainer = overlay.parentNode;
+              if (portalContainer?.parentNode) {
+                console.log('Removing overlay container');
+                portalContainer.parentNode.removeChild(portalContainer);
+              }
             }
-          } else {
-            console.log('Overlay already removed or not found in DOM');
-          }
-        });
+          });
 
-        // Also clean up any remaining portal roots
-        const portalRoots = document.querySelectorAll('[data-vaul-drawer-portal]');
-        portalRoots.forEach(root => {
-          if (root.parentNode) {
-            root.parentNode.removeChild(root);
-          }
-        });
+          // Clean up portal roots if they exist
+          const portalRoots = document.querySelectorAll('[data-vaul-drawer-portal]');
+          portalRoots.forEach(root => {
+            if (root?.parentNode) {
+              console.log('Removing portal root');
+              root.parentNode.removeChild(root);
+            }
+          });
+        } catch (error) {
+          console.error('Error during cleanup:', error);
+        } finally {
+          cleanupInProgress.current = false;
+        }
       }, 300);
 
       return () => {
         clearTimeout(timeoutId);
+        cleanupInProgress.current = false;
       };
     }
   }, [isOpen]);
