@@ -4,8 +4,14 @@ import { CartHeader } from "./CartHeader";
 import { useCartDrawer } from "@/hooks/cart/useCartDrawer";
 
 export function CartDrawer() {
-  const { isOpen, close } = useCartDrawer();
-  const { itemsExist, total, isAuthenticated } = useCartState();
+  const {
+    isOpen,
+    setIsOpen,
+    session,
+    cartItems,
+    updateQuantity,
+    removeItem
+  } = useCartDrawer();
 
   if (!isOpen) return null;
 
@@ -13,16 +19,16 @@ export function CartDrawer() {
     <>
       <div 
         className="fixed inset-0 bg-black/80 z-50"
-        onClick={close}
+        onClick={() => setIsOpen(false)}
       />
       <div className="fixed right-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl">
         <div className="flex h-full flex-col">
-          <CartHeader onClose={close} />
+          <CartHeader onClose={() => setIsOpen(false)} />
           <CartContent
-            itemsExist={itemsExist}
-            total={total}
-            isAuthenticated={isAuthenticated}
-            onClose={close}
+            cartItems={cartItems}
+            userId={session?.user?.id || null}
+            updateQuantity={updateQuantity}
+            removeItem={removeItem}
           />
         </div>
       </div>
