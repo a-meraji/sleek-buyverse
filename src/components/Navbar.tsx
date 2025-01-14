@@ -11,7 +11,7 @@ import { CartDrawer } from "./cart/CartDrawer";
 export const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-
+// 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("Initial session check:", session);
