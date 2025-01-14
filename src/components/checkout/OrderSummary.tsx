@@ -2,12 +2,40 @@ import { useCart } from "@/contexts/cart/CartContext";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { OrderItem } from "./order/OrderItem";
+import { OrderTotals } from "./order/OrderTotals";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function OrderSummary() {
-  const { state: { items } } = useCart();
+  const { state: { items }, dispatch } = useCart();
   const navigate = useNavigate();
 
-  console.log('Rendering OrderSummary with items:', items);
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      const { data, error } = await supabase
+        .from('cart_items')
+        .select(`
+          *,
+          product:products (
+            *,
+            product_variants (*)
+          )
+        `);
+
+      if (error) {
+        console.error('Error fetching cart items:', error);
+        return;
+      }
+
+      if (data) {
+        console.log('Fetched cart items with variants:', data);
+        dispatch({ type: 'SET_ITEMS', payload: data });
+      }
+    };
+
+    fetchCartItems();
+  }, [dispatch]);
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
@@ -21,7 +49,7 @@ export function OrderSummary() {
   };
 
   const subtotal = calculateSubtotal();
-  const tax = subtotal * 0.08; // 8% tax
+  const tax = subtotal * 0.08;
   const shipping = items.length > 0 ? 5.99 : 0;
   const total = subtotal + tax + shipping;
 
@@ -40,72 +68,22 @@ export function OrderSummary() {
       </div>
 
       <div className="space-y-4">
-        {items.map((item) => {
-          const variant = item.product?.product_variants?.find(v => v.id === item.variant_id);
-          const variantPrice = variant?.price ?? 0;
-          const discount = item.product?.discount;
-          const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-          const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-          const subtotal = discountedPrice * item.quantity;
-          
-          return (
-            <div key={item.id} className="flex justify-between p-4 bg-secondary rounded-lg">
-              <div>
-                <h3 className="font-medium">{item.product?.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  Size: {variant?.size}, Color: {variant?.color}
-                </p>
-                <p className="text-sm">Quantity: {item.quantity}</p>
-              </div>
-              <div className="text-right">
-                {hasValidDiscount ? (
-                  <>
-                    <p className="text-sm text-muted-foreground line-through">
-                      ${variantPrice.toFixed(2)} × {item.quantity}
-                    </p>
-                    <p className="text-red-500">
-                      ${discountedPrice.toFixed(2)} × {item.quantity}
-                    </p>
-                    <p className="font-medium text-red-500">
-                      ${subtotal.toFixed(2)}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p>${variantPrice.toFixed(2)} × {item.quantity}</p>
-                    <p className="font-medium">${subtotal.toFixed(2)}</p>
-                  </>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {items.map((item) => (
+          <OrderItem key={item.id} item={item} />
+        ))}
       </div>
 
-      <div className="bg-secondary p-4 rounded-lg space-y-2">
-        <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Tax (8%)</span>
-          <span>${tax.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Shipping</span>
-          <span>${shipping.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between font-bold pt-2 border-t">
-          <span>Total</span>
-          <span>${total.toFixed(2)}</span>
-        </div>
-      </div>
+      <OrderTotals
+        subtotal={subtotal}
+        tax={tax}
+        shipping={shipping}
+        total={total}
+      />
 
       <Button 
         className="w-full" 
         size="lg"
         onClick={() => {
-          // Here you would implement the checkout logic
           console.log('Proceeding to checkout with total:', total);
         }}
       >
