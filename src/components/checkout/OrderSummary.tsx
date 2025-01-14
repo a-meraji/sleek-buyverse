@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export function OrderSummary() {
-  const { state: { items }, addToCart, updateQuantity, removeItem } = useCart();
+  const { state: { items }, addToCart } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,16 +37,23 @@ export function OrderSummary() {
       }
 
       if (data) {
-        console.log('Fetched cart items with variants:', data);
-        // Instead of using dispatch directly, use the context's update methods
+        console.log('Fetched cart items:', data);
+        // Instead of using dispatch, use addToCart for each item
         data.forEach(item => {
-          updateQuantity(null, item.id, item.quantity);
+          const cartItem = {
+            id: item.id,
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            quantity: item.quantity,
+            product: item.product
+          };
+          addToCart(null, cartItem);
         });
       }
     };
 
     fetchCartItems();
-  }, [updateQuantity]);
+  }, [addToCart]);
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
