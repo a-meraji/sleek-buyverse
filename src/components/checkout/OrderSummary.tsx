@@ -22,8 +22,8 @@ export function OrderSummary() {
           .from('cart_items')
           .select(`
             *,
-            product:products!cart_items_product_id_fkey (*),
-            variant:product_variants!cart_items_variant_id_fkey (*)
+            product:products(*),
+            variant:product_variants!cart_items_variant_id_fkey(*)
           `);
 
         if (cartError) {
@@ -40,12 +40,9 @@ export function OrderSummary() {
           console.log('Raw cart data:', cartData);
           
           const processedItems = cartData.map(item => ({
-            id: item.id,
-            product_id: item.product_id,
-            variant_id: item.variant_id,
-            quantity: item.quantity,
+            ...item,
             product: item.product,
-            variant: Array.isArray(item.variant) ? item.variant[0] : item.variant
+            variant: item.variant
           })).filter(item => item.product && item.variant);
 
           console.log('Processed cart items:', processedItems);

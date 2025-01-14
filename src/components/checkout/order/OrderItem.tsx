@@ -6,28 +6,27 @@ interface OrderItemProps {
 }
 
 export const OrderItem = ({ item }: OrderItemProps) => {
-  const selectedVariant = item.variant;
-  const product = item.product;
+  const { product, variant, quantity } = item;
   
   console.log('OrderItem rendering with:', {
     itemId: item.id,
     productName: product?.name,
-    variant: selectedVariant,
+    variant,
     variantId: item.variant_id,
-    price: selectedVariant?.price,
-    quantity: item.quantity
+    price: variant?.price,
+    quantity
   });
 
-  if (!selectedVariant || !product) {
-    console.error('Missing variant or product data:', { item });
+  if (!product || !variant) {
+    console.error('Missing product or variant data:', { item });
     return null;
   }
 
-  const variantPrice = selectedVariant.price;
+  const variantPrice = variant.price;
   const discount = product.discount;
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
   const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-  const subtotal = discountedPrice * item.quantity;
+  const subtotal = discountedPrice * quantity;
 
   return (
     <div className="flex gap-4 p-4 bg-background rounded-lg border">
@@ -45,10 +44,10 @@ export const OrderItem = ({ item }: OrderItemProps) => {
             <h3 className="font-medium">{product.name}</h3>
             <div className="flex gap-2 mt-1">
               <Badge variant="outline" className="bg-primary/10">
-                Size: {selectedVariant.size}
+                Size: {variant.size}
               </Badge>
               <Badge variant="outline" className="bg-primary/10">
-                Color: {selectedVariant.color}
+                Color: {variant.color}
               </Badge>
             </div>
           </div>
@@ -57,10 +56,10 @@ export const OrderItem = ({ item }: OrderItemProps) => {
             {hasValidDiscount ? (
               <>
                 <p className="text-sm text-muted-foreground line-through">
-                  ${variantPrice.toFixed(2)} × {item.quantity}
+                  ${variantPrice.toFixed(2)} × {quantity}
                 </p>
                 <p className="text-red-500">
-                  ${discountedPrice.toFixed(2)} × {item.quantity}
+                  ${discountedPrice.toFixed(2)} × {quantity}
                 </p>
                 <p className="font-medium text-red-500">
                   ${subtotal.toFixed(2)}
@@ -69,7 +68,7 @@ export const OrderItem = ({ item }: OrderItemProps) => {
             ) : (
               <>
                 <p className="text-sm text-muted-foreground">
-                  ${variantPrice.toFixed(2)} × {item.quantity}
+                  ${variantPrice.toFixed(2)} × {quantity}
                 </p>
                 <p className="font-medium">
                   ${subtotal.toFixed(2)}
@@ -79,9 +78,9 @@ export const OrderItem = ({ item }: OrderItemProps) => {
           </div>
         </div>
         
-        {selectedVariant.stock < 5 && (
+        {variant.stock < 5 && (
           <p className="text-sm text-red-500 mt-2">
-            Only {selectedVariant.stock} left in stock!
+            Only {variant.stock} left in stock!
           </p>
         )}
       </div>

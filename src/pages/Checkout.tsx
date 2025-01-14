@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/cart/CartContext";
 import { ProfileForm } from "@/components/navbar/ProfileForm";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
+import { Navbar } from "@/components/Navbar";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -44,16 +45,19 @@ const Checkout = () => {
   if (!userId) return null;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto space-y-8">
-        <h1 className="text-2xl font-bold">Checkout</h1>
-        
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Shipping Information</h2>
-          <ProfileForm userId={userId} onClose={() => {}} />
-        </div>
+    <div className="min-h-screen">
+      <Navbar />
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto space-y-8">
+          <h1 className="text-2xl font-bold">Checkout</h1>
+          
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold">Shipping Information</h2>
+            <ProfileForm userId={userId} onClose={() => {}} />
+          </div>
 
-        <OrderSummary />
+          <OrderSummary />
+        </div>
       </div>
     </div>
   );
