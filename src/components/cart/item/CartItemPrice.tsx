@@ -9,17 +9,23 @@ export const CartItemPrice = ({ variantPrice, quantity, discount }: CartItemPric
   const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
   const subtotal = discountedPrice * quantity;
 
+  console.log('CartItemPrice:', { variantPrice, quantity, discount, discountedPrice, subtotal });
+
   return (
     <div className="space-y-1">
       {hasValidDiscount ? (
         <>
-          <p className="text-red-500">${discountedPrice.toFixed(2)} × {quantity} = ${subtotal.toFixed(2)}</p>
-          <p className="text-sm text-muted-foreground line-through">
+          <p className="text-red-500" aria-label={`Discounted price: $${discountedPrice.toFixed(2)} × ${quantity} = $${subtotal.toFixed(2)}`}>
+            ${discountedPrice.toFixed(2)} × {quantity} = ${subtotal.toFixed(2)}
+          </p>
+          <p className="text-sm text-muted-foreground line-through" aria-label={`Original price: $${variantPrice.toFixed(2)} × ${quantity} = $${(variantPrice * quantity).toFixed(2)}`}>
             ${variantPrice.toFixed(2)} × {quantity} = ${(variantPrice * quantity).toFixed(2)}
           </p>
         </>
       ) : (
-        <p>${variantPrice.toFixed(2)} × {quantity} = ${subtotal.toFixed(2)}</p>
+        <p aria-label={`Price: $${variantPrice.toFixed(2)} × ${quantity} = $${subtotal.toFixed(2)}`}>
+          ${variantPrice.toFixed(2)} × {quantity} = ${subtotal.toFixed(2)}
+        </p>
       )}
     </div>
   );

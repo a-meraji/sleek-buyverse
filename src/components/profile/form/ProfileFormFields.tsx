@@ -16,7 +16,7 @@ interface ProfileFormFieldsProps {
 
 export function ProfileFormFields({ profile, setProfile }: ProfileFormFieldsProps) {
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <Label htmlFor="first_name">First Name</Label>
         <Input
@@ -37,11 +37,12 @@ export function ProfileFormFields({ profile, setProfile }: ProfileFormFieldsProp
         <Label htmlFor="phone">Phone</Label>
         <Input
           id="phone"
+          type="tel"
           value={profile.phone}
           onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
         />
       </div>
-      <div>
+      <div className="md:col-span-2">
         <Label htmlFor="street_address">Street Address</Label>
         <Input
           id="street_address"
@@ -73,6 +74,6 @@ export function ProfileFormFields({ profile, setProfile }: ProfileFormFieldsProp
           onChange={(e) => setProfile({ ...profile, postal_code: e.target.value })}
         />
       </div>
-    </>
+    </div>
   );
 }

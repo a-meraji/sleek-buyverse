@@ -21,34 +21,38 @@ export const CartItem = ({ item, onQuantityChange, onRemove, readonly = false }:
     productName: item.product?.name,
     variantId: item.variant_id,
     selectedVariant,
+    price: selectedVariant?.price,
     readonly
   });
+
+  if (!selectedVariant || !item.product) {
+    console.error('Missing variant or product data:', { item, selectedVariant });
+    return null;
+  }
 
   return (
     <div className="flex gap-6 p-4 bg-secondary rounded-lg">
       <CartItemImage 
-        imageUrl={item.product?.image_url || ''}
-        productName={item.product?.name || ''}
-        discount={item.product?.discount}
+        imageUrl={item.product.image_url}
+        productName={item.product.name}
+        discount={item.product.discount}
       />
       
       <div className="flex-1 space-y-2">
         <CartItemHeader 
-          productName={item.product?.name || ''}
+          productName={item.product.name}
           onRemove={() => onRemove(item.id)}
           readonly={readonly}
         />
         
-        {selectedVariant && (
-          <span className="block text-sm text-muted-foreground">
-            Size: {selectedVariant.size}, Color: {selectedVariant.color}
-          </span>
-        )}
+        <span className="block text-sm text-muted-foreground">
+          Size: {selectedVariant.size}, Color: {selectedVariant.color}
+        </span>
 
         <CartItemPrice 
-          variantPrice={selectedVariant?.price ?? 0}
+          variantPrice={selectedVariant.price}
           quantity={item.quantity}
-          discount={item.product?.discount}
+          discount={item.product.discount}
         />
         
         {!readonly && (
