@@ -3,8 +3,10 @@ import { cartReducer } from '../cartReducer';
 import { CartState } from '../types';
 
 export const useCartState = () => {
-  return useReducer(cartReducer, {
+  const initialState: CartState = {
     items: [],
     isLoading: false,
-  });
+  };
+  
+  return useReducer(cartReducer, initialState);
 };
