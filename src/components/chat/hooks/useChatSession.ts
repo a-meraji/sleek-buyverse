@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -9,17 +10,20 @@ export const useChatSession = (open: boolean, onClose: () => void) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initializeChat = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
+        console.log('User not authenticated, showing sign in message');
         toast({
           title: "Please sign in",
           description: "You need to be signed in to chat with customer service.",
           variant: "destructive",
         });
         onClose();
+        navigate('/auth');
         return;
       }
 
@@ -62,7 +66,7 @@ export const useChatSession = (open: boolean, onClose: () => void) => {
     if (open) {
       initializeChat();
     }
-  }, [open, toast, onClose]);
+  }, [open, toast, onClose, navigate]);
 
   const { data: messages = [] } = useQuery({
     queryKey: ['chat-messages', sessionId],
@@ -93,11 +97,13 @@ export const useChatSession = (open: boolean, onClose: () => void) => {
     
     if (!session) {
       toast({
-        title: "Error",
-        description: "You must be signed in to send messages.",
+        title: "Please sign in",
+        description: "You need to be signed in to send messages.",
         variant: "destructive",
       });
       setLoading(false);
+      onClose();
+      navigate('/auth');
       return;
     }
 
