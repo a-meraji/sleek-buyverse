@@ -22,6 +22,13 @@ export const OrderSummaryContent = ({
 }: OrderSummaryContentProps) => {
   const { toast } = useToast();
 
+  console.log('OrderSummaryContent rendering with:', {
+    itemsCount: items.length,
+    items,
+    subtotal,
+    total
+  });
+
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <OrderHeader />

@@ -17,50 +17,57 @@ export function OrderSummary() {
       console.log('Fetching cart items for OrderSummary...');
       setIsLoading(true);
       
-      const { data: cartData, error: cartError } = await supabase
-        .from('cart_items')
-        .select(`
-          *,
-          product:products (
+      try {
+        const { data: cartData, error: cartError } = await supabase
+          .from('cart_items')
+          .select(`
             *,
-            product_variants (*)
-          ),
-          variant:product_variants (*)
-        `);
+            product:products (*),
+            variant:product_variants (*)
+          `);
 
-      if (cartError) {
-        console.error('Error fetching cart items:', cartError);
+        if (cartError) {
+          console.error('Error fetching cart items:', cartError);
+          toast({
+            title: "Error",
+            description: "Failed to load cart items",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (cartData) {
+          console.log('Raw cart data:', cartData);
+          
+          const processedItems = cartData.map(item => ({
+            id: item.id,
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            quantity: item.quantity,
+            product: item.product,
+            variant: item.variant
+          }));
+
+          console.log('Processed cart items:', processedItems);
+          setCartItems(processedItems);
+          
+          // Update cart context
+          processedItems.forEach(item => {
+            if (item.product && item.variant) {
+              addToCart(null, item);
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error in fetchCartItems:', error);
         toast({
           title: "Error",
-          description: "Failed to load cart items",
+          description: "Something went wrong while loading your cart",
           variant: "destructive",
         });
+      } finally {
         setIsLoading(false);
-        return;
       }
-
-      if (cartData) {
-        console.log('Raw cart data:', cartData);
-        
-        const processedItems = cartData.map(item => ({
-          id: item.id,
-          product_id: item.product_id,
-          variant_id: item.variant_id,
-          quantity: item.quantity,
-          product: item.product,
-          variant: item.variant
-        }));
-
-        console.log('Processed cart items:', processedItems);
-        setCartItems(processedItems);
-        
-        // Update cart context
-        processedItems.forEach(item => {
-          addToCart(null, item);
-        });
-      }
-      
-      setIsLoading(false);
     };
 
     fetchCartItems();
@@ -68,8 +75,9 @@ export function OrderSummary() {
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
-      const variant = item.variant;
-      const variantPrice = variant?.price ?? 0;
+      if (!item.variant?.price) return total;
+      
+      const variantPrice = item.variant.price;
       const discount = item.product?.discount;
       const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
       const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
@@ -85,7 +93,7 @@ export function OrderSummary() {
   console.log('OrderSummary state:', {
     isLoading,
     itemsCount: items.length,
-    cartItems,
+    cartItems: items,
     subtotal,
     total
   });
