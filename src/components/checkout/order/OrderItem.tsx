@@ -6,8 +6,8 @@ interface OrderItemProps {
 }
 
 export const OrderItem = ({ item }: OrderItemProps) => {
-  const variant = item.variant || item.product?.product_variants?.find(v => v.id === item.variant_id);
-  const variantPrice = variant?.price ?? 0;
+  const selectedVariant = item.variant || item.product?.product_variants?.find(v => v.id === item.variant_id);
+  const variantPrice = selectedVariant?.price ?? 0;
   const discount = item.product?.discount;
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
   const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
@@ -15,8 +15,8 @@ export const OrderItem = ({ item }: OrderItemProps) => {
 
   console.log('Rendering OrderItem:', { 
     item, 
-    variant, 
-    variantPrice, 
+    selectedVariant,
+    variantPrice,
     discount,
     discountedPrice,
     subtotal 
@@ -36,13 +36,13 @@ export const OrderItem = ({ item }: OrderItemProps) => {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium">{item.product?.name}</h3>
-            {variant && (
+            {selectedVariant && (
               <div className="flex gap-2 mt-1">
                 <Badge variant="outline" className="bg-primary/10">
-                  Size: {variant.size}
+                  Size: {selectedVariant.size}
                 </Badge>
                 <Badge variant="outline" className="bg-primary/10">
-                  Color: {variant.color}
+                  Color: {selectedVariant.color}
                 </Badge>
               </div>
             )}
@@ -74,9 +74,9 @@ export const OrderItem = ({ item }: OrderItemProps) => {
           </div>
         </div>
         
-        {variant && variant.stock < 5 && (
+        {selectedVariant && selectedVariant.stock < 5 && (
           <p className="text-sm text-red-500 mt-2">
-            Only {variant.stock} left in stock!
+            Only {selectedVariant.stock} left in stock!
           </p>
         )}
       </div>
