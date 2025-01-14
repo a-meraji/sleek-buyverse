@@ -17,12 +17,12 @@ export function OrderSummary() {
       console.log('Fetching cart items for OrderSummary...');
       setIsLoading(true);
       
-      // Match the cart's data fetching pattern
       const { data, error } = await supabase
         .from('cart_items')
         .select(`
           *,
-          product:products (*),
+          product:products (*,
+            product_variants(*)),
           variant:product_variants (*)
         `);
 
@@ -38,24 +38,27 @@ export function OrderSummary() {
       }
 
       if (data) {
-        console.log('Fetched cart items:', data);
-        // Process items similar to cart component
+        console.log('Raw fetched cart items:', data);
+        
         const processedItems = data.map(item => ({
           id: item.id,
           product_id: item.product_id,
           variant_id: item.variant_id,
           quantity: item.quantity,
-          product: item.product,
+          product: {
+            ...item.product,
+            product_variants: item.product.product_variants
+          },
           variant: item.variant
         }));
         
+        console.log('Processed cart items:', processedItems);
         setCartItems(processedItems);
-        // Clear existing items before adding new ones
+        
+        // Clear existing items and add new ones
         processedItems.forEach(item => {
           addToCart(null, item);
         });
-        
-        console.log('Processed cart items:', processedItems);
       }
       setIsLoading(false);
     };
@@ -65,7 +68,6 @@ export function OrderSummary() {
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
-      // Match cart's price calculation
       const variant = item.variant;
       const variantPrice = variant?.price ?? 0;
       const discount = item.product?.discount;

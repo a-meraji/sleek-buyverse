@@ -6,22 +6,20 @@ interface OrderItemProps {
 }
 
 export const OrderItem = ({ item }: OrderItemProps) => {
-  // Directly use the variant from the item
   const selectedVariant = item.variant;
+  
+  console.log('OrderItem rendering with:', {
+    itemId: item.id,
+    productName: item.product?.name,
+    variant: selectedVariant,
+    variantId: item.variant_id
+  });
+
   const variantPrice = selectedVariant?.price ?? 0;
   const discount = item.product?.discount;
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
   const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
   const subtotal = discountedPrice * item.quantity;
-
-  console.log('Rendering OrderItem:', { 
-    item, 
-    selectedVariant,
-    variantPrice,
-    discount,
-    discountedPrice,
-    subtotal 
-  });
 
   return (
     <div className="flex gap-4 p-4 bg-background rounded-lg border">
