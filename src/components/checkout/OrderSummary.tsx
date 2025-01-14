@@ -7,6 +7,8 @@ export function OrderSummary() {
   const { state: { items } } = useCart();
   const navigate = useNavigate();
 
+  console.log('Rendering OrderSummary with items:', items);
+
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
       const variant = item.product?.product_variants?.find(v => v.id === item.variant_id);
@@ -14,8 +16,7 @@ export function OrderSummary() {
       const discount = item.product?.discount;
       const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
       const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-      const quantity = item.quantity;
-      return total + (discountedPrice * quantity);
+      return total + (discountedPrice * item.quantity);
     }, 0);
   };
 
@@ -23,8 +24,6 @@ export function OrderSummary() {
   const tax = subtotal * 0.08; // 8% tax
   const shipping = items.length > 0 ? 5.99 : 0;
   const total = subtotal + tax + shipping;
-
-  console.log('Rendering OrderSummary with items:', items);
 
   return (
     <div className="space-y-6">
