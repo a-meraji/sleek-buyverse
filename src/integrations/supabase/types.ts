@@ -353,28 +353,37 @@ export type Database = {
       }
       profiles: {
         Row: {
+          city: string | null
           created_at: string
           first_name: string | null
           id: string
           last_name: string | null
           phone: string | null
-          shipping_address: Json | null
+          postal_code: string | null
+          state: string | null
+          street_address: string | null
         }
         Insert: {
+          city?: string | null
           created_at?: string
           first_name?: string | null
           id: string
           last_name?: string | null
           phone?: string | null
-          shipping_address?: Json | null
+          postal_code?: string | null
+          state?: string | null
+          street_address?: string | null
         }
         Update: {
+          city?: string | null
           created_at?: string
           first_name?: string | null
           id?: string
           last_name?: string | null
           phone?: string | null
-          shipping_address?: Json | null
+          postal_code?: string | null
+          state?: string | null
+          street_address?: string | null
         }
         Relationships: []
       }

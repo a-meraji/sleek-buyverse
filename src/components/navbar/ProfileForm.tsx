@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,13 +15,19 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
     first_name: "",
     last_name: "",
     phone: "",
-    shipping_address: "",
+    street_address: "",
+    city: "",
+    state: "",
+    postal_code: "",
   });
   const [initialProfile, setInitialProfile] = useState({
     first_name: "",
     last_name: "",
     phone: "",
-    shipping_address: "",
+    street_address: "",
+    city: "",
+    state: "",
+    postal_code: "",
   });
   const { toast } = useToast();
 
@@ -44,7 +49,10 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
           first_name: data.first_name || "",
           last_name: data.last_name || "",
           phone: data.phone || "",
-          shipping_address: data.shipping_address ? JSON.stringify(data.shipping_address, null, 2) : "",
+          street_address: data.street_address || "",
+          city: data.city || "",
+          state: data.state || "",
+          postal_code: data.postal_code || "",
         };
         setProfile(profileData);
         setInitialProfile(profileData);
@@ -58,18 +66,6 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
     e.preventDefault();
 
     try {
-      let parsedAddress;
-      try {
-        parsedAddress = profile.shipping_address ? JSON.parse(profile.shipping_address) : null;
-      } catch (error) {
-        toast({
-          title: "Invalid address format",
-          description: "Please enter a valid JSON address format",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const { error } = await supabase
         .from('profiles')
         .upsert({
@@ -77,7 +73,10 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
           first_name: profile.first_name,
           last_name: profile.last_name,
           phone: profile.phone,
-          shipping_address: parsedAddress,
+          street_address: profile.street_address,
+          city: profile.city,
+          state: profile.state,
+          postal_code: profile.postal_code,
         });
 
       if (error) throw error;
@@ -127,12 +126,35 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="shipping_address">Shipping Address (JSON format)</Label>
-        <Textarea
-          id="shipping_address"
-          value={profile.shipping_address}
-          onChange={(e) => setProfile({ ...profile, shipping_address: e.target.value })}
-          rows={4}
+        <Label htmlFor="street_address">Street Address</Label>
+        <Input
+          id="street_address"
+          value={profile.street_address}
+          onChange={(e) => setProfile({ ...profile, street_address: e.target.value })}
+        />
+      </div>
+      <div>
+        <Label htmlFor="city">City</Label>
+        <Input
+          id="city"
+          value={profile.city}
+          onChange={(e) => setProfile({ ...profile, city: e.target.value })}
+        />
+      </div>
+      <div>
+        <Label htmlFor="state">State</Label>
+        <Input
+          id="state"
+          value={profile.state}
+          onChange={(e) => setProfile({ ...profile, state: e.target.value })}
+        />
+      </div>
+      <div>
+        <Label htmlFor="postal_code">Postal Code</Label>
+        <Input
+          id="postal_code"
+          value={profile.postal_code}
+          onChange={(e) => setProfile({ ...profile, postal_code: e.target.value })}
         />
       </div>
       {hasChanges && (
