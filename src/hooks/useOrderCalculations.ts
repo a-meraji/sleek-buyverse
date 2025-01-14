@@ -12,10 +12,18 @@ export const useOrderCalculations = () => {
     return items.reduce((total, item) => {
       // Find the correct variant from product_variants
       const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
-      const variantPrice = selectedVariant?.price;
       
-      if (!variantPrice) {
-        console.error('Missing variant price for item:', {
+      console.log('Processing item:', {
+        itemId: item.id,
+        productName: item.product?.name,
+        variantId: item.variant_id,
+        selectedVariant,
+        quantity: item.quantity,
+        discount: item.product?.discount
+      });
+
+      if (!selectedVariant?.price) {
+        console.warn('Missing or invalid variant price:', {
           itemId: item.id,
           productName: item.product?.name,
           variantId: item.variant_id,
@@ -23,24 +31,23 @@ export const useOrderCalculations = () => {
         });
         return total;
       }
-      
+
       const quantity = item.quantity;
       const discount = item.product?.discount ?? 0;
-      const finalPrice = discount > 0 ? variantPrice * (1 - discount / 100) : variantPrice;
+      const finalPrice = discount > 0 ? selectedVariant.price * (1 - discount / 100) : selectedVariant.price;
+      const itemTotal = finalPrice * quantity;
       
-      console.log('Item calculation:', {
+      console.log('Item calculation result:', {
         itemId: item.id,
-        productName: item.product?.name,
-        variantId: item.variant_id,
-        selectedVariant,
-        variantPrice,
+        variantPrice: selectedVariant.price,
         quantity,
         discount,
         finalPrice,
-        subtotal: finalPrice * quantity
+        itemTotal,
+        runningTotal: total + itemTotal
       });
       
-      return total + (finalPrice * quantity);
+      return total + itemTotal;
     }, 0);
   };
 
