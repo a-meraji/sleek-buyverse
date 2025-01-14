@@ -67,6 +67,7 @@ const Checkout = () => {
                 userId={userId}
                 updateQuantity={() => {}}
                 removeItem={() => {}}
+                readonly={true}
               />
               <CartSummary 
                 total={total}

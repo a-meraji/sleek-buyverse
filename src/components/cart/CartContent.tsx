@@ -7,13 +7,15 @@ interface CartContentProps {
   userId: string | null;
   updateQuantity: (id: string, quantity: number) => void;
   removeItem: (id: string) => void;
+  readonly?: boolean;
 }
 
 export const CartContent = ({ 
   cartItems, 
   userId, 
   updateQuantity, 
-  removeItem 
+  removeItem,
+  readonly = false
 }: CartContentProps) => {
   return (
     <div className="flex-1 overflow-auto p-4">
@@ -32,6 +34,7 @@ export const CartContent = ({
                 updateQuantity(id, newQuantity);
               }}
               onRemove={removeItem}
+              readonly={readonly}
             />
           ))}
         </div>

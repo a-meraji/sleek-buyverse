@@ -10,16 +10,18 @@ interface CartItemProps {
   userId: string | null;
   onQuantityChange: (id: string, currentQuantity: number, delta: number) => void;
   onRemove: (id: string) => void;
+  readonly?: boolean;
 }
 
-export const CartItem = ({ item, onQuantityChange, onRemove }: CartItemProps) => {
+export const CartItem = ({ item, onQuantityChange, onRemove, readonly = false }: CartItemProps) => {
   const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
   
   console.log('Rendering cart item:', {
     itemId: item.id,
     productName: item.product?.name,
     variantId: item.variant_id,
-    selectedVariant
+    selectedVariant,
+    readonly
   });
 
   return (
@@ -34,6 +36,7 @@ export const CartItem = ({ item, onQuantityChange, onRemove }: CartItemProps) =>
         <CartItemHeader 
           productName={item.product?.name || ''}
           onRemove={() => onRemove(item.id)}
+          readonly={readonly}
         />
         
         {selectedVariant && (
@@ -48,10 +51,12 @@ export const CartItem = ({ item, onQuantityChange, onRemove }: CartItemProps) =>
           discount={item.product?.discount}
         />
         
-        <CartItemQuantity 
-          quantity={item.quantity}
-          onQuantityChange={(delta) => onQuantityChange(item.id, item.quantity, delta)}
-        />
+        {!readonly && (
+          <CartItemQuantity 
+            quantity={item.quantity}
+            onQuantityChange={(delta) => onQuantityChange(item.id, item.quantity, delta)}
+          />
+        )}
       </div>
     </div>
   );
