@@ -13,10 +13,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
       console.log("Fetching profiles with search:", searchQuery);
       let query = supabase
         .from("profiles")
-        .select(`
-          *,
-          users:auth.users!profiles_id_fkey(email)
-        `);
+        .select("*, auth.users!profiles_id_fkey(email)");
 
       if (searchQuery) {
         query = query.or(
@@ -24,7 +21,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
           `last_name.ilike.%${searchQuery}%,` +
           `phone.ilike.%${searchQuery}%,` +
           `postal_code.ilike.%${searchQuery}%,` +
-          `users.email.ilike.%${searchQuery}%`
+          `auth.users.email.ilike.%${searchQuery}%`
         );
       }
 
