@@ -26,7 +26,8 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
           users!profiles_id_fkey (
             email
           )
-        `);
+        `)
+        .returns<ProfileData[]>();
 
       if (searchQuery) {
         query = query.or(
@@ -45,7 +46,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
       }
 
       console.log("Fetched profiles:", data);
-      return data as ProfileData[];
+      return data;
     },
   });
 }
