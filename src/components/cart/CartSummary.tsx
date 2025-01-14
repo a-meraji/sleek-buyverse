@@ -16,8 +16,9 @@ export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: Car
     onClose();
     if (!isAuthenticated) {
       navigate('/auth');
+      return;
     }
-    // Handle checkout logic here
+    navigate('/checkout');
   };
   
   return (
