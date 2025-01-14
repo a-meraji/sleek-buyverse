@@ -23,7 +23,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
           city,
           state,
           postal_code,
-          users:auth.users (
+          users!profiles_id_fkey (
             email
           )
         `);
