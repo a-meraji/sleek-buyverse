@@ -8,7 +8,7 @@ export const useOrderCalculations = () => {
 
   console.log('Calculating order totals for items:', items);
 
-  const calculateSubtotal = () => {
+  const calculateTotal = () => {
     return items.reduce((total, item) => {
       const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
       const variantPrice = selectedVariant?.price ?? 0;
@@ -33,7 +33,7 @@ export const useOrderCalculations = () => {
     }, 0);
   };
 
-  const subtotal = calculateSubtotal();
+  const subtotal = calculateTotal();
   const tax = subtotal * TAX_RATE;
   const shipping = items.length > 0 ? SHIPPING_RATE : 0;
   const total = subtotal + tax + shipping;
