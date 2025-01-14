@@ -21,6 +21,14 @@ export interface CartItem {
       stock: number;
     }>;
   };
+  variant?: {
+    id: string;
+    product_id: string;
+    price: number;
+    size: string;
+    color: string;
+    stock: number;
+  };
 }
 
 export interface CartState {
