@@ -23,13 +23,13 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
           city,
           state,
           postal_code,
-          users!profiles_id_fkey (
+          users (
             email
           )
-        `)
-        .returns<ProfileData[]>();
+        `);
 
       if (searchQuery) {
+        // Convert the query to a FilterBuilder before applying .or
         query = query.or(
           `first_name.ilike.%${searchQuery}%,` +
           `last_name.ilike.%${searchQuery}%,` +
@@ -46,7 +46,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
       }
 
       console.log("Fetched profiles:", data);
-      return data;
+      return data as ProfileData[];
     },
   });
 }
