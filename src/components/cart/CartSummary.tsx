@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useOrderCalculations } from "@/hooks/useOrderCalculations";
+import { Separator } from "@/components/ui/separator";
 
 interface CartSummaryProps {
   total: number;
@@ -24,39 +25,46 @@ export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: Car
   };
   
   return (
-    <div className="bg-secondary p-6 rounded-lg space-y-4">
-      <h2 className="text-xl font-semibold">Order Summary</h2>
-      
-      <div className="space-y-2">
-        <div className="flex justify-between">
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Subtotal</span>
           <span>${subtotal.toFixed(2)}</span>
         </div>
         
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Tax</span>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Tax (8%)</span>
           <span>${tax.toFixed(2)}</span>
         </div>
         
-        <div className="flex justify-between">
+        <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Shipping</span>
           <span>${shipping.toFixed(2)}</span>
         </div>
-      </div>
-      
-      <div className="flex justify-between py-4 border-t">
-        <span className="font-semibold">Total</span>
-        <span className="font-semibold">${total.toFixed(2)}</span>
+
+        <Separator className="my-4" />
+        
+        <div className="flex justify-between text-lg font-semibold">
+          <span>Total</span>
+          <span>${total.toFixed(2)}</span>
+        </div>
       </div>
       
       <Button 
-        className="w-full" 
+        className="w-full py-6 text-lg"
         size="lg"
         disabled={!itemsExist}
         onClick={handleCheckout}
+        aria-label={isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
       >
-        {isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
+        {isAuthenticated ? 'Place Order' : 'Sign in to Checkout'}
       </Button>
+
+      {!isAuthenticated && (
+        <p className="text-sm text-muted-foreground text-center">
+          You need to sign in to complete your purchase
+        </p>
+      )}
     </div>
   );
 };

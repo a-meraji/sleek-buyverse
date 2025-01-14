@@ -8,6 +8,7 @@ import { CartContent } from "@/components/cart/CartContent";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { Navbar } from "@/components/Navbar";
 import { useOrderCalculations } from "@/hooks/useOrderCalculations";
+import { Separator } from "@/components/ui/separator";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -31,15 +32,25 @@ const Checkout = () => {
   }, [navigate]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-lg">Loading...</div>
+      </div>
+    );
   }
 
   if (items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
-          <Button onClick={() => navigate('/products')}>Continue Shopping</Button>
+      <div className="min-h-screen">
+        <Navbar />
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-md mx-auto text-center space-y-4">
+            <h1 className="text-2xl font-bold">Your cart is empty</h1>
+            <p className="text-muted-foreground">Add some items to your cart to proceed with checkout.</p>
+            <Button onClick={() => navigate('/products')} className="w-full sm:w-auto">
+              Continue Shopping
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -48,37 +59,52 @@ const Checkout = () => {
   if (!userId) return null;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto space-y-8">
-          <h1 className="text-2xl font-bold">Checkout</h1>
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl font-bold mb-8" id="checkout-title">Checkout</h1>
           
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Shipping Information</h2>
-            <ProfileForm userId={userId} onClose={() => {}} />
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left column - Forms */}
+            <div className="lg:col-span-7 space-y-8">
+              <section aria-labelledby="shipping-heading" className="bg-card rounded-lg p-6 shadow-sm">
+                <h2 id="shipping-heading" className="text-xl font-semibold mb-6">
+                  Shipping Information
+                </h2>
+                <ProfileForm userId={userId} onClose={() => {}} />
+              </section>
+            </div>
 
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Order Summary</h2>
-            <div className="bg-secondary/50 rounded-lg p-6">
-              <CartContent 
-                cartItems={items} 
-                userId={userId}
-                updateQuantity={() => {}}
-                removeItem={() => {}}
-                readonly={true}
-              />
-              <CartSummary 
-                total={total}
-                isAuthenticated={!!userId}
-                itemsExist={items.length > 0}
-                onClose={() => {}}
-              />
+            {/* Right column - Order summary */}
+            <div className="lg:col-span-5 space-y-6">
+              <section aria-labelledby="order-heading" className="bg-card rounded-lg shadow-sm divide-y">
+                <h2 id="order-heading" className="sr-only">Order summary</h2>
+                
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
+                  <CartContent 
+                    cartItems={items} 
+                    userId={userId}
+                    updateQuantity={() => {}}
+                    removeItem={() => {}}
+                    readonly={true}
+                  />
+                </div>
+
+                <div className="p-6">
+                  <CartSummary 
+                    total={total}
+                    isAuthenticated={!!userId}
+                    itemsExist={items.length > 0}
+                    onClose={() => {}}
+                  />
+                </div>
+              </section>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
