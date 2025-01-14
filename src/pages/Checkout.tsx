@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useOrderCalculations } from "@/hooks/useOrderCalculations";
+import { useCart } from "@/contexts/cart/CartContext";
 
 interface Profile {
   first_name: string;
@@ -19,6 +21,9 @@ interface Profile {
 const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { state: { items } } = useCart();
+  const { subtotal, tax, shipping, total } = useOrderCalculations();
+  
   const [profile, setProfile] = useState<Profile>({
     first_name: "",
     last_name: "",
@@ -112,6 +117,17 @@ const Checkout = () => {
     return <div>Loading...</div>;
   }
 
+  if (items.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
+          <Button onClick={() => navigate('/products')}>Continue Shopping</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto space-y-8">
@@ -181,23 +197,22 @@ const Checkout = () => {
 
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Order Summary</h2>
-          {/* Order details will be implemented in the next iteration */}
           <div className="bg-secondary p-4 rounded-lg space-y-2">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>$0.00</span>
+              <span>${subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Tax</span>
-              <span>$0.00</span>
+              <span>${tax.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span>$0.00</span>
+              <span>${shipping.toFixed(2)}</span>
             </div>
             <div className="flex justify-between font-bold pt-2 border-t">
               <span>Total</span>
-              <span>$0.00</span>
+              <span>${total.toFixed(2)}</span>
             </div>
           </div>
         </div>
