@@ -15,7 +15,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
         .from("profiles")
         .select(`
           *,
-          email:auth.users(email)
+          users:auth.users!profiles_id_fkey(email)
         `);
 
       if (searchQuery) {
@@ -24,7 +24,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
           `last_name.ilike.%${searchQuery}%,` +
           `phone.ilike.%${searchQuery}%,` +
           `postal_code.ilike.%${searchQuery}%,` +
-          `auth.users.email.ilike.%${searchQuery}%`
+          `users.email.ilike.%${searchQuery}%`
         );
       }
 
@@ -38,7 +38,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
       console.log("Fetched profiles:", profiles);
       return profiles.map((profile: any) => ({
         ...profile,
-        email: profile.email?.[0]?.email,
+        email: profile.users?.email,
       })) as ProfileData[];
     },
   });
