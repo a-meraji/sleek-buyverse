@@ -1,17 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/contexts/cart/CartContext";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { OrderSummaryContent } from "./order/OrderSummaryContent";
+import { CartItem } from "@/types";
 
 export function OrderSummary() {
   const { state: { items }, addToCart } = useCart();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
     const fetchCartItems = async () => {
       console.log('Fetching cart items for OrderSummary...');
+      setIsLoading(true);
+      
       const { data, error } = await supabase
         .from('cart_items')
         .select(`
@@ -30,23 +35,29 @@ export function OrderSummary() {
           description: "Failed to load cart items",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
       if (data) {
         console.log('Fetched cart items:', data);
-        data.forEach(item => {
-          const cartItem = {
-            id: item.id,
-            product_id: item.product_id,
-            variant_id: item.variant_id,
-            quantity: item.quantity,
-            product: item.product,
-            variant: item.variant
-          };
-          addToCart(null, cartItem);
+        const processedItems = data.map(item => ({
+          id: item.id,
+          product_id: item.product_id,
+          variant_id: item.variant_id,
+          quantity: item.quantity,
+          product: item.product,
+          variant: item.variant
+        }));
+        
+        setCartItems(processedItems);
+        processedItems.forEach(item => {
+          addToCart(null, item);
         });
+        
+        console.log('Processed cart items:', processedItems);
       }
+      setIsLoading(false);
     };
 
     fetchCartItems();
@@ -68,7 +79,17 @@ export function OrderSummary() {
   const shipping = items.length > 0 ? 5.99 : 0;
   const total = subtotal + tax + shipping;
 
-  console.log('Rendering OrderSummary with items:', items);
+  console.log('Rendering OrderSummary with:', {
+    isLoading,
+    items,
+    cartItems,
+    subtotal,
+    total
+  });
+
+  if (isLoading) {
+    return <div className="text-center py-8">Loading cart items...</div>;
+  }
 
   if (!items.length) {
     return (
