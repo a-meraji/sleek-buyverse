@@ -10,8 +10,9 @@ export const useOrderCalculations = () => {
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
-      // Get the variant price directly from the variant if it exists
-      const price = item.variant?.price ?? item.product?.price ?? 0;
+      // Find the correct variant from product_variants
+      const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
+      const price = selectedVariant?.price ?? item.product?.price ?? 0;
       const quantity = item.quantity;
       
       // Apply discount if it exists
@@ -20,6 +21,9 @@ export const useOrderCalculations = () => {
       
       console.log('Item calculation:', {
         itemId: item.id,
+        productName: item.product?.name,
+        variantId: item.variant_id,
+        selectedVariant,
         price,
         quantity,
         discount,
