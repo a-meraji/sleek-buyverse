@@ -23,7 +23,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
           city,
           state,
           postal_code,
-          users (
+          users!profiles_id_fkey (
             email
           )
         `);
@@ -45,8 +45,14 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
         throw error;
       }
 
-      console.log("Fetched profiles:", data);
-      return data as ProfileData[];
+      // Transform the data to match ProfileData type
+      const transformedData = data?.map(profile => ({
+        ...profile,
+        users: profile.users?.[0] || null // Take first user since it's a 1-1 relationship
+      }));
+
+      console.log("Fetched and transformed profiles:", transformedData);
+      return transformedData as ProfileData[];
     },
   });
 }
