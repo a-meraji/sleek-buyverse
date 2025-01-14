@@ -17,6 +17,8 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { total } = useOrderCalculations();
 
+  console.log('Checkout page - Cart items:', items);
+
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -39,7 +41,7 @@ const Checkout = () => {
     );
   }
 
-  if (items.length === 0) {
+  if (!items || items.length === 0) {
     return (
       <div className="min-h-screen">
         <Navbar />
