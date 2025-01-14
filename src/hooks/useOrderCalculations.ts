@@ -12,19 +12,28 @@ export const useOrderCalculations = () => {
     return items.reduce((total, item) => {
       // Find the correct variant from product_variants
       const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
-      const price = selectedVariant?.price ?? item.product?.price ?? 0;
-      const quantity = item.quantity;
+      const variantPrice = selectedVariant?.price;
       
-      // Apply discount if it exists
+      if (!variantPrice) {
+        console.error('Missing variant price for item:', {
+          itemId: item.id,
+          productName: item.product?.name,
+          variantId: item.variant_id,
+          selectedVariant
+        });
+        return total;
+      }
+      
+      const quantity = item.quantity;
       const discount = item.product?.discount ?? 0;
-      const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
+      const finalPrice = discount > 0 ? variantPrice * (1 - discount / 100) : variantPrice;
       
       console.log('Item calculation:', {
         itemId: item.id,
         productName: item.product?.name,
         variantId: item.variant_id,
         selectedVariant,
-        price,
+        variantPrice,
         quantity,
         discount,
         finalPrice,
