@@ -44,11 +44,11 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/about" element={<About />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/shipping" element={<ShippingPolicy />} />
               <Route path="/returns" element={<ReturnsExchanges />} />
               <Route path="/faq" element={<FAQ />} />
-              <Route path="/checkout" element={<Checkout />} />
             </Route>
           </Routes>
           <ChatButton />
