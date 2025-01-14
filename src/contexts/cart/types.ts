@@ -14,6 +14,7 @@ export interface CartItem {
     discount?: number | null;
     product_variants?: Array<{
       id: string;
+      product_id: string;
       price: number;
       size: string;
       color: string;

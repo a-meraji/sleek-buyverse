@@ -8,18 +8,26 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export function OrderSummary() {
-  const { state: { items }, dispatch } = useCart();
+  const { state: { items }, addToCart, updateQuantity, removeItem } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCartItems = async () => {
+      console.log('Fetching cart items for OrderSummary...');
       const { data, error } = await supabase
         .from('cart_items')
         .select(`
           *,
           product:products (
             *,
-            product_variants (*)
+            product_variants (
+              id,
+              product_id,
+              size,
+              color,
+              stock,
+              price
+            )
           )
         `);
 
@@ -30,12 +38,15 @@ export function OrderSummary() {
 
       if (data) {
         console.log('Fetched cart items with variants:', data);
-        dispatch({ type: 'SET_ITEMS', payload: data });
+        // Instead of using dispatch directly, use the context's update methods
+        data.forEach(item => {
+          updateQuantity(null, item.id, item.quantity);
+        });
       }
     };
 
     fetchCartItems();
-  }, [dispatch]);
+  }, [updateQuantity]);
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
@@ -52,6 +63,8 @@ export function OrderSummary() {
   const tax = subtotal * 0.08;
   const shipping = items.length > 0 ? 5.99 : 0;
   const total = subtotal + tax + shipping;
+
+  console.log('Rendering OrderSummary with items:', items);
 
   return (
     <div className="space-y-6">
