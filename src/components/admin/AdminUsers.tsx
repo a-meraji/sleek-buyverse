@@ -5,9 +5,17 @@ import {
 import { UserTableHeader } from "./users/UserTableHeader";
 import { UserTableRow } from "./users/UserTableRow";
 import { useProfiles } from "./users/useProfiles";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { debounce } from "lodash";
 
 export function AdminUsers() {
-  const { data: profiles, isLoading, error } = useProfiles();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: profiles, isLoading, error } = useProfiles({ searchQuery });
+
+  const handleSearch = debounce((value: string) => {
+    setSearchQuery(value);
+  }, 300);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading users</div>;
@@ -16,13 +24,20 @@ export function AdminUsers() {
   console.log("Rendering profiles:", profiles);
 
   return (
-    <Table>
-      <UserTableHeader />
-      <TableBody>
-        {profiles.map((profile) => (
-          <UserTableRow key={profile.id} user={profile} />
-        ))}
-      </TableBody>
-    </Table>
+    <div className="space-y-4">
+      <Input
+        placeholder="Search by name, email, phone, or postal code..."
+        onChange={(e) => handleSearch(e.target.value)}
+        className="max-w-md"
+      />
+      <Table>
+        <UserTableHeader />
+        <TableBody>
+          {profiles.map((profile) => (
+            <UserTableRow key={profile.id} user={profile} />
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

@@ -2,14 +2,30 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileData } from "./types";
 
-export function useProfiles() {
+interface UseProfilesProps {
+  searchQuery?: string;
+}
+
+export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
   return useQuery({
-    queryKey: ["admin-profiles"],
+    queryKey: ["admin-profiles", searchQuery],
     queryFn: async () => {
-      console.log("Fetching profiles...");
-      const { data: profiles, error } = await supabase
+      console.log("Fetching profiles with search:", searchQuery);
+      let query = supabase
         .from("profiles")
-        .select("*");
+        .select(`*, auth_users:id (email)`);
+
+      if (searchQuery) {
+        query = query.or(
+          `first_name.ilike.%${searchQuery}%,` +
+          `last_name.ilike.%${searchQuery}%,` +
+          `phone.ilike.%${searchQuery}%,` +
+          `postal_code.ilike.%${searchQuery}%,` +
+          `auth_users.email.ilike.%${searchQuery}%`
+        );
+      }
+
+      const { data: profiles, error } = await query;
 
       if (error) {
         console.error("Error fetching profiles:", error);
@@ -17,7 +33,10 @@ export function useProfiles() {
       }
 
       console.log("Fetched profiles:", profiles);
-      return profiles as ProfileData[];
+      return profiles.map((profile: any) => ({
+        ...profile,
+        email: profile.auth_users?.email,
+      })) as ProfileData[];
     },
   });
 }
