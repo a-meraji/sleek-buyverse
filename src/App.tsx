@@ -14,6 +14,7 @@ import ContactUs from "./pages/ContactUs";
 import ShippingPolicy from "./pages/ShippingPolicy";
 import ReturnsExchanges from "./pages/ReturnsExchanges";
 import FAQ from "./pages/FAQ";
+import Checkout from "./pages/Checkout";
 import { ChatButton } from "./components/chat/ChatButton";
 import { CartProvider } from "./contexts/cart/CartContext";
 import { RootLayout } from "./components/layout/RootLayout";
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/shipping" element={<ShippingPolicy />} />
               <Route path="/returns" element={<ReturnsExchanges />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/checkout" element={<Checkout />} />
             </Route>
           </Routes>
           <ChatButton />
