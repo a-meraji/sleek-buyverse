@@ -6,12 +6,14 @@ interface OrderItemProps {
 }
 
 export const OrderItem = ({ item }: OrderItemProps) => {
-  const variant = item.product?.product_variants?.find(v => v.id === item.variant_id);
+  const variant = item.variant || item.product?.product_variants?.find(v => v.id === item.variant_id);
   const variantPrice = variant?.price ?? 0;
   const discount = item.product?.discount;
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
   const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
   const subtotal = discountedPrice * item.quantity;
+
+  console.log('Rendering OrderItem:', { item, variant, variantPrice, discount });
 
   return (
     <div className="flex gap-4 p-4 bg-background rounded-lg border">
@@ -29,8 +31,12 @@ export const OrderItem = ({ item }: OrderItemProps) => {
             <h3 className="font-medium">{item.product?.name}</h3>
             {variant && (
               <div className="flex gap-2 mt-1">
-                <Badge variant="secondary">{variant.size}</Badge>
-                <Badge variant="secondary">{variant.color}</Badge>
+                <Badge variant="outline" className="bg-primary/10">
+                  Size: {variant.size}
+                </Badge>
+                <Badge variant="outline" className="bg-primary/10">
+                  Color: {variant.color}
+                </Badge>
               </div>
             )}
           </div>

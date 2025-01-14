@@ -48,4 +48,5 @@ export interface CartItem {
   variant_id?: string;
   quantity: number;
   product?: Product;
+  variant?: ProductVariant;
 }

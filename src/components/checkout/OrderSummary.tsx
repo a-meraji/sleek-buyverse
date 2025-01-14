@@ -20,15 +20,9 @@ export function OrderSummary() {
           *,
           product:products (
             *,
-            product_variants (
-              id,
-              product_id,
-              size,
-              color,
-              stock,
-              price
-            )
-          )
+            product_variants (*)
+          ),
+          variant:product_variants (*)
         `);
 
       if (error) {
@@ -49,7 +43,8 @@ export function OrderSummary() {
             product_id: item.product_id,
             variant_id: item.variant_id,
             quantity: item.quantity,
-            product: item.product
+            product: item.product,
+            variant: item.variant
           };
           addToCart(null, cartItem);
         });
@@ -61,7 +56,7 @@ export function OrderSummary() {
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
-      const variant = item.product?.product_variants?.find(v => v.id === item.variant_id);
+      const variant = item.variant || item.product?.product_variants?.find(v => v.id === item.variant_id);
       const variantPrice = variant?.price ?? 0;
       const discount = item.product?.discount;
       const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
