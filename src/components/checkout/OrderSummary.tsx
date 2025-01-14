@@ -23,7 +23,7 @@ export function OrderSummary() {
           .select(`
             *,
             product:products (*),
-            variant:product_variants (*)
+            variant:product_variants!cart_items_variant_id_fkey (*)
           `);
 
         if (cartError) {
