@@ -13,7 +13,14 @@ export const OrderItem = ({ item }: OrderItemProps) => {
   const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
   const subtotal = discountedPrice * item.quantity;
 
-  console.log('Rendering OrderItem:', { item, variant, variantPrice, discount });
+  console.log('Rendering OrderItem:', { 
+    item, 
+    variant, 
+    variantPrice, 
+    discount,
+    discountedPrice,
+    subtotal 
+  });
 
   return (
     <div className="flex gap-4 p-4 bg-background rounded-lg border">

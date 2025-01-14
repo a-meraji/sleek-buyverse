@@ -2,10 +2,8 @@ import { useEffect } from "react";
 import { useCart } from "@/contexts/cart/CartContext";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { OrderHeader } from "./order/OrderHeader";
-import { OrderItemsList } from "./order/OrderItemsList";
-import { OrderTotals } from "./order/OrderTotals";
 import { useToast } from "@/hooks/use-toast";
+import { OrderSummaryContent } from "./order/OrderSummaryContent";
 
 export function OrderSummary() {
   const { state: { items }, addToCart } = useCart();
@@ -81,34 +79,11 @@ export function OrderSummary() {
     );
   }
 
-  return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <OrderHeader />
-      
-      <div className="bg-secondary/50 rounded-lg p-6 space-y-6">
-        <OrderItemsList items={items} />
-        
-        <OrderTotals
-          subtotal={subtotal}
-          tax={tax}
-          shipping={shipping}
-          total={total}
-        />
-
-        <Button 
-          className="w-full" 
-          size="lg"
-          onClick={() => {
-            console.log('Proceeding to checkout with total:', total);
-            toast({
-              title: "Processing Order",
-              description: "Redirecting to payment...",
-            });
-          }}
-        >
-          Proceed to Payment (${total.toFixed(2)})
-        </Button>
-      </div>
-    </div>
-  );
+  return <OrderSummaryContent 
+    items={items}
+    subtotal={subtotal}
+    tax={tax}
+    shipping={shipping}
+    total={total}
+  />;
 }
