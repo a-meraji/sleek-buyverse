@@ -7,12 +7,14 @@ import { ProfileForm } from "@/components/navbar/ProfileForm";
 import { CartContent } from "@/components/cart/CartContent";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { Navbar } from "@/components/Navbar";
+import { useOrderCalculations } from "@/hooks/useOrderCalculations";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { state: { items } } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { total } = useOrderCalculations();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -66,7 +68,12 @@ const Checkout = () => {
                 updateQuantity={() => {}}
                 removeItem={() => {}}
               />
-              <CartSummary />
+              <CartSummary 
+                total={total}
+                isAuthenticated={!!userId}
+                itemsExist={items.length > 0}
+                onClose={() => {}}
+              />
             </div>
           </div>
         </div>
