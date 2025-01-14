@@ -23,7 +23,6 @@ export function UserTableRow({ user }: UserTableRowProps) {
           ? `${user.first_name || ""} ${user.last_name || ""}`
           : "N/A"}
       </TableCell>
-      <TableCell>N/A</TableCell>
       <TableCell>{user.phone || "N/A"}</TableCell>
       <TableCell>{formatAddress(user)}</TableCell>
       <TableCell>

@@ -9,7 +9,6 @@ export function UserTableHeader() {
     <TableHeader>
       <TableRow>
         <TableHead>Name</TableHead>
-        <TableHead>Email</TableHead>
         <TableHead>Phone</TableHead>
         <TableHead>Address</TableHead>
         <TableHead>Created At</TableHead>
