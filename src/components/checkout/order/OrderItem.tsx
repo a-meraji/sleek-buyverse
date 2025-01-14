@@ -1,7 +1,8 @@
-import { CartItem, Product, ProductVariant } from "@/types";
+import { CartItem } from "@/types";
+import { Badge } from "@/components/ui/badge";
 
 interface OrderItemProps {
-  item: CartItem & { product?: Product };
+  item: CartItem;
 }
 
 export const OrderItem = ({ item }: OrderItemProps) => {
@@ -13,32 +14,57 @@ export const OrderItem = ({ item }: OrderItemProps) => {
   const subtotal = discountedPrice * item.quantity;
 
   return (
-    <div className="flex justify-between p-4 bg-secondary rounded-lg">
-      <div>
-        <h3 className="font-medium">{item.product?.name}</h3>
-        <p className="text-sm text-muted-foreground">
-          Size: {variant?.size}, Color: {variant?.color}
-        </p>
-        <p className="text-sm">Quantity: {item.quantity}</p>
+    <div className="flex gap-4 p-4 bg-background rounded-lg border">
+      <div className="w-20 h-20 rounded-md overflow-hidden">
+        <img 
+          src={item.product?.image_url} 
+          alt={item.product?.name}
+          className="w-full h-full object-cover"
+        />
       </div>
-      <div className="text-right">
-        {hasValidDiscount ? (
-          <>
-            <p className="text-sm text-muted-foreground line-through">
-              ${variantPrice.toFixed(2)} × {item.quantity}
-            </p>
-            <p className="text-red-500">
-              ${discountedPrice.toFixed(2)} × {item.quantity}
-            </p>
-            <p className="font-medium text-red-500">
-              ${subtotal.toFixed(2)}
-            </p>
-          </>
-        ) : (
-          <>
-            <p>${variantPrice.toFixed(2)} × {item.quantity}</p>
-            <p className="font-medium">${subtotal.toFixed(2)}</p>
-          </>
+      
+      <div className="flex-1">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-medium">{item.product?.name}</h3>
+            {variant && (
+              <div className="flex gap-2 mt-1">
+                <Badge variant="secondary">{variant.size}</Badge>
+                <Badge variant="secondary">{variant.color}</Badge>
+              </div>
+            )}
+          </div>
+          
+          <div className="text-right">
+            {hasValidDiscount ? (
+              <>
+                <p className="text-sm text-muted-foreground line-through">
+                  ${variantPrice.toFixed(2)} × {item.quantity}
+                </p>
+                <p className="text-red-500">
+                  ${discountedPrice.toFixed(2)} × {item.quantity}
+                </p>
+                <p className="font-medium text-red-500">
+                  ${subtotal.toFixed(2)}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  ${variantPrice.toFixed(2)} × {item.quantity}
+                </p>
+                <p className="font-medium">
+                  ${subtotal.toFixed(2)}
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+        
+        {variant && variant.stock < 5 && (
+          <p className="text-sm text-red-500 mt-2">
+            Only {variant.stock} left in stock!
+          </p>
         )}
       </div>
     </div>
