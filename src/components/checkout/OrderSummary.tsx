@@ -53,9 +53,7 @@ export function OrderSummary() {
           
           // Update cart context
           processedItems.forEach(item => {
-            if (item.product && item.variant) {
-              addToCart(null, item);
-            }
+            addToCart(null, item);
           });
         }
       } catch (error) {
