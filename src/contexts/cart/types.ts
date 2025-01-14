@@ -6,8 +6,12 @@ export interface CartItem {
   product?: {
     id: string;
     name: string;
-    image_url: string;
     description?: string;
+    price: number;
+    image_url: string;
+    category?: string;
+    sku?: string;
+    discount?: number | null;
     product_variants?: Array<{
       id: string;
       price: number;
