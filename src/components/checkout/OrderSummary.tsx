@@ -23,7 +23,7 @@ export function OrderSummary() {
           .select(`
             *,
             product:products (*),
-            variant:product_variants!cart_items_variant_id_fkey (*)
+            variant:product_variants (*)
           `);
 
         if (cartError) {
@@ -45,15 +45,17 @@ export function OrderSummary() {
             variant_id: item.variant_id,
             quantity: item.quantity,
             product: item.product,
-            variant: item.variant
+            variant: item.variant?.[0] // Take first variant since it's an array
           }));
 
           console.log('Processed cart items:', processedItems);
           setCartItems(processedItems);
           
-          // Update cart context
+          // Update cart context with valid items only
           processedItems.forEach(item => {
-            addToCart(null, item);
+            if (item.product && item.variant) {
+              addToCart(null, item);
+            }
           });
         }
       } catch (error) {
