@@ -13,7 +13,20 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
       console.log("Fetching profiles with search:", searchQuery);
       let query = supabase
         .from("profiles")
-        .select("*, users:auth.users!profiles_id_fkey(email)");
+        .select(`
+          id,
+          first_name,
+          last_name,
+          phone,
+          created_at,
+          street_address,
+          city,
+          state,
+          postal_code,
+          users (
+            email
+          )
+        `);
 
       if (searchQuery) {
         query = query.or(
@@ -24,15 +37,15 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
         );
       }
 
-      const { data: profiles, error } = await query;
+      const { data, error } = await query;
 
       if (error) {
         console.error("Error fetching profiles:", error);
         throw error;
       }
 
-      console.log("Fetched profiles:", profiles);
-      return profiles as ProfileData[];
+      console.log("Fetched profiles:", data);
+      return data as ProfileData[];
     },
   });
 }
