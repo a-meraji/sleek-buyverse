@@ -26,7 +26,7 @@ export function AdminUsers() {
   return (
     <div className="space-y-4">
       <Input
-        placeholder="Search by name, email, phone, or postal code..."
+        placeholder="Search by name, phone, or postal code..."
         onChange={(e) => handleSearch(e.target.value)}
         className="max-w-md"
       />

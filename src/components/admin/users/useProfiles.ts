@@ -13,15 +13,19 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
       console.log("Fetching profiles with search:", searchQuery);
       let query = supabase
         .from("profiles")
-        .select("*, auth.users!profiles_id_fkey(email)");
+        .select(`
+          *,
+          users:auth.users!profiles_id_fkey (
+            email
+          )
+        `);
 
       if (searchQuery) {
         query = query.or(
           `first_name.ilike.%${searchQuery}%,` +
           `last_name.ilike.%${searchQuery}%,` +
           `phone.ilike.%${searchQuery}%,` +
-          `postal_code.ilike.%${searchQuery}%,` +
-          `auth.users.email.ilike.%${searchQuery}%`
+          `postal_code.ilike.%${searchQuery}%`
         );
       }
 
@@ -33,10 +37,7 @@ export function useProfiles({ searchQuery }: UseProfilesProps = {}) {
       }
 
       console.log("Fetched profiles:", profiles);
-      return profiles.map((profile: any) => ({
-        ...profile,
-        email: profile.users?.email,
-      })) as ProfileData[];
+      return profiles as ProfileData[];
     },
   });
 }
