@@ -10,9 +10,12 @@ export function OrderSummary() {
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
       const variant = item.product?.product_variants?.find(v => v.id === item.variant_id);
-      const price = variant?.price ?? 0;
+      const variantPrice = variant?.price ?? 0;
+      const discount = item.product?.discount;
+      const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+      const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
       const quantity = item.quantity;
-      return total + (price * quantity);
+      return total + (discountedPrice * quantity);
     }, 0);
   };
 
@@ -40,8 +43,11 @@ export function OrderSummary() {
       <div className="space-y-4">
         {items.map((item) => {
           const variant = item.product?.product_variants?.find(v => v.id === item.variant_id);
-          const price = variant?.price ?? 0;
-          const subtotal = price * item.quantity;
+          const variantPrice = variant?.price ?? 0;
+          const discount = item.product?.discount;
+          const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+          const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
+          const subtotal = discountedPrice * item.quantity;
           
           return (
             <div key={item.id} className="flex justify-between p-4 bg-secondary rounded-lg">
@@ -53,8 +59,24 @@ export function OrderSummary() {
                 <p className="text-sm">Quantity: {item.quantity}</p>
               </div>
               <div className="text-right">
-                <p>${price.toFixed(2)} × {item.quantity}</p>
-                <p className="font-medium">${subtotal.toFixed(2)}</p>
+                {hasValidDiscount ? (
+                  <>
+                    <p className="text-sm text-muted-foreground line-through">
+                      ${variantPrice.toFixed(2)} × {item.quantity}
+                    </p>
+                    <p className="text-red-500">
+                      ${discountedPrice.toFixed(2)} × {item.quantity}
+                    </p>
+                    <p className="font-medium text-red-500">
+                      ${subtotal.toFixed(2)}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>${variantPrice.toFixed(2)} × {item.quantity}</p>
+                    <p className="font-medium">${subtotal.toFixed(2)}</p>
+                  </>
+                )}
               </div>
             </div>
           );
