@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/cart/CartContext";
 import { ProfileForm } from "@/components/navbar/ProfileForm";
-import { OrderSummary } from "@/components/checkout/OrderSummary";
+import { CartContent } from "@/components/cart/CartContent";
+import { CartSummary } from "@/components/cart/CartSummary";
 import { Navbar } from "@/components/Navbar";
 
 const Checkout = () => {
@@ -56,7 +57,18 @@ const Checkout = () => {
             <ProfileForm userId={userId} onClose={() => {}} />
           </div>
 
-          <OrderSummary />
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold">Order Summary</h2>
+            <div className="bg-secondary/50 rounded-lg p-6">
+              <CartContent 
+                cartItems={items} 
+                userId={userId}
+                updateQuantity={() => {}}
+                removeItem={() => {}}
+              />
+              <CartSummary />
+            </div>
+          </div>
         </div>
       </div>
     </div>
