@@ -3,8 +3,8 @@ import { useCart } from "@/contexts/cart/CartContext";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { OrderSummaryContent } from "./order/OrderSummaryContent";
 import { CartItem } from "@/types";
+import { OrderSummaryContent } from "./order/OrderSummaryContent";
 
 export function OrderSummary() {
   const { state: { items }, addToCart } = useCart();
@@ -17,17 +17,19 @@ export function OrderSummary() {
       console.log('Fetching cart items for OrderSummary...');
       setIsLoading(true);
       
-      const { data, error } = await supabase
+      const { data: cartData, error: cartError } = await supabase
         .from('cart_items')
         .select(`
           *,
-          product:products (*,
-            product_variants(*)),
+          product:products (
+            *,
+            product_variants (*)
+          ),
           variant:product_variants (*)
         `);
 
-      if (error) {
-        console.error('Error fetching cart items:', error);
+      if (cartError) {
+        console.error('Error fetching cart items:', cartError);
         toast({
           title: "Error",
           description: "Failed to load cart items",
@@ -37,29 +39,27 @@ export function OrderSummary() {
         return;
       }
 
-      if (data) {
-        console.log('Raw fetched cart items:', data);
+      if (cartData) {
+        console.log('Raw cart data:', cartData);
         
-        const processedItems = data.map(item => ({
+        const processedItems = cartData.map(item => ({
           id: item.id,
           product_id: item.product_id,
           variant_id: item.variant_id,
           quantity: item.quantity,
-          product: {
-            ...item.product,
-            product_variants: item.product.product_variants
-          },
+          product: item.product,
           variant: item.variant
         }));
-        
+
         console.log('Processed cart items:', processedItems);
         setCartItems(processedItems);
         
-        // Clear existing items and add new ones
+        // Update cart context
         processedItems.forEach(item => {
           addToCart(null, item);
         });
       }
+      
       setIsLoading(false);
     };
 
@@ -82,9 +82,9 @@ export function OrderSummary() {
   const shipping = items.length > 0 ? 5.99 : 0;
   const total = subtotal + tax + shipping;
 
-  console.log('Rendering OrderSummary with:', {
+  console.log('OrderSummary state:', {
     isLoading,
-    items,
+    itemsCount: items.length,
     cartItems,
     subtotal,
     total
