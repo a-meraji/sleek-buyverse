@@ -22,8 +22,8 @@ export function OrderSummary() {
           .from('cart_items')
           .select(`
             *,
-            product:products (*),
-            variant:product_variants (*)
+            product:products!cart_items_product_id_fkey (*),
+            variant:product_variants!cart_items_variant_id_fkey (*)
           `);
 
         if (cartError) {
@@ -45,13 +45,13 @@ export function OrderSummary() {
             variant_id: item.variant_id,
             quantity: item.quantity,
             product: item.product,
-            variant: item.variant?.[0] // Take first variant since it's an array
-          }));
+            variant: Array.isArray(item.variant) ? item.variant[0] : item.variant
+          })).filter(item => item.product && item.variant);
 
           console.log('Processed cart items:', processedItems);
           setCartItems(processedItems);
           
-          // Update cart context with valid items only
+          // Update cart context with processed items
           processedItems.forEach(item => {
             if (item.product && item.variant) {
               addToCart(null, item);
