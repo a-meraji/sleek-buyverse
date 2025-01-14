@@ -17,14 +17,12 @@ export function OrderSummary() {
       console.log('Fetching cart items for OrderSummary...');
       setIsLoading(true);
       
+      // Match the cart's data fetching pattern
       const { data, error } = await supabase
         .from('cart_items')
         .select(`
           *,
-          product:products (
-            *,
-            product_variants (*)
-          ),
+          product:products (*),
           variant:product_variants (*)
         `);
 
@@ -41,6 +39,7 @@ export function OrderSummary() {
 
       if (data) {
         console.log('Fetched cart items:', data);
+        // Process items similar to cart component
         const processedItems = data.map(item => ({
           id: item.id,
           product_id: item.product_id,
@@ -51,6 +50,7 @@ export function OrderSummary() {
         }));
         
         setCartItems(processedItems);
+        // Clear existing items before adding new ones
         processedItems.forEach(item => {
           addToCart(null, item);
         });
@@ -65,7 +65,8 @@ export function OrderSummary() {
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
-      const variant = item.variant || item.product?.product_variants?.find(v => v.id === item.variant_id);
+      // Match cart's price calculation
+      const variant = item.variant;
       const variantPrice = variant?.price ?? 0;
       const discount = item.product?.discount;
       const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;

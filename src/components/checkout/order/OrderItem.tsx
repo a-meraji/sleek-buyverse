@@ -6,7 +6,8 @@ interface OrderItemProps {
 }
 
 export const OrderItem = ({ item }: OrderItemProps) => {
-  const selectedVariant = item.variant || item.product?.product_variants?.find(v => v.id === item.variant_id);
+  // Directly use the variant from the item
+  const selectedVariant = item.variant;
   const variantPrice = selectedVariant?.price ?? 0;
   const discount = item.product?.discount;
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
