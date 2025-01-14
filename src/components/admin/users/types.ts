@@ -8,7 +8,4 @@ export interface ProfileData {
   city: string | null;
   state: string | null;
   postal_code: string | null;
-  users: {
-    email: string;
-  } | null;
 }
