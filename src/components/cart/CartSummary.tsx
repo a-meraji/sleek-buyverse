@@ -5,14 +5,16 @@ import { Separator } from "@/components/ui/separator";
 
 interface CartSummaryProps {
   total: number;
+  subtotal:number;
+  tax:number;
   isAuthenticated: boolean;
   itemsExist: boolean;
   onClose: () => void;
 }
 
-export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: CartSummaryProps) => {
+export const CartSummary = ({ total, subtotal, tax, isAuthenticated, itemsExist, onClose }: CartSummaryProps) => {
   const navigate = useNavigate();
-  const { subtotal, tax, shipping } = useOrderCalculations();
+  const { shipping } = useOrderCalculations();
   
   const handleCheckout = () => {
     onClose();
