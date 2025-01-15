@@ -10,24 +10,28 @@ export const useFetchSessions = () => {
     
     const query = supabase
       .from('chat_messages')
-      .select('*', { count: 'exact', head: true })
+      .select('*', { count: 'exact' })
       .eq('session_id', sessionId)
       .eq('is_read', false);
 
     if (isAdmin) {
-      query.neq('sender_id', currentUserId);
+      // For admins, count unread messages from users (not from other admins)
+      query.not('sender_id', 'is', null).neq('sender_id', currentUserId);
     } else {
+      // For users, count unread messages from admins
       query.eq('sender_id', currentUserId);
     }
 
-    const { count, error } = await query;
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error counting unread messages:', error);
-      return 0;
+      throw error;
     }
 
-    return count || 0;
+    const count = data?.length || 0;
+    console.log(`Unread count for session ${sessionId}:`, count);
+    return count;
   };
 
   const fetchSessions = async () => {

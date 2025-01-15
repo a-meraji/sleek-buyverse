@@ -31,12 +31,12 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'chat_messages'
         },
         (payload) => {
-          console.log('New message received:', payload);
+          console.log('Chat message changed:', payload);
           refetch();
         }
       )

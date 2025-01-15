@@ -26,35 +26,17 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
     console.log('Setting up realtime listeners for session:', session.id);
     
     const channel = supabase
-      .channel('chat-updates')
+      .channel(`chat-updates-${session.id}`)
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*',
           schema: 'public',
           table: 'chat_messages',
           filter: `session_id=eq.${session.id}`
         },
         (payload) => {
-          console.log('Message updated:', payload);
-          queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
-          queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
-        }
-      )
-      .subscribe();
-
-    const newMessageChannel = supabase
-      .channel('new-messages')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chat_messages',
-          filter: `session_id=eq.${session.id}`
-        },
-        (payload) => {
-          console.log('New message received:', payload);
+          console.log('Message changed:', payload);
           queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
           queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
         }
@@ -63,7 +45,6 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
 
     return () => {
       supabase.removeChannel(channel);
-      supabase.removeChannel(newMessageChannel);
     };
   }, [session.id, queryClient]);
 
