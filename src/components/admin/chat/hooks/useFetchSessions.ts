@@ -85,22 +85,16 @@ export const useFetchSessions = () => {
         // Fetch user profile
         const userProfile = session.user_id ? await fetchUserProfile(session.user_id) : null;
         
-        // Fetch user email directly if needed
-        let userEmail = userProfile?.email;
-        if (!userEmail && session.user_id) {
-          const { data: userData } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', session.user_id)
-            .single();
-          userEmail = userData?.email;
-        }
+        // Get email from user profile
+        const userEmail = userProfile?.first_name 
+          ? `${userProfile.first_name} ${userProfile.last_name || ''}`
+          : 'Anonymous';
 
         const unreadCount = await fetchUnreadCount(session.id, currentUserId, isAdmin);
 
         return {
           ...session,
-          user_email: userEmail || 'Anonymous',
+          user_email: userEmail,
           unread_count: unreadCount
         };
       })

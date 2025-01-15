@@ -5,6 +5,7 @@ import { SessionCard } from "./components/SessionCard";
 import { SessionHeader } from "./components/SessionHeader";
 import { useSessionList } from "./hooks/useSessionList";
 import { useQueryClient } from "@tanstack/react-query";
+import { useUnreadAdminMessages } from "./hooks/useUnreadAdminMessages";
 
 interface SessionListProps {
   selectedSession: string | null;
@@ -14,6 +15,8 @@ interface SessionListProps {
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
   const { data: sessions = [], refetch } = useSessionList();
   const queryClient = useQueryClient();
+  // Add this to trigger refetch when unread count changes
+  const { data: unreadMessages } = useUnreadAdminMessages();
 
   useEffect(() => {
     console.log('Setting up realtime listeners for chat sessions...');
@@ -64,6 +67,12 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
       supabase.removeChannel(channel);
     };
   }, [refetch, queryClient]);
+
+  // Add this effect to refetch when unread count changes
+  useEffect(() => {
+    console.log('Unread messages changed, refetching sessions...');
+    refetch();
+  }, [unreadMessages, refetch]);
 
   return (
     <div className="flex flex-col h-full">
