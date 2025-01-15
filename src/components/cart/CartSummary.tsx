@@ -13,7 +13,7 @@ interface CartSummaryProps {
 export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: CartSummaryProps) => {
   const navigate = useNavigate();
   const { state: { items } } = useCart();
-  
+  console.log("items from usecart: ",items);
   // Calculate subtotal from cart items
   const subtotal = items?.reduce((sum, item) => {
     const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
