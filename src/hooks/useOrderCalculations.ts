@@ -6,23 +6,26 @@ const SHIPPING_RATE = 5.99; // Flat shipping rate
 export const useOrderCalculations = () => {
   const { state: { items } } = useCart();
 
-  const calculateTotal = () => {
-    const total = items.reduce((total, item) => {
-      const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
-      const variantPrice = selectedVariant?.price ?? 0;
-      const quantity = item.quantity;
-      const discount = item.product?.discount;
-      const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-      const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-      const itemTotal = discountedPrice * quantity;
+  // Calculate all values in a single pass to ensure consistency
+  const calculations = items.reduce((acc, item) => {
+    const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
+    const variantPrice = selectedVariant?.price ?? 0;
+    const quantity = item.quantity;
+    const discount = item.product?.discount;
+    const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+    const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
+    const itemTotal = discountedPrice * quantity;
 
-      return total + itemTotal;
-    }, 0);
+    return {
+      subtotal: acc.subtotal + itemTotal,
+      itemCount: acc.itemCount + 1
+    };
+  }, {
+    subtotal: 0,
+    itemCount: 0
+  });
 
-    return total;
-  };
-
-  const subtotal = calculateTotal();
+  const { subtotal } = calculations;
   const tax = subtotal * TAX_RATE;
   const shipping = items.length > 0 ? SHIPPING_RATE : 0;
   const total = subtotal + tax + shipping;
