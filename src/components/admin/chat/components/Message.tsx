@@ -30,7 +30,7 @@ export const Message = ({ message }: MessageProps) => {
         className={`rounded-lg px-4 py-2 max-w-[80%] break-words ${
           isCurrentUser
             ? "bg-primary text-primary-foreground"
-            : "bg-muted"
+            : "bg-blue-50"
         }`}
       >
         {message.content}
