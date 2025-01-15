@@ -23,7 +23,7 @@ export const useMarkMessagesAsRead = () => {
     const unreadMessages = messages.filter(msg => {
       if (isAdmin) {
         // Admin should mark messages from users as read
-        return !msg.is_read && msg.sender_id !== null && !isAdmin;
+        return !msg.is_read && msg.sender_id !== null && msg.sender_id !== currentUserId;
       } else {
         // Regular user should mark messages from admins as read
         return !msg.is_read && msg.sender_id !== currentUserId;
@@ -40,16 +40,14 @@ export const useMarkMessagesAsRead = () => {
         .from('chat_messages')
         .update({ is_read: true })
         .in('id', unreadIds)
-        .eq('session_id', sessionId)
         .select();
-
-      console.log('Update operation result:', updateResult);
-      console.log('Update operation error:', updateError);
 
       if (updateError) {
         console.error('Error marking messages as read:', updateError);
         return messages;
       }
+
+      console.log('Messages marked as read:', updateResult);
 
       // Return updated messages with is_read set to true for the updated messages
       return messages.map(msg => 
