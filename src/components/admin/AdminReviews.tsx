@@ -54,6 +54,7 @@ export function AdminReviews() {
     }
   });
 
+  // Show loading state while products are being fetched
   if (isLoadingProducts) {
     return <div className="flex items-center justify-center p-8">Loading products...</div>;
   }
@@ -63,7 +64,7 @@ export function AdminReviews() {
       <h2 className="text-2xl font-bold">Reviews</h2>
       
       <ReviewFilters
-        products={products || []}
+        products={products || []} // Ensure we always pass an array
         selectedProduct={selectedProduct}
         onProductChange={setSelectedProduct}
         selectedStatus={selectedStatus}

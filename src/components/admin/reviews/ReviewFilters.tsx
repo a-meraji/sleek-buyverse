@@ -32,7 +32,7 @@ interface ReviewFiltersProps {
 }
 
 export function ReviewFilters({
-  products = [],
+  products,
   selectedProduct,
   onProductChange,
   selectedStatus,
