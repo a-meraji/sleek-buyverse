@@ -65,20 +65,10 @@ export const useFetchSessions = () => {
     const isAdmin = isAdminData;
     console.log('Current user is admin:', isAdmin);
 
-    // Update the query to match the real-time subscription data structure
+    // Simplified query without relying on foreign key relationships
     const { data: chatSessions, error: sessionsError } = await supabase
       .from('chat_sessions')
-      .select(`
-        *,
-        user:user_id (
-          id,
-          email
-        ),
-        admin:admin_id (
-          id,
-          email
-        )
-      `)
+      .select('*')
       .eq('status', 'active')
       .order('last_message_at', { ascending: false });
 
@@ -89,14 +79,28 @@ export const useFetchSessions = () => {
 
     console.log('Raw chat sessions:', chatSessions);
 
+    // Fetch user profiles and unread counts separately
     const sessionsWithProfiles = await Promise.all(
       chatSessions.map(async (session) => {
-        const profile = session.user_id ? await fetchUserProfile(session.user_id) : null;
+        // Fetch user profile
+        const userProfile = session.user_id ? await fetchUserProfile(session.user_id) : null;
+        
+        // Fetch user email directly if needed
+        let userEmail = userProfile?.email;
+        if (!userEmail && session.user_id) {
+          const { data: userData } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user_id)
+            .single();
+          userEmail = userData?.email;
+        }
+
         const unreadCount = await fetchUnreadCount(session.id, currentUserId, isAdmin);
 
         return {
           ...session,
-          user_email: profile?.email || session.user?.email || 'Anonymous',
+          user_email: userEmail || 'Anonymous',
           unread_count: unreadCount
         };
       })
