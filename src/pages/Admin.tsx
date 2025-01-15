@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Store } from "lucide-react";
 import { useUnreadAdminMessages } from "@/components/admin/chat/hooks/useUnreadAdminMessages";
+import { SessionBadge } from "@/components/admin/chat/components/session-card/SessionBadge";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -83,9 +84,7 @@ export default function Admin() {
           </TabsTrigger>
           <TabsTrigger value="chat" className="relative">
             Chat
-            {unreadMessages > 0 && (
-              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-blue-500" />
-            )}
+            <SessionBadge count={unreadMessages} />
           </TabsTrigger>
         </TabsList>
         <TabsContent value="analytics" className="space-y-4">
