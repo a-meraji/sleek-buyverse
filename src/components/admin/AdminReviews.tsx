@@ -15,10 +15,12 @@ export function AdminReviews() {
       const { data, error } = await supabase
         .from("products")
         .select("id, name");
+      
       if (error) {
         console.error("Error fetching products:", error);
         throw error;
       }
+      
       console.log("Fetched products:", data);
       return data || [];
     }
