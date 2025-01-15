@@ -14,7 +14,7 @@ const Checkout = () => {
   const { state: { items }, updateQuantity: updateCartQuantity, removeItem: removeCartItem } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { total } = useOrderCalculations();
+  const { total, subtotal, tax } = useOrderCalculations();
 
   console.log('Checkout page - Cart items:', items);
 
@@ -64,6 +64,8 @@ const Checkout = () => {
             userId={userId}
             items={items}
             total={total}
+            subtotal={subtotal}
+            tax={tax}
             handleUpdateQuantity={handleUpdateQuantity}
             handleRemoveItem={handleRemoveItem}
           />
