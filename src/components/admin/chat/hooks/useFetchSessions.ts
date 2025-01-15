@@ -65,9 +65,20 @@ export const useFetchSessions = () => {
     const isAdmin = isAdminData;
     console.log('Current user is admin:', isAdmin);
 
+    // Update the query to match the real-time subscription data structure
     const { data: chatSessions, error: sessionsError } = await supabase
       .from('chat_sessions')
-      .select('*')
+      .select(`
+        *,
+        user:user_id (
+          id,
+          email
+        ),
+        admin:admin_id (
+          id,
+          email
+        )
+      `)
       .eq('status', 'active')
       .order('last_message_at', { ascending: false });
 
@@ -76,6 +87,8 @@ export const useFetchSessions = () => {
       throw sessionsError;
     }
 
+    console.log('Raw chat sessions:', chatSessions);
+
     const sessionsWithProfiles = await Promise.all(
       chatSessions.map(async (session) => {
         const profile = session.user_id ? await fetchUserProfile(session.user_id) : null;
@@ -83,7 +96,7 @@ export const useFetchSessions = () => {
 
         return {
           ...session,
-          user_email: profile?.email || 'Anonymous',
+          user_email: profile?.email || session.user?.email || 'Anonymous',
           unread_count: unreadCount
         };
       })
