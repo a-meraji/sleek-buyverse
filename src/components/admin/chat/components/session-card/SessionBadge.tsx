@@ -5,7 +5,10 @@ interface SessionBadgeProps {
 }
 
 export const SessionBadge = ({ count }: SessionBadgeProps) => {
-  if (count <= 0) return null;
+  console.log('Session badge count:', count); // Add logging to track the count
+  
+  // Remove the count <= 0 check since 0 is a valid number
+  if (!count) return null;
   
   return (
     <Badge 

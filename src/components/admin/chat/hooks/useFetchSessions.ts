@@ -19,6 +19,7 @@ export const useFetchSessions = () => {
     }
 
     const adminIds = adminUsers.map(admin => admin.id);
+    console.log('Admin IDs:', adminIds);
 
     // For admins, count unread messages from users (not from other admins)
     const query = supabase
@@ -30,21 +31,23 @@ export const useFetchSessions = () => {
     if (isAdmin) {
       // For admins, count unread messages from users (not from other admins)
       query.not('sender_id', 'in', adminIds);
+      console.log('Counting unread messages from non-admin users');
     } else {
       // For users, count unread messages from admins
       query.in('sender_id', adminIds);
+      console.log('Counting unread messages from admins');
     }
 
-    const { data, error } = await query;
+    const { data, error, count } = await query;
 
     if (error) {
       console.error('Error counting unread messages:', error);
       throw error;
     }
 
-    const count = data?.length || 0;
-    console.log(`Unread count for session ${sessionId}:`, count);
-    return count;
+    const unreadCount = data?.length || 0;
+    console.log(`Unread count for session ${sessionId}:`, unreadCount);
+    return unreadCount;
   };
 
   const fetchSessions = async () => {
@@ -88,7 +91,7 @@ export const useFetchSessions = () => {
       })
     );
 
-    console.log('Sessions with profiles:', sessionsWithProfiles);
+    console.log('Sessions with profiles and unread counts:', sessionsWithProfiles);
     return sessionsWithProfiles;
   };
 
