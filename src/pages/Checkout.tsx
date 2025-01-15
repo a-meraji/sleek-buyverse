@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { state: { items }, updateQuantity, removeItem } = useCart();
+  const { state: { items }, updateQuantity: updateCartQuantity, removeItem: removeCartItem } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { total } = useOrderCalculations();
@@ -32,6 +32,19 @@ const Checkout = () => {
 
     checkAuth();
   }, [navigate]);
+
+  // Wrapper functions to match the expected types
+  const handleUpdateQuantity = (id: string, quantity: number) => {
+    if (userId) {
+      updateCartQuantity(userId, id, quantity);
+    }
+  };
+
+  const handleRemoveItem = (id: string) => {
+    if (userId) {
+      removeCartItem(userId, id);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -88,8 +101,8 @@ const Checkout = () => {
                   <CartContent 
                     cartItems={items} 
                     userId={userId}
-                    updateQuantity={updateQuantity}
-                    removeItem={removeItem}
+                    updateQuantity={handleUpdateQuantity}
+                    removeItem={handleRemoveItem}
                     readonly={true}
                   />
                 </div>
