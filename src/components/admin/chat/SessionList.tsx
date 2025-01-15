@@ -29,6 +29,9 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         },
         (payload) => {
           console.log('Chat session changed:', payload);
+          if (payload.eventType === 'INSERT') {
+            console.log('New chat session created:', payload.new);
+          }
           queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
           refetch();
         }
@@ -46,7 +49,9 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
           refetch();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
 
     return () => {
       console.log('Cleaning up realtime listeners...');
