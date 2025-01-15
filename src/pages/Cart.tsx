@@ -76,6 +76,7 @@ const Cart = () => {
               itemsExist={!!cartItems?.length}
               onClose={() => {}}
               cartItems={cartItems}
+              readonly={true}
             />
           </div>
         </div>

@@ -9,9 +9,16 @@ interface CartSummaryProps {
   itemsExist: boolean;
   onClose: () => void;
   cartItems: CartItem[] | null;
+  readonly?: boolean;
 }
 
-export const CartSummary = ({ isAuthenticated, itemsExist, onClose, cartItems }: CartSummaryProps) => {
+export const CartSummary = ({ 
+  isAuthenticated, 
+  itemsExist, 
+  onClose, 
+  cartItems,
+  readonly = false 
+}: CartSummaryProps) => {
   const navigate = useNavigate();
   
   // Calculate subtotal from cart items
@@ -28,14 +35,15 @@ export const CartSummary = ({ isAuthenticated, itemsExist, onClose, cartItems }:
   const SHIPPING_RATE = cartItems?.length ? 5.99 : 0; // Flat shipping rate if items exist
   const tax = subtotal * TAX_RATE;
   const shipping = SHIPPING_RATE;
-  const total = subtotal + tax + shipping;
+  const total = readonly ? subtotal : (subtotal + tax + shipping);
   
   console.log('Cart summary calculations:', {
     subtotal,
     tax,
     shipping,
     total,
-    itemsCount: cartItems?.length
+    itemsCount: cartItems?.length,
+    mode: readonly ? 'readonly' : 'full'
   });
   
   const handleCheckout = () => {
@@ -50,22 +58,26 @@ export const CartSummary = ({ isAuthenticated, itemsExist, onClose, cartItems }:
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
-        </div>
-        
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Tax (8%)</span>
-          <span>${tax.toFixed(2)}</span>
-        </div>
-        
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Shipping</span>
-          <span>${shipping.toFixed(2)}</span>
-        </div>
+        {!readonly && (
+          <>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Subtotal</span>
+              <span>${subtotal.toFixed(2)}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Tax (8%)</span>
+              <span>${tax.toFixed(2)}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Shipping</span>
+              <span>${shipping.toFixed(2)}</span>
+            </div>
 
-        <Separator className="my-4" />
+            <Separator className="my-4" />
+          </>
+        )}
         
         <div className="flex justify-between text-lg font-semibold">
           <span>Total</span>
