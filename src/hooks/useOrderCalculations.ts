@@ -1,5 +1,4 @@
 import { useCart } from "@/contexts/cart/CartContext";
-import {useState} from "react";
 const TAX_RATE = 0.08; // 8% tax rate
 const SHIPPING_RATE = 5.99; // Flat shipping rate
 
@@ -33,7 +32,7 @@ export const useOrderCalculations = () => {
     }, 0);
   };
 
-  const [subtotal, setSubtotal] = useState(calculateTotal());
+  const subtotal =calculateTotal();
   const tax = subtotal * TAX_RATE;
   const shipping = items.length > 0 ? SHIPPING_RATE : 0;
   const total = subtotal + tax + shipping;
