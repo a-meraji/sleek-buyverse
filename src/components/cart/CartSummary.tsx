@@ -13,7 +13,6 @@ interface CartSummaryProps {
 export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: CartSummaryProps) => {
   const navigate = useNavigate();
   const { subtotal, tax, shipping } = useOrderCalculations();
-  console.log('Rendering cart summary with total:', total);
   
   const handleCheckout = () => {
     onClose();
