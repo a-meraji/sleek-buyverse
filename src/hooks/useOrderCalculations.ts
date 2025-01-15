@@ -41,9 +41,9 @@ export const useOrderCalculations = () => {
 
     // Sum up all item totals
     const instance = itemTotals.reduce((sum, { itemSubtotal }) => sum + itemSubtotal, 0);
-    const subtotal = instance + tax + shipping - tax - shipping;
-    const tax = subtotal * TAX_RATE;
+    const tax = instance * TAX_RATE;
     const shipping = items.length > 0 ? SHIPPING_RATE : 0;
+    const subtotal = instance + tax + shipping - tax - shipping;
     const total = subtotal + tax + shipping;
     const totalQuantity = itemTotals.reduce((sum, { quantity }) => sum + quantity, 0);
 
