@@ -8,7 +8,7 @@ export function AdminReviews() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
-  const { data: products, isLoading: isLoadingProducts } = useQuery({
+  const { data: products = [], isLoading: isLoadingProducts } = useQuery({
     queryKey: ["admin-products"],
     queryFn: async () => {
       console.log("Fetching products for review filters");
@@ -24,7 +24,7 @@ export function AdminReviews() {
     }
   });
 
-  const { data: reviews, isLoading: isLoadingReviews } = useQuery({
+  const { data: reviews = [], isLoading: isLoadingReviews } = useQuery({
     queryKey: ["admin-reviews", selectedProduct, selectedStatus],
     queryFn: async () => {
       console.log("Fetching reviews with filters:", { selectedProduct, selectedStatus });
@@ -54,7 +54,6 @@ export function AdminReviews() {
     }
   });
 
-  // Show loading state while products are being fetched
   if (isLoadingProducts) {
     return <div className="flex items-center justify-center p-8">Loading products...</div>;
   }
@@ -64,7 +63,7 @@ export function AdminReviews() {
       <h2 className="text-2xl font-bold">Reviews</h2>
       
       <ReviewFilters
-        products={products || []} // Ensure we always pass an array
+        products={products}
         selectedProduct={selectedProduct}
         onProductChange={setSelectedProduct}
         selectedStatus={selectedStatus}
@@ -74,7 +73,7 @@ export function AdminReviews() {
       {isLoadingReviews ? (
         <div className="flex items-center justify-center p-8">Loading reviews...</div>
       ) : (
-        <ReviewsTable reviews={reviews || []} />
+        <ReviewsTable reviews={reviews} />
       )}
     </div>
   );
