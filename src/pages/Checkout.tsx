@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { state: { items } } = useCart();
+  const { state: { items }, updateQuantity, removeItem } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { total } = useOrderCalculations();
@@ -88,8 +88,8 @@ const Checkout = () => {
                   <CartContent 
                     cartItems={items} 
                     userId={userId}
-                    updateQuantity={() => {}}
-                    removeItem={() => {}}
+                    updateQuantity={updateQuantity}
+                    removeItem={removeItem}
                     readonly={true}
                   />
                 </div>
