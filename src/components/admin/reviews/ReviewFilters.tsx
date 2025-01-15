@@ -56,30 +56,36 @@ export function ReviewFilters({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
-          <Command>
-            <CommandInput placeholder="Search products..." />
-            <CommandEmpty>No product found.</CommandEmpty>
-            <CommandGroup>
-              {products.map((product) => (
-                <CommandItem
-                  key={product.id}
-                  value={product.name}
-                  onSelect={() => {
-                    onProductChange(product.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedProduct === product.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {product.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
+          {products.length > 0 ? (
+            <Command>
+              <CommandInput placeholder="Search products..." />
+              <CommandEmpty>No product found.</CommandEmpty>
+              <CommandGroup>
+                {products.map((product) => (
+                  <CommandItem
+                    key={product.id}
+                    value={product.name}
+                    onSelect={() => {
+                      onProductChange(product.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedProduct === product.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {product.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          ) : (
+            <div className="p-4 text-sm text-muted-foreground">
+              No products available
+            </div>
+          )}
         </PopoverContent>
       </Popover>
       
