@@ -18,7 +18,10 @@ export function ProductSelector({
   onProductChange 
 }: ProductSelectorProps) {
   const [open, setOpen] = useState(false);
-  const selectedProductName = products.find(p => p.id === selectedProduct)?.name || "All Products";
+
+  // Ensure we have a valid array of products
+  const validProducts = Array.isArray(products) ? products : [];
+  const selectedProductName = validProducts.find(p => p.id === selectedProduct)?.name || "All Products";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -53,7 +56,7 @@ export function ProductSelector({
               />
               All Products
             </CommandItem>
-            {products.map((product) => (
+            {validProducts.map((product) => (
               <CommandItem
                 key={product.id}
                 value={product.name}
