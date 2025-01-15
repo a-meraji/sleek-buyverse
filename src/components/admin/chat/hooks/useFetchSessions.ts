@@ -8,6 +8,19 @@ export const useFetchSessions = () => {
   const fetchUnreadCount = async (sessionId: string, currentUserId: string, isAdmin: boolean) => {
     console.log('Fetching unread count for session:', sessionId);
     
+    // First get the admin user IDs
+    const { data: adminUsers, error: adminError } = await supabase
+      .from('admin_users')
+      .select('id');
+
+    if (adminError) {
+      console.error('Error fetching admin users:', adminError);
+      return 0;
+    }
+
+    const adminIds = adminUsers.map(admin => admin.id);
+
+    // For admins, count unread messages from users (not from other admins)
     const query = supabase
       .from('chat_messages')
       .select('*', { count: 'exact' })
@@ -16,10 +29,10 @@ export const useFetchSessions = () => {
 
     if (isAdmin) {
       // For admins, count unread messages from users (not from other admins)
-      query.not('sender_id', 'is', null).neq('sender_id', currentUserId);
+      query.not('sender_id', 'in', adminIds);
     } else {
       // For users, count unread messages from admins
-      query.eq('sender_id', currentUserId);
+      query.in('sender_id', adminIds);
     }
 
     const { data, error } = await query;

@@ -14,6 +14,8 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
   const { data: sessions = [], refetch } = useSessionList();
 
   useEffect(() => {
+    console.log('Setting up realtime listeners for chat sessions...');
+    
     const channel = supabase
       .channel('schema-db-changes')
       .on(
@@ -43,6 +45,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
       .subscribe();
 
     return () => {
+      console.log('Cleaning up realtime listeners...');
       supabase.removeChannel(channel);
     };
   }, [refetch]);

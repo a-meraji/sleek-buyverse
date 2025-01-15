@@ -36,7 +36,7 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
           filter: `session_id=eq.${session.id}`
         },
         (payload) => {
-          console.log('Message changed:', payload);
+          console.log('Message changed for session:', session.id, payload);
           queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
           queryClient.invalidateQueries({ queryKey: ['admin-chat-messages', session.id] });
         }
@@ -44,6 +44,7 @@ export const SessionCard = ({ session, isSelected, onSelect }: SessionCardProps)
       .subscribe();
 
     return () => {
+      console.log('Cleaning up realtime listeners for session:', session.id);
       supabase.removeChannel(channel);
     };
   }, [session.id, queryClient]);
