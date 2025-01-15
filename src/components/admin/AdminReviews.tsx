@@ -27,7 +27,7 @@ export function AdminReviews() {
         .from("reviews")
         .select(`
           *,
-          products (
+          product:products (
             name
           )
         `);
