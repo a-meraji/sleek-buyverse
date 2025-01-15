@@ -56,7 +56,7 @@ export function ReviewFilters({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
-          {products.length > 0 ? (
+          {products && products.length > 0 ? (
             <Command>
               <CommandInput placeholder="Search products..." />
               <CommandEmpty>No product found.</CommandEmpty>

@@ -8,7 +8,7 @@ export function AdminReviews() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
-  const { data: products = [], isLoading: isLoadingProducts } = useQuery({
+  const { data: products = [], isLoading: isLoadingProducts, error: productsError } = useQuery({
     queryKey: ["admin-products"],
     queryFn: async () => {
       console.log("Fetching products for review filters");
@@ -56,6 +56,10 @@ export function AdminReviews() {
 
   if (isLoadingProducts) {
     return <div className="flex items-center justify-center p-8">Loading products...</div>;
+  }
+
+  if (productsError) {
+    return <div className="flex items-center justify-center p-8 text-red-500">Error loading products</div>;
   }
 
   return (
