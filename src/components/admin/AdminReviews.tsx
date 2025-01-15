@@ -8,18 +8,23 @@ export function AdminReviews() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
-  const { data: products } = useQuery({
+  const { data: products, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["admin-products"],
     queryFn: async () => {
+      console.log("Fetching products for review filters");
       const { data, error } = await supabase
         .from("products")
         .select("id, name");
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+      }
+      console.log("Fetched products:", data);
+      return data || [];
     }
   });
 
-  const { data: reviews } = useQuery({
+  const { data: reviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ["admin-reviews", selectedProduct, selectedStatus],
     queryFn: async () => {
       console.log("Fetching reviews with filters:", { selectedProduct, selectedStatus });
@@ -40,27 +45,36 @@ export function AdminReviews() {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching reviews:", error);
+        throw error;
+      }
       console.log("Fetched reviews:", data);
-      return data;
+      return data || [];
     }
   });
+
+  if (isLoadingProducts) {
+    return <div className="flex items-center justify-center p-8">Loading products...</div>;
+  }
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Reviews</h2>
       
       <ReviewFilters
-        products={products ?? []}
+        products={products || []}
         selectedProduct={selectedProduct}
         onProductChange={setSelectedProduct}
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
       />
 
-      <ReviewsTable 
-        reviews={reviews ?? []}
-      />
+      {isLoadingReviews ? (
+        <div className="flex items-center justify-center p-8">Loading reviews...</div>
+      ) : (
+        <ReviewsTable reviews={reviews || []} />
+      )}
     </div>
   );
 }
