@@ -16,16 +16,26 @@ export const useOrderCalculations = () => {
     const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
     const itemTotal = discountedPrice * quantity;
 
+    console.log('Item calculation:', {
+      productName: item.product?.name,
+      variantPrice,
+      quantity,
+      discount,
+      discountedPrice,
+      itemTotal,
+      runningSubtotal: acc.subtotal + itemTotal
+    });
+
     return {
       subtotal: acc.subtotal + itemTotal,
-      itemCount: acc.itemCount + 1
+      itemCount: acc.itemCount + quantity
     };
   }, {
     subtotal: 0,
     itemCount: 0
   });
 
-  const { subtotal } = calculations;
+  const subtotal = calculations.subtotal;
   const tax = subtotal * TAX_RATE;
   const shipping = items.length > 0 ? SHIPPING_RATE : 0;
   const total = subtotal + tax + shipping;
