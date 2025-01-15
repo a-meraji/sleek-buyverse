@@ -40,7 +40,8 @@ export const useOrderCalculations = () => {
     const itemTotals = items.map(calculateItemTotal);
 
     // Sum up all item totals
-    const subtotal = itemTotals.reduce((sum, { itemSubtotal }) => sum + itemSubtotal, 0);
+    const instance = itemTotals.reduce((sum, { itemSubtotal }) => sum + itemSubtotal, 0);
+    const subtotal = instance + 0;
     const tax = subtotal * TAX_RATE;
     const shipping = items.length > 0 ? SHIPPING_RATE : 0;
     const total = subtotal + tax + shipping;
