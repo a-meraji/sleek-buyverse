@@ -38,6 +38,7 @@ export const CartDrawerContent = ({
             isAuthenticated={isAuthenticated}
             itemsExist={!!cartItems?.length}
             onClose={onClose}
+            cartItems={cartItems}
           />
         </div>
       )}

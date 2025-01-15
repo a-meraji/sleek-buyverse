@@ -1,21 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
-import { useCart } from "@/contexts/cart/CartContext";
+import { CartItem } from "@/types";
 
 interface CartSummaryProps {
   total: number;
   isAuthenticated: boolean;
   itemsExist: boolean;
   onClose: () => void;
+  cartItems: CartItem[] | null;
 }
 
-export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: CartSummaryProps) => {
+export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose, cartItems }: CartSummaryProps) => {
   const navigate = useNavigate();
-  const { state: { items } } = useCart();
-  console.log("items from usecart: ",items);
+  
   // Calculate subtotal from cart items
-  const subtotal = items?.reduce((sum, item) => {
+  const subtotal = cartItems?.reduce((sum, item) => {
     const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
     const discount = item.product?.discount;
     const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
@@ -25,7 +25,7 @@ export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: Car
 
   // Calculate tax and shipping
   const TAX_RATE = 0.08; // 8% tax rate
-  const SHIPPING_RATE = items?.length ? 5.99 : 0; // Flat shipping rate if items exist
+  const SHIPPING_RATE = cartItems?.length ? 5.99 : 0; // Flat shipping rate if items exist
   const tax = subtotal * TAX_RATE;
   const shipping = SHIPPING_RATE;
   
@@ -34,7 +34,7 @@ export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: Car
     tax,
     shipping,
     total,
-    itemsCount: items?.length
+    itemsCount: cartItems?.length
   });
   
   const handleCheckout = () => {
