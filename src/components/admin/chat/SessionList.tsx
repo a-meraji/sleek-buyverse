@@ -27,13 +27,18 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
           schema: 'public',
           table: 'chat_sessions'
         },
-        (payload) => {
+        async (payload) => {
           console.log('Chat session changed:', payload);
           if (payload.eventType === 'INSERT') {
             console.log('New chat session created:', payload.new);
+            // Immediately invalidate and refetch to show new session
+            await queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
+            await refetch();
+          } else {
+            // For updates and deletes, also refresh the data
+            await queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
+            await refetch();
           }
-          queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
-          refetch();
         }
       )
       .on(
@@ -43,10 +48,11 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
           schema: 'public',
           table: 'chat_messages'
         },
-        (payload) => {
+        async (payload) => {
           console.log('Chat message changed:', payload);
-          queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
-          refetch();
+          // Refresh sessions to update last message timestamps and unread counts
+          await queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
+          await refetch();
         }
       )
       .subscribe((status) => {
