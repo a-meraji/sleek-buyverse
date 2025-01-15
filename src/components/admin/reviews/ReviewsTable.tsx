@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Review } from "@/types";
 import { ReviewStatusSelect } from "./ReviewStatusSelect";
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import { AlertCircle, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -54,6 +54,15 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
     queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
     setReviewToDelete(null);
   };
+
+  if (reviews.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <AlertCircle className="h-12 w-12 mb-4" />
+        <p className="text-lg">No reviews in {reviews[0]?.status || 'selected'} status to view.</p>
+      </div>
+    );
+  }
 
   return (
     <>
