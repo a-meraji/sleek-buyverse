@@ -38,47 +38,45 @@ export function ProductSelector({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        {open && (
-          <Command>
-            <CommandInput placeholder="Search products..." />
-            <CommandEmpty>No product found.</CommandEmpty>
-            <CommandGroup>
+        <Command>
+          <CommandInput placeholder="Search products..." />
+          <CommandEmpty>No product found.</CommandEmpty>
+          <CommandGroup>
+            <CommandItem
+              value="all"
+              onSelect={() => {
+                onProductChange(null);
+                setOpen(false);
+              }}
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  !selectedProduct ? "opacity-100" : "opacity-0"
+                )}
+              />
+              All Products
+            </CommandItem>
+            {validProducts.map((product) => (
               <CommandItem
-                value="all"
+                key={product.id}
+                value={product.name}
                 onSelect={() => {
-                  onProductChange(null);
+                  onProductChange(product.id);
                   setOpen(false);
                 }}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    !selectedProduct ? "opacity-100" : "opacity-0"
+                    selectedProduct === product.id ? "opacity-100" : "opacity-0"
                   )}
                 />
-                All Products
+                {product.name}
               </CommandItem>
-              {validProducts.map((product) => (
-                <CommandItem
-                  key={product.id}
-                  value={product.name}
-                  onSelect={() => {
-                    onProductChange(product.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedProduct === product.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {product.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
-        )}
+            ))}
+          </CommandGroup>
+        </Command>
       </PopoverContent>
     </Popover>
   );
