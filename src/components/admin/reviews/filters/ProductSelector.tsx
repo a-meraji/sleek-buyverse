@@ -18,6 +18,7 @@ export function ProductSelector({
   onProductChange 
 }: ProductSelectorProps) {
   const [open, setOpen] = useState(false);
+  console.log("ProductSelector render:", { products, selectedProduct });
 
   // Ensure we have a valid array of products
   const validProducts = Array.isArray(products) ? products : [];
