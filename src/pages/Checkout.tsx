@@ -1,21 +1,35 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useCart } from "@/contexts/cart/CartContext";
 import { Navbar } from "@/components/Navbar";
-import { useOrderCalculations } from "@/hooks/useOrderCalculations";
 import { CheckoutHeader } from "@/components/checkout/CheckoutHeader";
 import { LoadingState } from "@/components/checkout/LoadingState";
 import { EmptyCartState } from "@/components/checkout/EmptyCartState";
 import { CheckoutContent } from "@/components/checkout/CheckoutContent";
+import { useQuery } from "@tanstack/react-query";
+import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
+import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { state: { items } } = useCart();
-  const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  console.log('Checkout page - Cart items:', items);
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
+
+  const authenticatedCart = useAuthenticatedCart(session?.user?.id || '');
+  const unauthenticatedCart = useUnauthenticatedCart();
+
+  const {
+    cartItems,
+  } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
+
+  console.log('Checkout page - Cart items:', cartItems);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -24,22 +38,25 @@ const Checkout = () => {
         navigate('/auth');
         return;
       }
-      setUserId(session.user.id);
       setIsLoading(false);
     };
 
     checkAuth();
   }, [navigate]);
 
+  useEffect(() => {
+    if (!cartItems || cartItems.length === 0) {
+      navigate('/cart');
+    }
+  }, [cartItems, navigate]);
+
   if (isLoading) {
     return <LoadingState />;
   }
 
-  if (!items || items.length === 0) {
+  if (!cartItems || cartItems.length === 0) {
     return <EmptyCartState />;
   }
-
-  if (!userId) return null;
 
   return (
     <div className="min-h-screen bg-background">
