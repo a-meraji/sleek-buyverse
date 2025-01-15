@@ -6,9 +6,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Product } from "@/types";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 
 interface ReviewFiltersProps {
   products: Pick<Product, "id" | "name">[];
@@ -27,8 +26,11 @@ export function ReviewFilters({
 }: ReviewFiltersProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = useMemo(() => 
+    products.filter((product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ),
+    [products, searchTerm]
   );
 
   console.log("Filtered products:", filteredProducts);
