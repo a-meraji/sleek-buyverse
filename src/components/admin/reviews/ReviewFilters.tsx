@@ -44,13 +44,26 @@ export function ReviewFilters({
             <SelectTrigger>
               <SelectValue placeholder="Filter by product" />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-gray-800 border shadow-md">
+            <SelectContent 
+              className="bg-white dark:bg-gray-800 border shadow-md"
+              onPointerDownOutside={(e) => {
+                // Prevent closing when clicking inside the input
+                const target = e.target as HTMLElement;
+                if (target.closest('input')) {
+                  e.preventDefault();
+                }
+              }}
+            >
               <div className="px-2 py-2">
                 <Input
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="mb-2"
+                  onClick={(e) => {
+                    // Prevent the click from bubbling up to the Select
+                    e.stopPropagation();
+                  }}
                 />
               </div>
               <SelectItem value="all">All Products</SelectItem>
