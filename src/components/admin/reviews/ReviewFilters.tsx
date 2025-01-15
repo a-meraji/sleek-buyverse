@@ -32,16 +32,14 @@ interface ReviewFiltersProps {
 }
 
 export function ReviewFilters({
-  products = [], // Provide default empty array
+  products = [],
   selectedProduct,
   onProductChange,
   selectedStatus,
   onStatusChange,
 }: ReviewFiltersProps) {
   const [open, setOpen] = useState(false);
-
-  // Safely find the selected product name
-  const selectedProductName = products?.find(p => p.id === selectedProduct)?.name || "";
+  const selectedProductName = products.find(p => p.id === selectedProduct)?.name || "Select a product...";
 
   return (
     <div className="space-y-4">
@@ -53,35 +51,41 @@ export function ReviewFilters({
             aria-expanded={open}
             className="w-full justify-between"
           >
-            {selectedProduct ? selectedProductName : "Search products..."}
+            {selectedProductName}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
-          <Command>
-            <CommandInput placeholder="Search products..." />
-            <CommandEmpty>No product found.</CommandEmpty>
-            <CommandGroup>
-              {(products || []).map((product) => (
-                <CommandItem
-                  key={product.id}
-                  value={product.name}
-                  onSelect={() => {
-                    onProductChange(product.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedProduct === product.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {product.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
+          {products.length > 0 ? (
+            <Command>
+              <CommandInput placeholder="Search products..." />
+              <CommandEmpty>No product found.</CommandEmpty>
+              <CommandGroup>
+                {products.map((product) => (
+                  <CommandItem
+                    key={product.id}
+                    value={product.name}
+                    onSelect={() => {
+                      onProductChange(product.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedProduct === product.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {product.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          ) : (
+            <div className="p-4 text-sm text-muted-foreground">
+              No products available
+            </div>
+          )}
         </PopoverContent>
       </Popover>
       
@@ -94,9 +98,9 @@ export function ReviewFilters({
             <SelectTrigger>
               <SelectValue placeholder="Filter by product" />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-gray-800 border shadow-md">
+            <SelectContent>
               <SelectItem value="all">All Products</SelectItem>
-              {(products || []).map((product) => (
+              {products.map((product) => (
                 <SelectItem key={product.id} value={product.id}>
                   {product.name}
                 </SelectItem>
@@ -113,7 +117,7 @@ export function ReviewFilters({
             <SelectTrigger>
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-gray-800 border shadow-md">
+            <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
