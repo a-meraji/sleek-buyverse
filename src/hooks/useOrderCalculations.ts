@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useCart } from "@/contexts/cart/CartContext";
 
 const TAX_RATE = 0.08; // 8% tax rate
@@ -6,46 +7,59 @@ const SHIPPING_RATE = 5.99; // Flat shipping rate
 export const useOrderCalculations = () => {
   const { state: { items } } = useCart();
 
-  // Calculate all values in a single pass to ensure consistency
-  const calculations = items.reduce((acc, item) => {
-    const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
-    const variantPrice = selectedVariant?.price ?? 0;
-    const quantity = item.quantity;
-    const discount = item.product?.discount;
-    const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-    const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-    const itemTotal = discountedPrice * quantity;
+  const calculations = useMemo(() => {
+    console.log('Recalculating order totals with items:', items);
 
-    console.log('Item calculation:', {
-      productName: item.product?.name,
-      variantPrice,
-      quantity,
-      discount,
-      discountedPrice,
-      itemTotal,
-      runningSubtotal: acc.subtotal + itemTotal
+    // Calculate item totals first
+    const itemTotals = items.map(item => {
+      const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
+      if (!selectedVariant || !item.product) {
+        console.warn('Missing variant or product data for item:', item);
+        return { itemSubtotal: 0, quantity: item.quantity };
+      }
+
+      const variantPrice = selectedVariant.price;
+      const quantity = item.quantity;
+      const discount = item.product.discount;
+      const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+      const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
+      const itemSubtotal = discountedPrice * quantity;
+
+      console.log('Individual item calculation:', {
+        productName: item.product.name,
+        variantPrice,
+        quantity,
+        discount,
+        discountedPrice,
+        itemSubtotal
+      });
+
+      return { itemSubtotal, quantity };
+    });
+
+    // Sum up all item totals
+    const subtotal = itemTotals.reduce((sum, { itemSubtotal }) => sum + itemSubtotal, 0);
+    const tax = subtotal * TAX_RATE;
+    const shipping = items.length > 0 ? SHIPPING_RATE : 0;
+    const total = subtotal + tax + shipping;
+    const totalQuantity = itemTotals.reduce((sum, { quantity }) => sum + quantity, 0);
+
+    console.log('Final order calculations:', {
+      subtotal,
+      tax,
+      shipping,
+      total,
+      totalQuantity
     });
 
     return {
-      subtotal: acc.subtotal + itemTotal,
-      itemCount: acc.itemCount + quantity
+      subtotal,
+      tax,
+      shipping,
+      total,
+      totalQuantity
     };
-  }, {
-    subtotal: 0,
-    itemCount: 0
-  });
+  }, [items]); // Only recalculate when items change
 
-  const subtotal = calculations.subtotal;
-  const tax = subtotal * TAX_RATE;
-  const shipping = items.length > 0 ? SHIPPING_RATE : 0;
-  const total = subtotal + tax + shipping;
-
-  console.log('Order calculations:', { subtotal, tax, shipping, total });
-
-  return {
-    subtotal,
-    tax,
-    shipping,
-    total,
-  };
+  return calculations;
 };
