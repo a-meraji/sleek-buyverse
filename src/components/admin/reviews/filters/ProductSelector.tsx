@@ -12,9 +12,13 @@ interface ProductSelectorProps {
   onProductChange: (value: string | null) => void;
 }
 
-export function ProductSelector({ products, selectedProduct, onProductChange }: ProductSelectorProps) {
+export function ProductSelector({ 
+  products = [], 
+  selectedProduct, 
+  onProductChange 
+}: ProductSelectorProps) {
   const [open, setOpen] = useState(false);
-  const selectedProductName = products.find(p => p.id === selectedProduct)?.name || "Select a product...";
+  const selectedProductName = products.find(p => p.id === selectedProduct)?.name || "All Products";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -30,36 +34,45 @@ export function ProductSelector({ products, selectedProduct, onProductChange }: 
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        {products && products.length > 0 ? (
-          <Command>
-            <CommandInput placeholder="Search products..." />
-            <CommandEmpty>No product found.</CommandEmpty>
-            <CommandGroup>
-              {products.map((product) => (
-                <CommandItem
-                  key={product.id}
-                  value={product.name}
-                  onSelect={() => {
-                    onProductChange(product.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedProduct === product.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {product.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
-        ) : (
-          <div className="p-4 text-sm text-muted-foreground">
-            No products available
-          </div>
-        )}
+        <Command>
+          <CommandInput placeholder="Search products..." />
+          <CommandEmpty>No product found.</CommandEmpty>
+          <CommandGroup>
+            <CommandItem
+              value="all"
+              onSelect={() => {
+                onProductChange(null);
+                setOpen(false);
+              }}
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  !selectedProduct ? "opacity-100" : "opacity-0"
+                )}
+              />
+              All Products
+            </CommandItem>
+            {products.map((product) => (
+              <CommandItem
+                key={product.id}
+                value={product.name}
+                onSelect={() => {
+                  onProductChange(product.id);
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    selectedProduct === product.id ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {product.name}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </Command>
       </PopoverContent>
     </Popover>
   );

@@ -19,12 +19,6 @@ export function ReviewFilters({
 }: ReviewFiltersProps) {
   return (
     <div className="space-y-4">
-      <ProductSelector
-        products={products}
-        selectedProduct={selectedProduct}
-        onProductChange={onProductChange}
-      />
-      
       <div className="flex gap-4">
         <div className="w-[200px]">
           <ProductSelector
