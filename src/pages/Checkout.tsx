@@ -27,6 +27,9 @@ const Checkout = () => {
 
   const {
     cartItems,
+    updateQuantity,
+    removeItem,
+    isLoading: isCartLoading
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
   console.log('Checkout page - Cart items:', cartItems);
@@ -44,18 +47,15 @@ const Checkout = () => {
     checkAuth();
   }, [navigate]);
 
+  // Only check for empty cart after both auth and cart loading are complete
   useEffect(() => {
-    if (!cartItems || cartItems.length === 0) {
+    if (!isLoading && !isCartLoading && (!cartItems || cartItems.length === 0)) {
       navigate('/cart');
     }
-  }, [cartItems, navigate]);
+  }, [cartItems, isLoading, isCartLoading, navigate]);
 
-  if (isLoading) {
+  if (isLoading || isCartLoading) {
     return <LoadingState />;
-  }
-
-  if (!cartItems || cartItems.length === 0) {
-    return <EmptyCartState />;
   }
 
   return (
