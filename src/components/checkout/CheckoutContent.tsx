@@ -33,7 +33,7 @@ export const CheckoutContent = () => {
             userId={session?.user?.id || null}
             updateQuantity={updateQuantity}
             removeItem={removeItem}
-            readonly={false}
+            readonly={true}
           />
         </div>
       </div>
