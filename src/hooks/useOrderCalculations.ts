@@ -36,6 +36,16 @@ export const useOrderCalculations = () => {
   return useMemo(() => {
     console.log('Recalculating order totals with items:', items);
 
+    if (!items?.length) {
+      return {
+        subtotal: 0,
+        tax: 0,
+        shipping: 0,
+        total: 0,
+        totalQuantity: 0
+      };
+    }
+
     // Calculate item totals first
     const itemTotals = items.map(calculateItemTotal);
     
