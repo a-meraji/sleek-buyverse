@@ -13,11 +13,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Store } from "lucide-react";
+import { useUnreadAdminMessages } from "@/components/admin/chat/hooks/useUnreadAdminMessages";
 
 export default function Admin() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: adminStatus, isLoading } = useAdmin();
+  const { data: unreadMessages = 0 } = useUnreadAdminMessages();
 
   const { data: pendingReviewsCount } = useQuery({
     queryKey: ["pending-reviews-count"],
@@ -79,7 +81,12 @@ export default function Admin() {
               <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-blue-500" />
             )}
           </TabsTrigger>
-          <TabsTrigger value="chat">Chat</TabsTrigger>
+          <TabsTrigger value="chat" className="relative">
+            Chat
+            {unreadMessages > 0 && (
+              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-blue-500" />
+            )}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="analytics" className="space-y-4">
           <AdminAnalytics />
