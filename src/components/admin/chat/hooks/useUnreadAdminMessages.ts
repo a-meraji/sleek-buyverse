@@ -1,7 +1,36 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useUnreadAdminMessages = () => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    console.log('Setting up real-time subscription for unread messages...');
+    
+    const channel = supabase
+      .channel('admin-unread-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'chat_messages'
+        },
+        () => {
+          console.log('Received real-time update for chat messages, invalidating query...');
+          queryClient.invalidateQueries({ queryKey: ['admin-unread-messages'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up real-time subscription...');
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   return useQuery({
     queryKey: ['admin-unread-messages'],
     queryFn: async () => {
@@ -40,6 +69,6 @@ export const useUnreadAdminMessages = () => {
       console.log('Unread messages count:', count);
       return count || 0;
     },
-    refetchInterval: 10000, // Refetch every 10 seconds
+    refetchInterval: 10000, // Keep the refetch interval as a fallback
   });
 };
