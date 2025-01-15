@@ -11,7 +11,7 @@ interface CartSummaryProps {
   cartItems: CartItem[] | null;
 }
 
-export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose, cartItems }: CartSummaryProps) => {
+export const CartSummary = ({ isAuthenticated, itemsExist, onClose, cartItems }: CartSummaryProps) => {
   const navigate = useNavigate();
   
   // Calculate subtotal from cart items
@@ -28,6 +28,7 @@ export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose, cartI
   const SHIPPING_RATE = cartItems?.length ? 5.99 : 0; // Flat shipping rate if items exist
   const tax = subtotal * TAX_RATE;
   const shipping = SHIPPING_RATE;
+  const total = subtotal + tax + shipping;
   
   console.log('Cart summary calculations:', {
     subtotal,

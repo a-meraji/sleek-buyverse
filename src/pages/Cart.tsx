@@ -29,21 +29,6 @@ const Cart = () => {
     removeItem
   } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
 
-  const total = cartItems?.reduce((sum, item) => {
-    const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
-    const discount = item.product?.discount;
-    const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-    const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-    return sum + (discountedPrice * item.quantity);
-  }, 0) ?? 0;
-
-  console.log('Cart page render:', {
-    isAuthenticated: !!session?.user?.id,
-    cartItemsCount: cartItems?.length,
-    total,
-    cartItems
-  });
-
   if (isSessionLoading || isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -86,10 +71,11 @@ const Cart = () => {
           
           <div className="lg:col-span-1">
             <CartSummary
-              total={total}
+              total={0}
               isAuthenticated={!!session}
               itemsExist={!!cartItems?.length}
-              onClose={() => {}} // Add empty function since Cart page doesn't need to close anything
+              onClose={() => {}}
+              cartItems={cartItems}
             />
           </div>
         </div>

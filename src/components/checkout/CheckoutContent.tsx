@@ -1,61 +1,56 @@
-import { FC } from "react";
-import { CartContent } from "@/components/cart/CartContent";
 import { CartSummary } from "@/components/cart/CartSummary";
-import { ProfileForm } from "@/components/navbar/ProfileForm";
-import { CartItem } from "@/types";
+import { useCartState } from "@/contexts/cart/hooks/useCartState";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuthenticatedCart } from "@/hooks/cart/useAuthenticatedCart";
+import { useUnauthenticatedCart } from "@/hooks/cart/useUnauthenticatedCart";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-interface CheckoutContentProps {
-  userId: string;
-  items: CartItem[];
-  total: number;
-  handleUpdateQuantity: (id: string, quantity: number) => void;
-  handleRemoveItem: (id: string) => void;
-}
+export const CheckoutContent = () => {
+  const navigate = useNavigate();
+  const [state] = useCartState();
 
-export const CheckoutContent: FC<CheckoutContentProps> = ({
-  userId,
-  items,
-  total,
-  handleUpdateQuantity,
-  handleRemoveItem,
-}) => {
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
+
+  const authenticatedCart = useAuthenticatedCart(session?.user?.id || '');
+  const unauthenticatedCart = useUnauthenticatedCart();
+
+  const {
+    cartItems,
+  } = session?.user?.id ? authenticatedCart : unauthenticatedCart;
+
+  useEffect(() => {
+    if (!state.items?.length) {
+      navigate('/cart');
+    }
+  }, [state.items, navigate]);
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      {/* Left column - Forms */}
-      <div className="lg:col-span-7 space-y-8">
-        <section aria-labelledby="shipping-heading" className="bg-card rounded-lg p-6 shadow-sm">
-          <h2 id="shipping-heading" className="text-xl font-semibold mb-6">
-            Shipping Information
-          </h2>
-          <ProfileForm userId={userId} onClose={() => {}} />
-        </section>
-      </div>
-
-      {/* Right column - Order summary */}
-      <div className="lg:col-span-5 space-y-6">
-        <section aria-labelledby="order-heading" className="bg-card rounded-lg shadow-sm divide-y">
-          <h2 id="order-heading" className="sr-only">Order summary</h2>
-          
-          <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
-            <CartContent 
-              cartItems={items} 
-              userId={userId}
-              updateQuantity={handleUpdateQuantity}
-              removeItem={handleRemoveItem}
-              readonly={true}
-            />
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2">
+          {/* Checkout form will go here */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-2xl font-semibold mb-6">Checkout</h2>
+            {/* Add checkout form components here */}
           </div>
-
-          <div className="p-6">
-            <CartSummary 
-              total={total}
-              isAuthenticated={!!userId}
-              itemsExist={items.length > 0}
-              onClose={() => {}}
-            />
-          </div>
-        </section>
+        </div>
+        <div>
+          <CartSummary
+            total={0}
+            isAuthenticated={true}
+            itemsExist={true}
+            onClose={() => {}}
+            cartItems={cartItems}
+          />
+        </div>
       </div>
     </div>
   );
