@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useOrderCalculations } from "@/hooks/useOrderCalculations";
 import { Separator } from "@/components/ui/separator";
+import { useCart } from "@/contexts/cart/CartContext";
 
 interface CartSummaryProps {
   total: number;
@@ -12,7 +12,30 @@ interface CartSummaryProps {
 
 export const CartSummary = ({ total, isAuthenticated, itemsExist, onClose }: CartSummaryProps) => {
   const navigate = useNavigate();
-  const { subtotal, tax, shipping } = useOrderCalculations();
+  const { state: { items } } = useCart();
+  
+  // Calculate subtotal from cart items
+  const subtotal = items?.reduce((sum, item) => {
+    const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
+    const discount = item.product?.discount;
+    const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+    const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
+    return sum + (discountedPrice * item.quantity);
+  }, 0) ?? 0;
+
+  // Calculate tax and shipping
+  const TAX_RATE = 0.08; // 8% tax rate
+  const SHIPPING_RATE = items?.length ? 5.99 : 0; // Flat shipping rate if items exist
+  const tax = subtotal * TAX_RATE;
+  const shipping = SHIPPING_RATE;
+  
+  console.log('Cart summary calculations:', {
+    subtotal,
+    tax,
+    shipping,
+    total,
+    itemsCount: items?.length
+  });
   
   const handleCheckout = () => {
     onClose();
