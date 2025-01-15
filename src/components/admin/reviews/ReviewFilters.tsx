@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/types";
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -29,22 +29,19 @@ interface ReviewFiltersProps {
   onProductChange: (value: string | null) => void;
   selectedStatus: string | null;
   onStatusChange: (value: string | null) => void;
-  searchTerm?: string;
-  onSearchChange?: (value: string) => void;
 }
 
 export function ReviewFilters({
-  products,
+  products = [], // Provide default empty array
   selectedProduct,
   onProductChange,
   selectedStatus,
   onStatusChange,
-  searchTerm = "",
-  onSearchChange = () => {},
 }: ReviewFiltersProps) {
   const [open, setOpen] = useState(false);
 
-  const selectedProductName = products.find(p => p.id === selectedProduct)?.name || "";
+  // Safely find the selected product name
+  const selectedProductName = products?.find(p => p.id === selectedProduct)?.name || "";
 
   return (
     <div className="space-y-4">
@@ -65,7 +62,7 @@ export function ReviewFilters({
             <CommandInput placeholder="Search products..." />
             <CommandEmpty>No product found.</CommandEmpty>
             <CommandGroup>
-              {products.map((product) => (
+              {(products || []).map((product) => (
                 <CommandItem
                   key={product.id}
                   value={product.name}
@@ -99,7 +96,7 @@ export function ReviewFilters({
             </SelectTrigger>
             <SelectContent className="bg-white dark:bg-gray-800 border shadow-md">
               <SelectItem value="all">All Products</SelectItem>
-              {products.map((product) => (
+              {(products || []).map((product) => (
                 <SelectItem key={product.id} value={product.id}>
                   {product.name}
                 </SelectItem>
