@@ -8,7 +8,7 @@ export const useFetchSessions = () => {
   const fetchUnreadCount = async (sessionId: string, currentUserId: string, isAdmin: boolean) => {
     console.log('Fetching unread count for session:', sessionId);
     
-    // First get the admin user IDs
+    // First get the admin user IDs - same as chat tab
     const { data: adminUsers, error: adminError } = await supabase
       .from('admin_users')
       .select('id');
@@ -21,31 +21,29 @@ export const useFetchSessions = () => {
     const adminIds = adminUsers.map(admin => admin.id);
     console.log('Admin IDs:', adminIds);
 
-    // For admins, count unread messages from users (not from other admins)
-    const query = supabase
+    // Match the exact query structure from useUnreadAdminMessages
+    const { data: messages, error: countError } = await supabase
       .from('chat_messages')
       .select('*', { count: 'exact' })
       .eq('session_id', sessionId)
       .eq('is_read', false);
 
-    if (isAdmin) {
-      // For admins, count unread messages from users (not from other admins)
-      query.not('sender_id', 'in', adminIds);
-      console.log('Counting unread messages from non-admin users');
-    } else {
-      // For users, count unread messages from admins
-      query.in('sender_id', adminIds);
-      console.log('Counting unread messages from admins');
+    if (countError) {
+      console.error('Error counting unread messages:', countError);
+      return 0;
     }
 
-    const { data, error, count } = await query;
+    // Filter messages based on sender - match chat tab logic
+    const unreadCount = messages?.filter(msg => {
+      if (isAdmin) {
+        // For admins, count messages from non-admin users
+        return !adminIds.includes(msg.sender_id);
+      } else {
+        // For users, count messages from admins
+        return adminIds.includes(msg.sender_id);
+      }
+    }).length || 0;
 
-    if (error) {
-      console.error('Error counting unread messages:', error);
-      throw error;
-    }
-
-    const unreadCount = data?.length || 0;
     console.log(`Unread count for session ${sessionId}:`, unreadCount);
     return unreadCount;
   };

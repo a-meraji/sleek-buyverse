@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SessionCard } from "./components/SessionCard";
 import { SessionHeader } from "./components/SessionHeader";
 import { useSessionList } from "./hooks/useSessionList";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SessionListProps {
   selectedSession: string | null;
@@ -12,6 +13,7 @@ interface SessionListProps {
 
 export const SessionList = ({ selectedSession, onSelectSession }: SessionListProps) => {
   const { data: sessions = [], refetch } = useSessionList();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     console.log('Setting up realtime listeners for chat sessions...');
@@ -27,6 +29,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         },
         (payload) => {
           console.log('Chat session changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
           refetch();
         }
       )
@@ -39,6 +42,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
         },
         (payload) => {
           console.log('Chat message changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
           refetch();
         }
       )
@@ -48,7 +52,7 @@ export const SessionList = ({ selectedSession, onSelectSession }: SessionListPro
       console.log('Cleaning up realtime listeners...');
       supabase.removeChannel(channel);
     };
-  }, [refetch]);
+  }, [refetch, queryClient]);
 
   return (
     <div className="flex flex-col h-full">

@@ -5,10 +5,10 @@ interface SessionBadgeProps {
 }
 
 export const SessionBadge = ({ count }: SessionBadgeProps) => {
-  console.log('Session badge count:', count); // Add logging to track the count
+  console.log('Session badge count:', count);
   
-  // Remove the count <= 0 check since 0 is a valid number
-  if (!count) return null;
+  // Match chat tab logic - show badge when count > 0
+  if (count <= 0) return null;
   
   return (
     <Badge 
