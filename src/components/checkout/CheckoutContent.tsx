@@ -8,8 +8,6 @@ interface CheckoutContentProps {
   userId: string;
   items: CartItem[];
   total: number;
-  subtotal:number;
-  tax:numer;
   handleUpdateQuantity: (id: string, quantity: number) => void;
   handleRemoveItem: (id: string) => void;
 }
@@ -18,8 +16,6 @@ export const CheckoutContent: FC<CheckoutContentProps> = ({
   userId,
   items,
   total,
-  subtotal,
-  tax,
   handleUpdateQuantity,
   handleRemoveItem,
 }) => {
@@ -54,8 +50,6 @@ export const CheckoutContent: FC<CheckoutContentProps> = ({
           <div className="p-6">
             <CartSummary 
               total={total}
-              subtotal={subtotal}
-              tax={tax}
               isAuthenticated={!!userId}
               itemsExist={items.length > 0}
               onClose={() => {}}
