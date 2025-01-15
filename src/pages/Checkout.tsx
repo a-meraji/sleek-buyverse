@@ -11,10 +11,9 @@ import { CheckoutContent } from "@/components/checkout/CheckoutContent";
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { state: { items }, updateQuantity: updateCartQuantity, removeItem: removeCartItem } = useCart();
+  const { state: { items } } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { total } = useOrderCalculations();
 
   console.log('Checkout page - Cart items:', items);
 
@@ -32,18 +31,6 @@ const Checkout = () => {
     checkAuth();
   }, [navigate]);
 
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    if (userId) {
-      updateCartQuantity(userId, id, quantity);
-    }
-  };
-
-  const handleRemoveItem = (id: string) => {
-    if (userId) {
-      removeCartItem(userId, id);
-    }
-  };
-
   if (isLoading) {
     return <LoadingState />;
   }
@@ -60,13 +47,7 @@ const Checkout = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <CheckoutHeader />
-          <CheckoutContent 
-            userId={userId}
-            items={items}
-            total={total}
-            handleUpdateQuantity={handleUpdateQuantity}
-            handleRemoveItem={handleRemoveItem}
-          />
+          <CheckoutContent />
         </div>
       </main>
     </div>
