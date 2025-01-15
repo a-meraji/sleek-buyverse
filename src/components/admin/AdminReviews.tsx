@@ -7,7 +7,6 @@ import { ReviewsTable } from "./reviews/ReviewsTable";
 export function AdminReviews() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: products } = useQuery({
     queryKey: ["admin-products"],
@@ -47,10 +46,6 @@ export function AdminReviews() {
     }
   });
 
-  const filteredReviews = reviews?.filter(review => 
-    review.products?.name.toLowerCase().includes(searchTerm.toLowerCase())
-  ) ?? [];
-
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Reviews</h2>
@@ -61,12 +56,10 @@ export function AdminReviews() {
         onProductChange={setSelectedProduct}
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
       />
 
       <ReviewsTable 
-        reviews={filteredReviews}
+        reviews={reviews ?? []}
       />
     </div>
   );
