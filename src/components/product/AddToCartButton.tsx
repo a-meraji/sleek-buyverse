@@ -29,11 +29,6 @@ export function AddToCartButton({
   const navigate = useNavigate();
 
   const handleAddToCart = async () => {
-    if (!userId) {
-      navigate("/auth");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -48,14 +43,48 @@ export function AddToCartButton({
         throw new Error("Please select all options");
       }
 
-      const { error } = await supabase.from("cart_items").insert({
-        user_id: userId,
-        product_id: productId,
-        variant_id: selectedVariant.id,
-        quantity: 1
-      });
+      if (userId) {
+        // Authenticated flow
+        const { error } = await supabase.from("cart_items").insert({
+          user_id: userId,
+          product_id: productId,
+          variant_id: selectedVariant.id,
+          quantity: 1
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        // Unauthenticated flow
+        const { data: product } = await supabase
+          .from('products')
+          .select('*, product_variants(*)')
+          .eq('id', productId)
+          .single();
+
+        if (!product) throw new Error("Product not found");
+
+        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const newItem = {
+          id: `local-${Date.now()}`,
+          product_id: productId,
+          variant_id: selectedVariant.id,
+          quantity: 1,
+          product,
+          variant: selectedVariant
+        };
+
+        localCart.push(newItem);
+        localStorage.setItem('cart', JSON.stringify(localCart));
+
+        // Dispatch cart update event
+        const event = new CustomEvent('cartUpdated', {
+          detail: { 
+            openDrawer: true,
+            cartItems: localCart 
+          }
+        });
+        window.dispatchEvent(event);
+      }
 
       toast({
         title: "Added to cart",
