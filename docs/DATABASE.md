@@ -18,8 +18,7 @@
 ```sql
 - id (uuid, PK)
 - product_id (uuid, FK -> products.id)
-- size (text)
-- color (text)
+- parameters (jsonb)
 - stock (integer)
 - price (numeric)
 - created_at (timestamp)
