@@ -23,12 +23,6 @@ export const VariantSelectionPanel = ({
     return <p>No variants available</p>;
   }
 
-  if (!parameterKeys || parameterKeys.length === 0) {
-    return <p>No parameters available for this product</p>;
-  }
-
-  const isOutOfStock = selectedVariant?.stock <= 0;
-
   const getOptionsForParameter = (key: string): (string | number)[] => {
     const options = new Set<string | number>();
     variants.forEach(variant => {
@@ -39,9 +33,11 @@ export const VariantSelectionPanel = ({
     return Array.from(options);
   };
 
+  const isOutOfStock = selectedVariant?.stock <= 0;
+
   return (
     <div className="space-y-4">
-      {parameterKeys.map(key => (
+      {parameterKeys?.map(key => (
         <VariantSelector
           key={key}
           label={key.charAt(0).toUpperCase() + key.slice(1)}

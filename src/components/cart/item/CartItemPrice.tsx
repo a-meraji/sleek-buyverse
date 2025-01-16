@@ -9,8 +9,6 @@ export const CartItemPrice = ({ variantPrice, quantity, discount }: CartItemPric
   const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
   const subtotal = discountedPrice * quantity;
 
-  console.log('CartItemPrice:', { variantPrice, quantity, discount, discountedPrice, subtotal });
-
   return (
     <div className="space-y-1">
       {hasValidDiscount ? (
