@@ -9,17 +9,10 @@ import { ProductVariantSection } from "./details/ProductVariantSection";
 interface ProductDetailsProps {
   product: Product;
   userId: string | null;
-  selectedSize: string;
-  onSizeSelect: (size: string) => void;
 }
 
-export const ProductDetails = ({ 
-  product, 
-  userId, 
-  selectedSize, 
-  onSizeSelect 
-}: ProductDetailsProps) => {
-  const [selectedColor, setSelectedColor] = useState("");
+export const ProductDetails = ({ product, userId }: ProductDetailsProps) => {
+  const [selectedParameters, setSelectedParameters] = useState<Record<string, string | number>>({});
 
   const { data: variants, isLoading: isLoadingVariants } = useQuery({
     queryKey: ['product-variants', product.id],
@@ -40,7 +33,11 @@ export const ProductDetails = ({
     }
   });
 
-  const selectedVariant = variants?.find(v => v.size === selectedSize && v.color === selectedColor);
+  const selectedVariant = variants?.find(v => 
+    Object.entries(selectedParameters).every(
+      ([key, value]) => v.parameters[key] === value
+    )
+  );
   
   // Calculate minimum price from all variants
   const minPrice = variants?.length 
@@ -54,6 +51,11 @@ export const ProductDetails = ({
   const finalSelectedVariantPrice = hasValidDiscount 
     ? selectedVariantPrice * (1 - product.discount / 100) 
     : selectedVariantPrice;
+
+  // Get unique parameter keys from variants
+  const parameterKeys = variants?.length 
+    ? [...new Set(variants.flatMap(v => Object.keys(v.parameters)))]
+    : [];
 
   return (
     <div className="space-y-6">
@@ -73,15 +75,19 @@ export const ProductDetails = ({
       
       <ProductVariantSection
         variants={variants}
-        selectedSize={selectedSize}
-        selectedColor={selectedColor}
-        onSizeSelect={onSizeSelect}
-        setSelectedColor={setSelectedColor}
+        selectedParameters={selectedParameters}
+        onParameterSelect={(key, value) => {
+          setSelectedParameters(prev => ({
+            ...prev,
+            [key]: value
+          }));
+        }}
         product={product}
         userId={userId}
         selectedVariant={selectedVariant}
         finalSelectedVariantPrice={finalSelectedVariantPrice}
         isLoadingVariants={isLoadingVariants}
+        parameterKeys={parameterKeys}
       />
     </div>
   );

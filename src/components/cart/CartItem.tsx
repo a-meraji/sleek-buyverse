@@ -1,69 +1,77 @@
-import { CartItem as CartItemType } from "@/contexts/cart/types";
 import { Product } from "@/types";
-import { CartItemHeader } from "./item/CartItemHeader";
-import { CartItemImage } from "./item/CartItemImage";
-import { CartItemPrice } from "./item/CartItemPrice";
-import { CartItemQuantity } from "./item/CartItemQuantity";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface CartItemProps {
-  item: CartItemType & { product?: Product };
+  item: {
+    id: string;
+    product_id: string;
+    variant_id?: string;
+    quantity: number;
+    product?: Product;
+  };
   userId: string | null;
-  onQuantityChange: (id: string, currentQuantity: number, delta: number) => void;
+  onQuantityChange: (id: string, quantity: number, delta: number) => void;
   onRemove: (id: string) => void;
   readonly?: boolean;
 }
 
-export const CartItem = ({ item, onQuantityChange, onRemove, readonly = false }: CartItemProps) => {
-  const selectedVariant = item.product?.product_variants?.find(v => v.id === item.variant_id);
-  
-  console.log('Rendering cart item:', {
-    itemId: item.id,
-    productName: item.product?.name,
-    variantId: item.variant_id,
-    selectedVariant,
-    price: selectedVariant?.price,
-    readonly
-  });
+export function CartItem({ 
+  item, 
+  userId,
+  onQuantityChange,
+  onRemove,
+  readonly = false
+}: CartItemProps) {
+  const { toast } = useToast();
+  const selectedVariant = item.variant; // Assuming variant is fetched with the item
+  const variantPrice = selectedVariant?.price || 0;
 
-  if (!selectedVariant || !item.product) {
-    console.error('Missing variant or product data:', { item, selectedVariant });
-    return null;
-  }
+  const handleRemove = () => {
+    onRemove(item.id);
+    toast({
+      title: "Item removed",
+      description: `${item.product?.name} has been removed from your cart.`,
+    });
+  };
 
   return (
-    <div className="flex gap-6 p-4 bg-secondary rounded-lg">
+    <div className="flex gap-4 py-4">
       <CartItemImage 
-        imageUrl={item.product.image_url}
-        productName={item.product.name}
-        discount={item.product.discount}
+        imageUrl={item.product?.image_url} 
+        productName={item.product?.name}
       />
       
-      <div className="flex-1 space-y-2">
-        <CartItemHeader 
-          productName={item.product.name}
-          onRemove={() => onRemove(item.id)}
+      <div className="flex-1 space-y-1">
+        <CartItemHeader
+          productName={item.product?.name}
+          onRemove={handleRemove}
           readonly={readonly}
         />
         
         <span className="block text-sm text-muted-foreground">
-          {Object.entries(selectedVariant.parameters)
+          {selectedVariant && Object.entries(selectedVariant.parameters)
             .map(([key, value]) => `${key}: ${value}`)
             .join(", ")}
         </span>
 
         <CartItemPrice 
-          variantPrice={selectedVariant.price}
+          price={variantPrice} 
           quantity={item.quantity}
-          discount={item.product.discount}
+          discount={item.product?.discount}
         />
         
         {!readonly && (
-          <CartItemQuantity 
+          <CartItemQuantity
             quantity={item.quantity}
-            onQuantityChange={(delta) => onQuantityChange(item.id, item.quantity, delta)}
+            onQuantityChange={(delta) => {
+              if (onQuantityChange) {
+                onQuantityChange(item.id, item.quantity, delta);
+              }
+            }}
           />
         )}
       </div>
     </div>
   );
-};
+}

@@ -23,6 +23,10 @@ export const VariantSelectionPanel = ({
     return <p>No variants available</p>;
   }
 
+  if (!parameterKeys || parameterKeys.length === 0) {
+    return <p>No parameters available for this product</p>;
+  }
+
   const isOutOfStock = selectedVariant?.stock <= 0;
 
   const getOptionsForParameter = (key: string): (string | number)[] => {
