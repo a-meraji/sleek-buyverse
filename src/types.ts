@@ -36,6 +36,7 @@ export interface CartItemProps {
   onQuantityChange: (id: string, currentQuantity: number, delta: number) => void;
   onRemove: (id: string) => void;
   readonly?: boolean;
+  userId?: string;
 }
 
 export interface CartItemPriceProps {
@@ -48,6 +49,7 @@ export interface ProductImageProps {
   image: string;
   name: string;
   discount?: number | null;
+  className?: string;
 }
 
 export interface DialogTitleProps {
@@ -72,7 +74,7 @@ export interface Review {
   title: string;
   review_text: string;
   rating: number;
-  status: string;
+  status: 'pending' | 'approved' | 'rejected';
   created_at: string;
 }
 

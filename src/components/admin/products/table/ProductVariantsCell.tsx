@@ -31,7 +31,7 @@ export function ProductVariantsCell({
               variant="secondary"
               className="whitespace-nowrap"
             >
-              {variant.color} - {variant.size} (${variant.price})
+              {variant.parameters.color} - {variant.parameters.size} (${variant.price})
             </Badge>
           ))}
         </div>
