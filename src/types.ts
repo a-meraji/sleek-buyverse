@@ -1,4 +1,4 @@
-import { ProductVariant } from './types/variant';
+export { ProductVariant } from './types/variant';
 export type ProductSize = string;
 
 export interface ProductImage {
