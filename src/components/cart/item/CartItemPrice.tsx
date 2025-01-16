@@ -5,6 +5,11 @@ interface CartItemPriceProps {
 }
 
 export const CartItemPrice = ({ variantPrice, quantity, discount }: CartItemPriceProps) => {
+  if (typeof variantPrice !== 'number') {
+    console.error('Invalid price:', variantPrice);
+    return null;
+  }
+
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
   const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
   const subtotal = discountedPrice * quantity;

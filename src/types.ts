@@ -38,10 +38,16 @@ export interface CartItemProps {
   readonly?: boolean;
 }
 
+export interface CartItemPriceProps {
+  variantPrice: number;
+  quantity: number;
+  discount?: number | null;
+}
+
 export interface ProductImageProps {
   image: string;
   name: string;
-  discount?: number;
+  discount?: number | null;
 }
 
 export interface DialogTitleProps {
@@ -55,4 +61,17 @@ export interface ProductDetailsProps {
   userId: string;
   selectedSize?: string;
   onSizeSelect?: (size: string) => void;
+}
+
+export interface Review {
+  id: string;
+  product_id: string;
+  reviewer_id?: string;
+  reviewer_first_name: string;
+  reviewer_last_name: string;
+  title: string;
+  review_text: string;
+  rating: number;
+  status: string;
+  created_at: string;
 }

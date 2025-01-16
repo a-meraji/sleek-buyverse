@@ -21,6 +21,8 @@ export const CartItem = ({
     .map(([key, value]) => `${key}: ${value}`)
     .join(", ");
 
+  const variantPrice = item.variant?.price || item.product.price;
+
   return (
     <div className="flex gap-4 py-4 border-b">
       <CartItemImage
@@ -47,7 +49,7 @@ export const CartItem = ({
             />
           )}
           <CartItemPrice
-            price={item.variant?.price || item.product.price}
+            variantPrice={variantPrice}
             quantity={item.quantity}
             discount={item.product.discount}
           />
