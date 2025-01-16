@@ -1,12 +1,5 @@
+export type { ProductVariant } from './types/variant';
 export type ProductSize = string;
-
-export interface ProductVariant {
-  id: string;
-  product_id: string;
-  stock: number;
-  price: number;
-  parameters: Record<string, string | number>;
-}
 
 export interface ProductImage {
   id: string;

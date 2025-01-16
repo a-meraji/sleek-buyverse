@@ -16,18 +16,16 @@ export interface CartItem {
       id: string;
       product_id: string;
       price: number;
-      size: string;
-      color: string;
       stock: number;
+      parameters: Record<string, string | number>;
     }>;
   };
   variant?: {
     id: string;
     product_id: string;
     price: number;
-    size: string;
-    color: string;
     stock: number;
+    parameters: Record<string, string | number>;
   };
 }
 
