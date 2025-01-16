@@ -101,8 +101,10 @@ export function useProductForm(onClose: () => void) {
 
       const variantsData = variants.map(variant => ({
         product_id: product.id,
-        size: variant.size,
-        color: variant.color,
+        parameters: {
+          size: variant.parameters.size,
+          color: variant.parameters.color
+        },
         stock: variant.stock,
         price: variant.price
       }));
