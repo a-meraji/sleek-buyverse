@@ -98,7 +98,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
 
       console.log('Product created:', product);
 
-      // Insert additional images if any
       if (additionalImages.length > 0) {
         const imagesData = additionalImages.map((img, index) => ({
           product_id: product.id,
@@ -110,16 +109,15 @@ export function ProductForm({ onClose }: ProductFormProps) {
           .from("product_images")
           .insert(imagesData);
 
-        if (imagesError) {
-          console.error('Error creating product images:', imagesError);
-          throw imagesError;
-        }
+        if (imagesError) throw imagesError;
       }
 
       const variantsData = variants.map(variant => ({
         product_id: product.id,
-        size: variant.size,
-        color: variant.color,
+        parameters: {
+          size: variant.parameters.size,
+          color: variant.parameters.color
+        },
         stock: variant.stock,
         price: variant.price
       }));
@@ -128,10 +126,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
         .from("product_variants")
         .insert(variantsData);
 
-      if (variantsError) {
-        console.error('Error creating product variants:', variantsError);
-        throw variantsError;
-      }
+      if (variantsError) throw variantsError;
 
       return product;
     },

@@ -65,19 +65,6 @@ export interface ProductDetailsProps {
   onSizeSelect?: (size: string) => void;
 }
 
-export interface Review {
-  id: string;
-  product_id: string;
-  reviewer_id?: string;
-  reviewer_first_name: string;
-  reviewer_last_name: string;
-  title: string;
-  review_text: string;
-  rating: number;
-  status: 'pending' | 'approved' | 'rejected';
-  created_at: string;
-}
-
 export interface VariantSelectionPanelProps {
   variants: ProductVariant[];
   selectedParameters: Record<string, string | number>;
