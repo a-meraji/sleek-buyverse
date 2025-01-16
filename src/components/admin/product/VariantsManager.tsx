@@ -28,8 +28,6 @@ interface VariantsManagerProps {
 export function VariantsManager({ variants, onChange, productId }: VariantsManagerProps) {
   const [parameters, setParameters] = useState<Record<string, string>>({});
   const [newParameterKey, setNewParameterKey] = useState("");
-  const [newStock, setNewStock] = useState(0);
-  const [newPrice, setNewPrice] = useState(0);
   const [definedParameters, setDefinedParameters] = useState<string[]>([]);
 
   const handleAddParameter = () => {
@@ -84,15 +82,13 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
       id: `temp-${Date.now()}`,
       product_id: productId || "",
       parameters: newParameters,
-      stock: newStock,
-      price: newPrice,
+      stock: 0,
+      price: 0,
       created_at: new Date().toISOString()
     };
 
     onChange([...variants, newVariant]);
     setParameters({});
-    setNewStock(0);
-    setNewPrice(0);
   };
 
   const handleRemoveVariant = (variantToRemove: ProductVariant) => {
@@ -225,33 +221,14 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
               </TableBody>
             </Table>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                type="number"
-                min="0"
-                placeholder="Enter stock quantity"
-                value={newStock}
-                onChange={(e) => setNewStock(Number(e.target.value))}
-              />
-
-              <Input
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="Enter price"
-                value={newPrice}
-                onChange={(e) => setNewPrice(Number(e.target.value))}
-              />
-
-              <Button 
-                type="button" 
-                onClick={handleAddVariant}
-                className="col-span-2"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Variant
-              </Button>
-            </div>
+            <Button 
+              type="button" 
+              onClick={handleAddVariant}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Variant
+            </Button>
           </>
         )}
       </div>
