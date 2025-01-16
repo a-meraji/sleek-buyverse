@@ -34,8 +34,8 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
     if (!newSize || !newColor) return;
 
     const isDuplicate = variants.some(
-      v => v.size.toLowerCase() === newSize.toLowerCase() && 
-           v.color.toLowerCase() === newColor.toLowerCase()
+      v => v.parameters.size?.toLowerCase() === newSize.toLowerCase() && 
+           v.parameters.color?.toLowerCase() === newColor.toLowerCase()
     );
 
     if (isDuplicate) {
@@ -46,10 +46,13 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
     const newVariant: ProductVariant = {
       id: `temp-${Date.now()}`,
       product_id: productId || "",
-      size: newSize,
-      color: newColor,
+      parameters: {
+        size: newSize,
+        color: newColor
+      },
       stock: newStock,
-      price: newPrice
+      price: newPrice,
+      created_at: new Date().toISOString()
     };
 
     onChange([...variants, newVariant]);
@@ -90,8 +93,8 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
             <TableBody>
               {variants.map((variant) => (
                 <TableRow key={variant.id}>
-                  <TableCell>{variant.size}</TableCell>
-                  <TableCell>{variant.color}</TableCell>
+                  <TableCell>{variant.parameters.size}</TableCell>
+                  <TableCell>{variant.parameters.color}</TableCell>
                   <TableCell>
                     <Input
                       type="number"
