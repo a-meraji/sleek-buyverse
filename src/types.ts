@@ -89,6 +89,6 @@ export interface Review {
   title: string;
   review_text: string;
   rating: number;
-  status: string;
+  status: "approved" | "pending" | "rejected";
   created_at: string;
 }

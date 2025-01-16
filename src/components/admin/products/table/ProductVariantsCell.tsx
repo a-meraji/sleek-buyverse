@@ -32,9 +32,10 @@ export function ProductVariantsCell({
               className="whitespace-nowrap"
             >
               {Object.entries(variant.parameters)
+                .filter(([key, value]) => value !== undefined && value !== null)
                 .map(([key, value]) => `${key}: ${value}`)
-                .join(", ")} 
-              (${variant.price})
+                .join(" | ")} 
+              - ${variant.price}
             </Badge>
           ))}
         </div>
