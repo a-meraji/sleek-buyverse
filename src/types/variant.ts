@@ -3,6 +3,10 @@ export interface ProductVariant {
   product_id: string;
   stock: number;
   price: number;
-  parameters: Record<string, string | number>;
+  parameters: {
+    size?: string;
+    color?: string;
+    [key: string]: string | number | undefined;
+  };
   created_at: string;
 }

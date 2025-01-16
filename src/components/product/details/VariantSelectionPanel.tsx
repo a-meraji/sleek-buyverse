@@ -1,64 +1,64 @@
-import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ProductVariant } from "@/types/variant";
-import { VariantSelector } from "../VariantSelector";
 
 interface VariantSelectionPanelProps {
   variants: ProductVariant[];
   selectedParameters: Record<string, string | number>;
   onParameterSelect: (key: string, value: string | number) => void;
-  selectedVariant?: ProductVariant;
-  finalSelectedVariantPrice: number;
-  parameterKeys: string[];
 }
 
 export const VariantSelectionPanel = ({
   variants,
   selectedParameters,
   onParameterSelect,
-  selectedVariant,
-  finalSelectedVariantPrice,
-  parameterKeys,
 }: VariantSelectionPanelProps) => {
-  if (!variants || variants.length === 0) {
-    return <p>No variants available</p>;
-  }
+  if (!variants?.length) return null;
 
-  const getOptionsForParameter = (key: string): (string | number)[] => {
-    const options = new Set<string | number>();
-    variants.forEach(variant => {
-      if (variant.parameters[key] !== undefined) {
-        options.add(variant.parameters[key]);
-      }
-    });
-    return Array.from(options);
+  // Get unique parameter keys from all variants
+  const parameterKeys = Array.from(
+    new Set(
+      variants.flatMap(variant => 
+        Object.keys(variant.parameters || {})
+      )
+    )
+  );
+
+  // Get unique values for each parameter
+  const getUniqueValuesForParameter = (key: string) => {
+    return Array.from(
+      new Set(
+        variants
+          .map(variant => variant.parameters?.[key])
+          .filter(Boolean)
+      )
+    );
   };
-
-  const isOutOfStock = selectedVariant?.stock <= 0;
 
   return (
     <div className="space-y-4">
-      {parameterKeys?.map(key => (
-        <VariantSelector
-          key={key}
-          label={key.charAt(0).toUpperCase() + key.slice(1)}
-          options={getOptionsForParameter(key)}
-          value={selectedParameters[key]?.toString() || ""}
-          onChange={(value) => onParameterSelect(key, value)}
-        />
-      ))}
-      
-      {selectedVariant && (
-        <div className="space-y-2">
-          <p className="text-lg font-medium">
-            Selected variant: ${finalSelectedVariantPrice.toFixed(2)}
-          </p>
-          {isOutOfStock && (
-            <Badge variant="destructive" className="w-fit">
-              Out of Stock
-            </Badge>
-          )}
+      {parameterKeys.map(key => (
+        <div key={key} className="space-y-2">
+          <Label className="capitalize">{key}</Label>
+          <RadioGroup
+            value={selectedParameters[key]?.toString()}
+            onValueChange={(value) => onParameterSelect(key, value)}
+            className="flex flex-wrap gap-2"
+          >
+            {getUniqueValuesForParameter(key).map((value) => (
+              <div key={`${key}-${value}`} className="flex items-center space-x-2">
+                <RadioGroupItem
+                  value={value?.toString() || ''}
+                  id={`${key}-${value}`}
+                />
+                <Label htmlFor={`${key}-${value}`} className="capitalize">
+                  {value?.toString()}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
         </div>
-      )}
+      ))}
     </div>
   );
 };

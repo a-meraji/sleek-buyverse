@@ -22,18 +22,6 @@ export interface Product {
   product_images?: ProductImage[];
 }
 
-export interface Review {
-  id: string;
-  product_id: string;
-  reviewer_first_name: string;
-  reviewer_last_name: string;
-  title: string;
-  review_text: string;
-  rating: number;
-  status: 'pending' | 'rejected' | 'approved';
-  created_at: string;
-}
-
 export interface CartItem {
   id: string;
   product_id: string;
@@ -41,4 +29,30 @@ export interface CartItem {
   quantity: number;
   product?: Product;
   variant?: ProductVariant;
+}
+
+export interface CartItemProps {
+  item: CartItem;
+  onQuantityChange: (id: string, currentQuantity: number, delta: number) => void;
+  onRemove: (id: string) => void;
+  readonly?: boolean;
+}
+
+export interface ProductImageProps {
+  image: string;
+  name: string;
+  discount?: number;
+}
+
+export interface DialogTitleProps {
+  userId: string;
+  productId: string;
+  className?: string;
+}
+
+export interface ProductDetailsProps {
+  product: Product;
+  userId: string;
+  selectedSize?: string;
+  onSizeSelect?: (size: string) => void;
 }
