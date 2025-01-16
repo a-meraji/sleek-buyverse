@@ -72,14 +72,14 @@ export function ProductOverviewDialog({
       modal={true}
     >
       <BaseDialogContent 
-        className="sm:max-w-[425px] max-h-[90vh] flex flex-col p-0"
+        className="sm:max-w-[425px] h-[90vh] flex flex-col p-0 overflow-hidden"
         onCloseAutoFocus={(event) => {
           event.preventDefault();
         }}
         onEscapeKeyDown={handleClose}
       >
         <DialogTitle userId={userId} productId={productId} className="p-6 pb-2" />
-        <ScrollArea className="flex-1 p-6 pt-2">
+        <ScrollArea className="flex-1 px-6">
           <DialogContent
             productId={productId}
             productName={productName}
