@@ -3,6 +3,7 @@ import { OrderStatus, OrderStatusSelect } from "../OrderStatusSelect";
 import { OrderDetailsDialog } from "../OrderDetailsDialog";
 import { Package, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProductVariant } from "@/types/variant";
 
 interface OrderTableRowProps {
   order: {
@@ -17,11 +18,7 @@ interface OrderTableRowProps {
         name: string;
         image_url: string;
       };
-      variant?: {
-        id: string;
-        parameters: Record<string, string | number>;
-        price: number;
-      };
+      variant?: ProductVariant;
       quantity: number;
       price_at_time: number;
     }>;

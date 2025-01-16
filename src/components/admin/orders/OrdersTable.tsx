@@ -5,6 +5,7 @@ import {
 import { OrderStatus } from "./OrderStatusSelect";
 import { OrderTableHeader } from "./table/OrderTableHeader";
 import { OrderTableRow } from "./table/OrderTableRow";
+import { ProductVariant } from "@/types/variant";
 
 interface OrdersTableProps {
   orders: Array<{
@@ -19,10 +20,7 @@ interface OrdersTableProps {
         name: string;
         image_url: string;
       };
-      variant?: {
-        size: string;
-        color: string;
-      };
+      variant?: ProductVariant;
       quantity: number;
       price_at_time: number;
     }>;
