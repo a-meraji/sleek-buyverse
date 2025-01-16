@@ -3,6 +3,7 @@ import { ProductVariant } from "@/types";
 import { useState, useEffect } from "react";
 import { DialogTitle } from "./dialog/DialogTitle";
 import { DialogContent } from "./dialog/DialogContent";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ProductOverviewDialogProps {
   isOpen: boolean;
@@ -71,30 +72,32 @@ export function ProductOverviewDialog({
       modal={true}
     >
       <BaseDialogContent 
-        className="sm:max-w-[425px] max-h-[90vh]"
+        className="sm:max-w-[425px] max-h-[90vh] flex flex-col p-0"
         onCloseAutoFocus={(event) => {
           event.preventDefault();
         }}
         onEscapeKeyDown={handleClose}
       >
-        <DialogTitle userId={userId} productId={productId} />
-        <DialogContent
-          productId={productId}
-          productName={productName}
-          productImage={productImage}
-          userId={userId}
-          variants={variants}
-          discount={discount}
-          parameterKeys={parameterKeys}
-          selectedParameters={selectedParameters}
-          onParameterSelect={(key, value) => {
-            setSelectedParameters(prev => ({
-              ...prev,
-              [key]: value
-            }));
-          }}
-          onSuccess={handleSuccess}
-        />
+        <DialogTitle userId={userId} productId={productId} className="p-6 pb-2" />
+        <ScrollArea className="flex-1 p-6 pt-2">
+          <DialogContent
+            productId={productId}
+            productName={productName}
+            productImage={productImage}
+            userId={userId}
+            variants={variants}
+            discount={discount}
+            parameterKeys={parameterKeys}
+            selectedParameters={selectedParameters}
+            onParameterSelect={(key, value) => {
+              setSelectedParameters(prev => ({
+                ...prev,
+                [key]: value
+              }));
+            }}
+            onSuccess={handleSuccess}
+          />
+        </ScrollArea>
       </BaseDialogContent>
     </Dialog>
   );
