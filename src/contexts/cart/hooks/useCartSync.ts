@@ -34,7 +34,8 @@ export const useCartSync = (
           .from('cart_items')
           .select(`
             *,
-            product:products(*)
+            product:products(*),
+            variant:product_variants(*)
           `);
 
         if (error) throw error;
@@ -50,7 +51,20 @@ export const useCartSync = (
       }
     };
 
+    // Initial sync
     syncCart();
+
+    // Listen for cart update events
+    const handleCartUpdate = (event: CustomEvent) => {
+      console.log('Cart update event received:', event.detail);
+      syncCart();
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate as EventListener);
+    };
   }, [dispatch, toast]);
 
   // Keep localStorage in sync for unauthenticated users

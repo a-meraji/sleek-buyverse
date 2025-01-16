@@ -45,14 +45,27 @@ export function AddToCartButton({
 
       if (userId) {
         // Authenticated flow
-        const { error } = await supabase.from("cart_items").insert({
+        console.log('Adding to cart with auth:', { userId, productId, variantId: selectedVariant.id });
+        
+        const { data, error } = await supabase.from("cart_items").insert({
           user_id: userId,
           product_id: productId,
           variant_id: selectedVariant.id,
           quantity: 1
-        });
+        }).select('*, product:products(*), variant:product_variants(*)').single();
 
         if (error) throw error;
+
+        // Dispatch cart update event with the new cart item
+        const event = new CustomEvent('cartUpdated', {
+          detail: { 
+            openDrawer: true,
+            cartItems: data 
+          }
+        });
+        window.dispatchEvent(event);
+        
+        console.log('Successfully added to cart:', data);
       } else {
         // Unauthenticated flow
         const { data: product } = await supabase
