@@ -26,9 +26,18 @@ interface VariantsManagerProps {
 }
 
 export function VariantsManager({ variants, onChange, productId }: VariantsManagerProps) {
+  // Extract unique parameter keys from existing variants
+  const existingParameterKeys = Array.from(
+    new Set(
+      variants.flatMap(variant => 
+        Object.keys(variant.parameters || {})
+      )
+    )
+  );
+
   const [parameters, setParameters] = useState<Record<string, string>>({});
   const [newParameterKey, setNewParameterKey] = useState("");
-  const [definedParameters, setDefinedParameters] = useState<string[]>([]);
+  const [definedParameters, setDefinedParameters] = useState<string[]>(existingParameterKeys);
 
   const handleAddParameter = () => {
     if (!newParameterKey.trim()) return;
@@ -115,6 +124,9 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
       })
     );
   };
+
+  console.log('Current variants:', variants);
+  console.log('Defined parameters:', definedParameters);
 
   return (
     <div className="space-y-4">
