@@ -26,13 +26,7 @@ export function useProductUpdate() {
 
       if (productError) throw productError;
 
-      const { error: cartError } = await supabase
-        .from("cart_items")
-        .delete()
-        .eq("product_id", formData.id);
-
-      if (cartError) throw cartError;
-
+      // Delete existing variants
       const { error: deleteError } = await supabase
         .from("product_variants")
         .delete()
@@ -40,15 +34,18 @@ export function useProductUpdate() {
 
       if (deleteError) throw deleteError;
 
+      // Insert new variants with properly formatted parameters
       const variantsData = variants.map(variant => ({
         product_id: formData.id,
-        parameters: {
-          size: variant.parameters.size,
-          color: variant.parameters.color
-        },
+        parameters: Object.fromEntries(
+          Object.entries(variant.parameters)
+            .filter(([_, value]) => value !== undefined && value !== null && value !== '')
+        ),
         stock: variant.stock,
         price: variant.price
       }));
+
+      console.log('Inserting variants with data:', variantsData);
 
       const { error: variantsError } = await supabase
         .from("product_variants")

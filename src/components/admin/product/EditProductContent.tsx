@@ -32,6 +32,7 @@ export function EditProductContent({
   isSubmitting,
 }: EditProductContentProps) {
   console.log('Current form data:', formData);
+  console.log('Current variants:', variants);
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
