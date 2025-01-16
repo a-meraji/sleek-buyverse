@@ -27,11 +27,14 @@ export function ProductVariantsCell({
         >
           {variants.map((variant) => (
             <Badge 
-              key={`${variant.id}`} 
+              key={variant.id} 
               variant="secondary"
               className="whitespace-nowrap"
             >
-              {variant.parameters.color} - {variant.parameters.size} (${variant.price})
+              {Object.entries(variant.parameters)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(", ")} 
+              (${variant.price})
             </Badge>
           ))}
         </div>
