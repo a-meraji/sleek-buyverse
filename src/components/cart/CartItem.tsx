@@ -46,7 +46,9 @@ export const CartItem = ({ item, onQuantityChange, onRemove, readonly = false }:
         />
         
         <span className="block text-sm text-muted-foreground">
-          Size: {selectedVariant.size}, Color: {selectedVariant.color}
+          {Object.entries(selectedVariant.parameters)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(", ")}
         </span>
 
         <CartItemPrice 

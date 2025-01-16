@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { ProductVariant } from "@/types";
+import { ProductVariant } from "@/types/variant";
 import { VariantSelector } from "../VariantSelector";
 
 interface VariantSelectionPanelProps {
@@ -19,14 +19,24 @@ export const VariantSelectionPanel = ({
   finalSelectedVariantPrice,
   parameterKeys,
 }: VariantSelectionPanelProps) => {
+  if (!variants || variants.length === 0) {
+    return <p>No variants available</p>;
+  }
+
   const isOutOfStock = selectedVariant?.stock <= 0;
 
-  const getOptionsForParameter = (key: string) => {
-    return [...new Set(variants.map(v => v.parameters[key]))];
+  const getOptionsForParameter = (key: string): (string | number)[] => {
+    const options = new Set<string | number>();
+    variants.forEach(variant => {
+      if (variant.parameters[key] !== undefined) {
+        options.add(variant.parameters[key]);
+      }
+    });
+    return Array.from(options);
   };
 
   return (
-    <>
+    <div className="space-y-4">
       {parameterKeys.map(key => (
         <VariantSelector
           key={key}
@@ -49,6 +59,6 @@ export const VariantSelectionPanel = ({
           )}
         </div>
       )}
-    </>
+    </div>
   );
 };

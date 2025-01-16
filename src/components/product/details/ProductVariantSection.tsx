@@ -34,7 +34,7 @@ export const ProductVariantSection = ({
   }
 
   return (
-    <>
+    <div className="space-y-6">
       <VariantSelectionPanel
         variants={variants}
         selectedParameters={selectedParameters}
@@ -52,6 +52,6 @@ export const ProductVariantSection = ({
         variants={variants}
         disabled={!selectedVariant || selectedVariant.stock <= 0}
       />
-    </>
+    </div>
   );
 };
