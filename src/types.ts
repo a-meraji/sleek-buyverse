@@ -75,3 +75,12 @@ export interface Review {
   status: string;
   created_at: string;
 }
+
+export interface VariantSelectionPanelProps {
+  variants: ProductVariant[];
+  selectedParameters: Record<string, string | number>;
+  onParameterSelect: (key: string, value: string | number) => void;
+  selectedVariant?: ProductVariant;
+  finalSelectedVariantPrice?: number;
+  parameterKeys: string[];
+}

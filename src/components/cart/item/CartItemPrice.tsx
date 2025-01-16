@@ -1,8 +1,4 @@
-interface CartItemPriceProps {
-  variantPrice: number;
-  quantity: number;
-  discount?: number | null;
-}
+import { CartItemPriceProps } from "@/types";
 
 export const CartItemPrice = ({ variantPrice, quantity, discount }: CartItemPriceProps) => {
   if (typeof variantPrice !== 'number') {
@@ -15,21 +11,26 @@ export const CartItemPrice = ({ variantPrice, quantity, discount }: CartItemPric
   const subtotal = discountedPrice * quantity;
 
   return (
-    <div className="space-y-1">
-      {hasValidDiscount ? (
-        <>
-          <p className="text-red-500" aria-label={`Discounted price: $${discountedPrice.toFixed(2)} × ${quantity} = $${subtotal.toFixed(2)}`}>
-            ${discountedPrice.toFixed(2)} × {quantity} = ${subtotal.toFixed(2)}
-          </p>
-          <p className="text-sm text-muted-foreground line-through" aria-label={`Original price: $${variantPrice.toFixed(2)} × ${quantity} = $${(variantPrice * quantity).toFixed(2)}`}>
-            ${variantPrice.toFixed(2)} × {quantity} = ${(variantPrice * quantity).toFixed(2)}
-          </p>
-        </>
-      ) : (
-        <p aria-label={`Price: $${variantPrice.toFixed(2)} × ${quantity} = $${subtotal.toFixed(2)}`}>
-          ${variantPrice.toFixed(2)} × {quantity} = ${subtotal.toFixed(2)}
-        </p>
-      )}
+    <div className="text-right">
+      <div className="flex flex-col items-end">
+        {hasValidDiscount ? (
+          <>
+            <span className="text-sm text-gray-500 line-through">
+              ${variantPrice.toFixed(2)}
+            </span>
+            <span className="text-red-500">
+              ${discountedPrice.toFixed(2)}
+            </span>
+          </>
+        ) : (
+          <span>${variantPrice.toFixed(2)}</span>
+        )}
+        {quantity > 1 && (
+          <span className="text-sm text-gray-500">
+            Subtotal: ${subtotal.toFixed(2)}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
