@@ -112,21 +112,27 @@ export function ProductForm({ onClose }: ProductFormProps) {
         if (imagesError) throw imagesError;
       }
 
+      // Ensure parameters are properly formatted before saving
       const variantsData = variants.map(variant => ({
         product_id: product.id,
-        parameters: {
-          size: variant.parameters.size,
-          color: variant.parameters.color
-        },
+        parameters: Object.fromEntries(
+          Object.entries(variant.parameters)
+            .filter(([_, value]) => value !== undefined && value !== null && value !== '')
+        ),
         stock: variant.stock,
         price: variant.price
       }));
+
+      console.log('Saving variants with data:', variantsData);
 
       const { error: variantsError } = await supabase
         .from("product_variants")
         .insert(variantsData);
 
-      if (variantsError) throw variantsError;
+      if (variantsError) {
+        console.error('Error saving variants:', variantsError);
+        throw variantsError;
+      }
 
       return product;
     },
