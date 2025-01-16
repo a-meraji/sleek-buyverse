@@ -53,14 +53,14 @@ export interface ProductImageProps {
 }
 
 export interface DialogTitleProps {
-  userId: string;
+  userId: string | null;
   productId: string;
   className?: string;
 }
 
 export interface ProductDetailsProps {
   product: Product;
-  userId: string;
+  userId: string | null;
   selectedSize?: string;
   onSizeSelect?: (size: string) => void;
 }
