@@ -33,8 +33,10 @@ export const CartItem = ({
       
       <div className="flex-1 min-w-0">
         <CartItemHeader 
-          name={item.product.name}
+          productName={item.product.name}
           parameters={formattedParameters}
+          onRemove={() => onRemove(item.id)}
+          readonly={readonly}
         />
         
         {!readonly && (
@@ -45,15 +47,6 @@ export const CartItem = ({
                 onQuantityChange(item.id, item.quantity, delta)
               }
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onRemove(item.id)}
-              className="ml-auto"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Remove</span>
-            </Button>
           </div>
         )}
       </div>

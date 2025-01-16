@@ -1,16 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { CartItemHeaderProps } from "@/types";
 
-interface CartItemHeaderProps {
-  productName: string;
-  onRemove: () => void;
-  readonly?: boolean;
-}
-
-export const CartItemHeader = ({ productName, onRemove, readonly = false }: CartItemHeaderProps) => {
+export const CartItemHeader = ({ 
+  productName, 
+  parameters,
+  onRemove, 
+  readonly = false 
+}: CartItemHeaderProps) => {
   return (
     <div className="flex items-center justify-between">
-      <h3 className="font-medium">{productName}</h3>
+      <div>
+        <h3 className="font-medium">{productName}</h3>
+        {parameters && (
+          <p className="text-sm text-muted-foreground">{parameters}</p>
+        )}
+      </div>
       {!readonly && (
         <Button
           variant="ghost"

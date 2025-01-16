@@ -45,6 +45,13 @@ export interface CartItemPriceProps {
   discount?: number | null;
 }
 
+export interface CartItemHeaderProps {
+  productName: string;
+  parameters?: string;
+  onRemove: () => void;
+  readonly?: boolean;
+}
+
 export interface ProductImageProps {
   image: string;
   name: string;
