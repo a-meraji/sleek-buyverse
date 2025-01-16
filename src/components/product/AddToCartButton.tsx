@@ -28,6 +28,14 @@ export function AddToCartButton({
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const selectedVariant = variants.find(variant => 
+    Object.entries(selectedParameters).every(
+      ([key, value]) => variant.parameters[key] === value
+    )
+  );
+
+  const isOutOfStock = selectedVariant && selectedVariant.stock <= 0;
+
   const handleAddToCart = async () => {
     setIsLoading(true);
 
@@ -118,12 +126,19 @@ export function AddToCartButton({
   };
 
   return (
-    <Button
-      onClick={handleAddToCart}
-      disabled={disabled || isLoading}
-      className="w-full"
-    >
-      Add to Cart
-    </Button>
+    <div className="space-y-2">
+      <Button
+        onClick={handleAddToCart}
+        disabled={disabled || isLoading || isOutOfStock}
+        className="w-full"
+      >
+        Add to Cart
+      </Button>
+      {isOutOfStock && (
+        <span className="text-red-500 text-sm block text-center">
+          This variant is currently out of stock
+        </span>
+      )}
+    </div>
   );
 }
