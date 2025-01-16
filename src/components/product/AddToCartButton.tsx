@@ -38,11 +38,11 @@ export function AddToCartButton({
 
     try {
       // Find matching variant based on selected parameters
-      const selectedVariant = variants.find(variant => {
-        return Object.entries(selectedParameters).every(
+      const selectedVariant = variants.find(variant => 
+        Object.entries(selectedParameters).every(
           ([key, value]) => variant.parameters[key] === value
-        );
-      });
+        )
+      );
 
       if (!selectedVariant) {
         throw new Error("Please select all options");

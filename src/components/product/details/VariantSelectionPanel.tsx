@@ -1,44 +1,41 @@
 import { Badge } from "@/components/ui/badge";
-import { ColorSelector } from "../ColorSelector";
-import { SizeSelector } from "../SizeSelector";
 import { ProductVariant } from "@/types";
+import { VariantSelector } from "../VariantSelector";
 
 interface VariantSelectionPanelProps {
-  colors: string[];
-  selectedColor: string;
-  onColorSelect: (color: string) => void;
-  selectedSize: string;
-  onSizeSelect: (size: string) => void;
   variants: ProductVariant[];
+  selectedParameters: Record<string, string | number>;
+  onParameterSelect: (key: string, value: string | number) => void;
   selectedVariant?: ProductVariant;
   finalSelectedVariantPrice: number;
+  parameterKeys: string[];
 }
 
 export const VariantSelectionPanel = ({
-  colors,
-  selectedColor,
-  onColorSelect,
-  selectedSize,
-  onSizeSelect,
   variants,
+  selectedParameters,
+  onParameterSelect,
   selectedVariant,
   finalSelectedVariantPrice,
+  parameterKeys,
 }: VariantSelectionPanelProps) => {
   const isOutOfStock = selectedVariant?.stock <= 0;
 
+  const getOptionsForParameter = (key: string) => {
+    return [...new Set(variants.map(v => v.parameters[key]))];
+  };
+
   return (
     <>
-      <ColorSelector
-        colors={colors}
-        selectedColor={selectedColor}
-        onColorSelect={onColorSelect}
-      />
-
-      <SizeSelector 
-        selectedSize={selectedSize} 
-        onSizeSelect={onSizeSelect}
-        variants={variants.filter(v => v.color === selectedColor)}
-      />
+      {parameterKeys.map(key => (
+        <VariantSelector
+          key={key}
+          label={key.charAt(0).toUpperCase() + key.slice(1)}
+          options={getOptionsForParameter(key)}
+          value={selectedParameters[key]?.toString() || ""}
+          onChange={(value) => onParameterSelect(key, value)}
+        />
+      ))}
       
       {selectedVariant && (
         <div className="space-y-2">
