@@ -1,12 +1,8 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Package, MapPin, Truck, Calendar } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { OrderStatus } from "./OrderStatusSelect";
+import { cloneElement } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 interface OrderDetailsDialogProps {
   order: {
@@ -22,8 +18,9 @@ interface OrderDetailsDialogProps {
         image_url: string;
       };
       variant?: {
-        size: string;
-        color: string;
+        id: string;
+        parameters: Record<string, string | number>;
+        price: number;
       };
       quantity: number;
       price_at_time: number;
@@ -31,99 +28,115 @@ interface OrderDetailsDialogProps {
     user?: {
       first_name: string;
       last_name: string;
-      phone?: string;
     } | null;
   };
-  children: React.ReactNode;
+  children: JSX.Element;
 }
 
 export function OrderDetailsDialog({ order, children }: OrderDetailsDialogProps) {
+  const formatVariantParameters = (parameters: Record<string, string | number>) => {
+    return Object.entries(parameters)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join(", ");
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        {children}
+        {cloneElement(children, {
+          onClick: (e: MouseEvent) => {
+            e.stopPropagation();
+            if (children.props.onClick) {
+              children.props.onClick(e);
+            }
+          },
+        })}
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Order #{order.id.slice(0, 8)}</DialogTitle>
-        </DialogHeader>
-        
         <div className="space-y-6">
-          {/* Customer Information */}
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Customer Information</h3>
-            <div className="space-y-1">
-              <p>
-                {order.user
-                  ? `${order.user.first_name} ${order.user.last_name}`
-                  : "Unknown Customer"}
-              </p>
-              {order.user?.phone && <p className="text-sm">📞 {order.user.phone}</p>}
-            </div>
+          <div>
+            <h2 className="text-lg font-semibold">Order Details</h2>
+            <p className="text-sm text-muted-foreground">
+              Order #{order.id.slice(0, 8)}
+            </p>
           </div>
 
-          {/* Shipping Information */}
-          {order.shipping_address && (
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <h3 className="font-semibold mb-2 flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                Shipping Address
-              </h3>
-              <div className="space-y-1 text-sm">
-                <p>{order.shipping_address.street}</p>
-                <p>
-                  {order.shipping_address.city}, {order.shipping_address.state}{" "}
-                  {order.shipping_address.postal_code}
+          <div className="grid gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-sm font-medium">Customer</h3>
+                <p className="text-sm text-muted-foreground">
+                  {order.user?.first_name 
+                    ? `${order.user.first_name} ${order.user.last_name || ''}`
+                    : 'Unknown User'}
                 </p>
-                <p>{order.shipping_address.country}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium">Status</h3>
+                <Badge variant="outline" className="mt-1">
+                  {order.status}
+                </Badge>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium">Date</h3>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(order.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium">Total Amount</h3>
+                <p className="text-sm text-muted-foreground">
+                  ${order.total_amount}
+                </p>
               </div>
             </div>
-          )}
 
-          {/* Order Items */}
-          <div className="space-y-4">
-            <h3 className="font-semibold flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              Order Items
-            </h3>
-            <div className="divide-y">
-              {order.order_items?.map((item) => (
-                <div key={item.id} className="py-4 flex items-center gap-4">
-                  <img
-                    src={item.product.image_url}
-                    alt={item.product.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium">{item.product.name}</p>
-                    {item.variant && (
+            <Separator />
+
+            <div>
+              <h3 className="text-sm font-medium mb-3">Order Items</h3>
+              <div className="space-y-4">
+                {order.order_items?.map((item) => (
+                  <div key={item.id} className="flex gap-4">
+                    <img
+                      src={item.product.image_url}
+                      alt={item.product.name}
+                      className="h-20 w-20 object-cover rounded-md"
+                    />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium">{item.product.name}</h4>
+                      {item.variant && item.variant.parameters && (
+                        <p className="text-sm text-muted-foreground">
+                          {formatVariantParameters(item.variant.parameters)}
+                        </p>
+                      )}
                       <p className="text-sm text-muted-foreground">
-                        Size: {item.variant.size}, Color: {item.variant.color}
+                        Quantity: {item.quantity}
                       </p>
-                    )}
-                    <p className="text-sm">Quantity: {item.quantity}</p>
+                      <p className="text-sm font-medium mt-1">
+                        ${item.price_at_time}
+                      </p>
+                    </div>
                   </div>
-                  <p className="font-medium">${item.price_at_time}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Order Summary */}
-          <div className="flex items-center justify-between pt-4 border-t">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="w-4 h-4" />
-              {new Date(order.created_at).toLocaleDateString()}
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Truck className="w-4 h-4" />
-                <span className="capitalize">{order.status}</span>
+                ))}
               </div>
-              <p className="font-semibold">
-                Total: ${order.total_amount}
-              </p>
             </div>
+
+            {order.shipping_address && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Shipping Address</h3>
+                  <div className="text-sm text-muted-foreground">
+                    <p>{order.shipping_address.street_address}</p>
+                    <p>
+                      {order.shipping_address.city}, {order.shipping_address.state}{" "}
+                      {order.shipping_address.postal_code}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </DialogContent>

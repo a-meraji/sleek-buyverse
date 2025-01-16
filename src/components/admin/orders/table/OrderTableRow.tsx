@@ -18,8 +18,9 @@ interface OrderTableRowProps {
         image_url: string;
       };
       variant?: {
-        size: string;
-        color: string;
+        id: string;
+        parameters: Record<string, string | number>;
+        price: number;
       };
       quantity: number;
       price_at_time: number;
@@ -32,6 +33,12 @@ interface OrderTableRowProps {
 }
 
 export function OrderTableRow({ order }: OrderTableRowProps) {
+  const formatVariantParameters = (parameters: Record<string, string | number>) => {
+    return Object.entries(parameters)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join(", ");
+  };
+
   return (
     <TableRow>
       <TableCell>{order.id.slice(0, 8)}</TableCell>
@@ -61,9 +68,9 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
                 <Package className="h-4 w-4 text-muted-foreground" />
                 <div className="text-sm">
                   <p className="font-medium">{item.product.name}</p>
-                  {item.variant && (
+                  {item.variant && item.variant.parameters && (
                     <p className="text-xs text-muted-foreground">
-                      {item.variant.color} - {item.variant.size}
+                      {formatVariantParameters(item.variant.parameters)}
                     </p>
                   )}
                   <p className="text-xs">Qty: {item.quantity}</p>

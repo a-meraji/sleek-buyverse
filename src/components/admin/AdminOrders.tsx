@@ -9,7 +9,7 @@ import { startOfDay, endOfDay } from "date-fns";
 export function AdminOrders() {
   const [filters, setFilters] = useState({
     search: "",
-    status: "pending" as OrderStatus | "all", // Changed default from "all" to "pending"
+    status: "pending" as OrderStatus | "all",
     dateRange: {
       from: undefined as Date | undefined,
       to: undefined as Date | undefined,
@@ -35,8 +35,9 @@ export function AdminOrders() {
               image_url
             ),
             variant:product_variants (
-              size,
-              color
+              id,
+              parameters,
+              price
             )
           )
         `)
