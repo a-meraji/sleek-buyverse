@@ -20,7 +20,8 @@ export const useAuthenticatedCart = (userId: string) => {
           product:products (
             *,
             product_variants (*)
-          )
+          ),
+          variant:product_variants (*)
         `)
         .eq('user_id', userId);
 
@@ -36,14 +37,12 @@ export const useAuthenticatedCart = (userId: string) => {
     }
   };
 
-  // Load cart items when userId changes
   useEffect(() => {
     if (userId) {
       loadCartItems();
     }
   }, [userId]);
 
-  // Subscribe to real-time updates for cart items
   useEffect(() => {
     if (!userId) return;
 

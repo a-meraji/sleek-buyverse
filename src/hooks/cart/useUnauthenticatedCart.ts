@@ -21,12 +21,10 @@ export const useUnauthenticatedCart = () => {
     setIsLoading(false);
   };
 
-  // Load cart items on mount
   useEffect(() => {
     loadCartItems();
   }, []);
 
-  // Listen for storage events from other tabs
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'cart') {
@@ -43,10 +41,8 @@ export const useUnauthenticatedCart = () => {
     console.log('Updating cart in localStorage and state:', updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     
-    // Update state immediately
     setCartItems(updatedCart);
     
-    // Dispatch event after state is updated
     const event = new CustomEvent('cartUpdated', {
       detail: { 
         openDrawer,

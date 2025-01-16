@@ -3,58 +3,66 @@ import { CartItemHeader } from "./item/CartItemHeader";
 import { CartItemImage } from "./item/CartItemImage";
 import { CartItemPrice } from "./item/CartItemPrice";
 import { CartItemQuantity } from "./item/CartItemQuantity";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
-export const CartItem = ({ 
-  item, 
-  onQuantityChange, 
+export const CartItem = ({
+  item,
+  onQuantityChange,
   onRemove,
-  readonly = false 
+  readonly = false,
+  userId
 }: CartItemProps) => {
-  if (!item.product) return null;
+  if (!item.product) {
+    console.error('Cart item has no associated product:', item);
+    return null;
+  }
 
-  const handleQuantityChange = (delta: number) => {
-    onQuantityChange(item.id, item.quantity, delta);
-  };
-
-  const variantParams = item.variant?.parameters || {};
-  const variantText = Object.entries(variantParams)
+  const variantPrice = item.variant?.price ?? item.product.price;
+  const variantParameters = item.variant?.parameters ?? {};
+  const formattedParameters = Object.entries(variantParameters)
     .map(([key, value]) => `${key}: ${value}`)
-    .join(", ");
-
-  const variantPrice = item.variant?.price || item.product.price;
+    .join(', ');
 
   return (
-    <div className="flex gap-4 py-4 border-b">
-      <CartItemImage
-        imageUrl={item.product.image_url}
-        productName={item.product.name}
-        discount={item.product.discount}
+    <div className="flex gap-4 py-4 border-b last:border-0">
+      <CartItemImage 
+        imageUrl={item.product.image_url} 
+        productName={item.product.name} 
       />
-      <div className="flex-1 space-y-2">
-        <CartItemHeader
-          productName={item.product.name}
-          onRemove={() => onRemove(item.id)}
-          readonly={readonly}
+      
+      <div className="flex-1 min-w-0">
+        <CartItemHeader 
+          name={item.product.name}
+          parameters={formattedParameters}
         />
-        {variantText && (
-          <p className="text-sm text-muted-foreground">
-            {variantText}
-          </p>
-        )}
-        <div className="flex items-center justify-between">
-          {!readonly && (
+        
+        {!readonly && (
+          <div className="mt-2 flex items-center gap-4">
             <CartItemQuantity
               quantity={item.quantity}
-              onQuantityChange={handleQuantityChange}
+              onQuantityChange={(delta) => 
+                onQuantityChange(item.id, item.quantity, delta)
+              }
             />
-          )}
-          <CartItemPrice
-            variantPrice={variantPrice}
-            quantity={item.quantity}
-            discount={item.product.discount}
-          />
-        </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onRemove(item.id)}
+              className="ml-auto"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Remove</span>
+            </Button>
+          </div>
+        )}
       </div>
+
+      <CartItemPrice
+        variantPrice={variantPrice}
+        quantity={item.quantity}
+        discount={item.product.discount}
+      />
     </div>
   );
 };

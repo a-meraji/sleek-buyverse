@@ -2,7 +2,7 @@ import { CartItemPriceProps } from "@/types";
 
 export const CartItemPrice = ({ variantPrice, quantity, discount }: CartItemPriceProps) => {
   if (typeof variantPrice !== 'number') {
-    console.error('Invalid price:', variantPrice);
+    console.error('Invalid price:', { variantPrice });
     return null;
   }
 
