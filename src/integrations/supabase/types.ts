@@ -282,30 +282,27 @@ export type Database = {
       }
       product_variants: {
         Row: {
-          color: string
           created_at: string
           id: string
+          parameters: Json | null
           price: number
           product_id: string
-          size: string
           stock: number
         }
         Insert: {
-          color: string
           created_at?: string
           id?: string
+          parameters?: Json | null
           price?: number
           product_id: string
-          size: string
           stock?: number
         }
         Update: {
-          color?: string
           created_at?: string
           id?: string
+          parameters?: Json | null
           price?: number
           product_id?: string
-          size?: string
           stock?: number
         }
         Relationships: [
@@ -317,6 +314,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      product_variants_backup: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          id: string | null
+          price: number | null
+          product_id: string | null
+          size: string | null
+          stock: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          id?: string | null
+          price?: number | null
+          product_id?: string | null
+          size?: string | null
+          stock?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          id?: string | null
+          price?: number | null
+          product_id?: string | null
+          size?: string | null
+          stock?: number | null
+        }
+        Relationships: []
       }
       products: {
         Row: {

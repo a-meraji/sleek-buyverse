@@ -25,9 +25,13 @@ export function ProductOverviewDialog({
   variants = [],
   discount
 }: ProductOverviewDialogProps) {
-  const [selectedSize, setSelectedSize] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedParameters, setSelectedParameters] = useState<Record<string, string | number>>({});
   const [internalOpen, setInternalOpen] = useState(false);
+
+  // Get unique parameter keys from all variants
+  const parameterKeys = variants?.length 
+    ? Array.from(new Set(variants.flatMap(v => Object.keys(v.parameters))))
+    : [];
 
   // Sync internal open state with prop and handle cleanup
   useEffect(() => {
@@ -42,10 +46,8 @@ export function ProductOverviewDialog({
 
   const handleClose = () => {
     console.log('Dialog closing, cleaning up states and overlay');
-    setSelectedSize("");
-    setSelectedColor("");
+    setSelectedParameters({});
     setInternalOpen(false);
-    // Ensure we call onClose after state updates
     setTimeout(() => {
       onClose();
     }, 0);
@@ -53,9 +55,7 @@ export function ProductOverviewDialog({
 
   const handleSuccess = () => {
     console.log('Add to cart success, closing dialog');
-    // Reset selection states and close the dialog
-    setSelectedSize("");
-    setSelectedColor("");
+    setSelectedParameters({});
     handleClose();
   };
 
@@ -85,10 +85,14 @@ export function ProductOverviewDialog({
           userId={userId}
           variants={variants}
           discount={discount}
-          selectedSize={selectedSize}
-          selectedColor={selectedColor}
-          onSizeSelect={setSelectedSize}
-          onColorSelect={setSelectedColor}
+          parameterKeys={parameterKeys}
+          selectedParameters={selectedParameters}
+          onParameterSelect={(key, value) => {
+            setSelectedParameters(prev => ({
+              ...prev,
+              [key]: value
+            }));
+          }}
           onSuccess={handleSuccess}
         />
       </BaseDialogContent>

@@ -4,30 +4,29 @@ import { ProductVariant } from "@/types";
 interface DialogActionsProps {
   productId: string;
   userId: string | null;
-  selectedSize: string;
-  selectedColor: string;
+  selectedParameters: Record<string, string | number>;
   productName: string;
   disabled?: boolean;
   variants?: ProductVariant[];
-  relatedProductId?: string;
   onSuccess?: () => void;
 }
 
 export function DialogActions({
   productId,
   userId,
-  selectedSize,
-  selectedColor,
+  selectedParameters,
   productName,
   disabled,
   variants,
-  relatedProductId,
   onSuccess
 }: DialogActionsProps) {
-  // Find the selected variant and check its stock
-  const selectedVariant = variants?.find(
-    v => v.size === selectedSize && v.color === selectedColor
+  // Find the selected variant based on parameters
+  const selectedVariant = variants?.find(variant => 
+    Object.entries(selectedParameters).every(([key, value]) => 
+      variant.parameters[key] === value
+    )
   );
+
   const isOutOfStock = selectedVariant?.stock <= 0;
 
   return (
@@ -35,12 +34,10 @@ export function DialogActions({
       <AddToCartButton
         productId={productId}
         userId={userId}
-        selectedSize={selectedSize}
-        selectedColor={selectedColor}
+        selectedParameters={selectedParameters}
         productName={productName}
         disabled={disabled || isOutOfStock}
         variants={variants}
-        relatedProductId={relatedProductId}
         onSuccess={onSuccess}
       />
     </div>
