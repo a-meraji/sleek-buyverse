@@ -1,4 +1,5 @@
 import { ProductVariant } from './types/variant';
+export type { ProductVariant };  // Re-export ProductVariant
 export type ProductSize = string;
 
 export interface ProductImage {
@@ -67,8 +68,6 @@ export interface DialogTitleProps {
 export interface ProductDetailsProps {
   product: Product;
   userId: string | null;
-  selectedSize?: string;
-  onSizeSelect?: (size: string) => void;
   selectedVariant?: ProductVariant;
 }
 
