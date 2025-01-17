@@ -68,6 +68,8 @@ export interface DialogTitleProps {
 export interface ProductDetailsProps {
   product: Product;
   userId: string | null;
+  selectedSize?: string;
+  onSizeSelect?: (size: string) => void;
   selectedVariant?: ProductVariant;
 }
 
