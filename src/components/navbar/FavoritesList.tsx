@@ -31,8 +31,7 @@ export function FavoritesList({ userId }: FavoritesListProps) {
             sku,
             product_variants(
               id,
-              size,
-              color,
+              parameters,
               stock,
               price
             )
