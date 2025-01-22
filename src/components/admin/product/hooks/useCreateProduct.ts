@@ -1,73 +1,74 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductVariant } from "@/types";
+import { Product } from "@/types/product";
+import { ProductVariant } from "@/types/variant";
 import { useToast } from "@/hooks/use-toast";
 
-export const useCreateProduct = (onSuccess?: () => void) => {
-  const queryClient = useQueryClient();
+interface CreateProductData {
+  formData: Partial<Product>;
+  variants: ProductVariant[];
+  additionalImages: { image_url: string }[];
+}
+
+export const useCreateProduct = (onSuccess: () => void) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      formData: Partial<Product>;
-      variants: ProductVariant[];
-      additionalImages: { image_url: string }[];
-    }) => {
-      const { formData, variants, additionalImages } = data;
-
-      // Insert the product
+    mutationFn: async ({ formData, variants, additionalImages }: CreateProductData) => {
+      console.log('Creating product with data:', { formData, variants, additionalImages });
+      
       const { data: product, error: productError } = await supabase
         .from("products")
         .insert([formData])
         .select()
         .single();
 
-      if (productError) throw productError;
-
-      // Insert variants if any
-      if (variants.length > 0) {
-        const variantsWithProductId = variants.map((variant) => ({
-          ...variant,
-          product_id: product.id,
-        }));
-
-        const { error: variantsError } = await supabase
-          .from("product_variants")
-          .insert(variantsWithProductId);
-
-        if (variantsError) throw variantsError;
+      if (productError) {
+        console.error('Error creating product:', productError);
+        throw productError;
       }
 
-      // Insert additional images if any
       if (additionalImages.length > 0) {
-        const imagesWithProductId = additionalImages.map((image, index) => ({
-          ...image,
+        const imagesData = additionalImages.map((img, index) => ({
           product_id: product.id,
-          display_order: index,
+          image_url: img.image_url,
+          display_order: index
         }));
 
         const { error: imagesError } = await supabase
           .from("product_images")
-          .insert(imagesWithProductId);
+          .insert(imagesData);
 
         if (imagesError) throw imagesError;
       }
 
+      const variantsData = variants.map(variant => ({
+        ...variant,
+        product_id: product.id
+      }));
+
+      const { error: variantsError } = await supabase
+        .from("product_variants")
+        .insert(variantsData);
+
+      if (variantsError) throw variantsError;
+
       return product;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       toast({
         title: "Success",
         description: "Product created successfully",
       });
-      if (onSuccess) onSuccess();
+      onSuccess();
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error("Error creating product:", error);
       toast({
         title: "Error",
-        description: "Failed to create product",
+        description: error.message || "Failed to create product",
         variant: "destructive",
       });
     },

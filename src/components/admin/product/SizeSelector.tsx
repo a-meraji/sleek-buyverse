@@ -24,11 +24,12 @@ export function SizeSelector({ selectedSizes, onChange }: SizeSelectorProps) {
     const sizesToAdd = sizesInput
       .split(",")
       .map(size => size.trim())
-      .filter(size => size !== "");
+      .filter(size => size !== "")
+      .map(size => ({ label: size, value: size }));
 
     // Filter out duplicates and add new sizes
     const uniqueNewSizes = sizesToAdd.filter(
-      size => !selectedSizes.includes(size)
+      size => !selectedSizes.some(existing => existing.value === size.value)
     );
 
     if (uniqueNewSizes.length > 0) {
@@ -37,8 +38,8 @@ export function SizeSelector({ selectedSizes, onChange }: SizeSelectorProps) {
     }
   };
 
-  const handleRemoveSize = (sizeToRemove: string) => {
-    onChange(selectedSizes.filter(size => size !== sizeToRemove));
+  const handleRemoveSize = (sizeToRemove: ProductSize) => {
+    onChange(selectedSizes.filter(size => size.value !== sizeToRemove.value));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -85,11 +86,11 @@ export function SizeSelector({ selectedSizes, onChange }: SizeSelectorProps) {
       <div className="flex flex-wrap gap-2 mt-2">
         {selectedSizes.map((size) => (
           <Badge 
-            key={size} 
+            key={size.value}
             variant="secondary"
             className="flex items-center gap-1"
           >
-            {size}
+            {size.label}
             <X
               className="h-3 w-3 cursor-pointer"
               onClick={() => handleRemoveSize(size)}

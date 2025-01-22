@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Slate, Editable, withReact } from "slate-react";
+import { Slate, Editable, withReact, useSlate } from "slate-react";
 import { createEditor, Descendant, Editor, Transforms, Element as SlateElement } from "slate";
 import { withHistory } from "slate-history";
 import { Button } from "@/components/ui/button";
