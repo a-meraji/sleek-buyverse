@@ -11,7 +11,7 @@ export type { ProductFormContainerProps } from './types/product';
 
 export interface CustomElement {
   type: string;
-  children: CustomText[];
+  children: (CustomElement | CustomText)[];
 }
 
 export interface CustomText {

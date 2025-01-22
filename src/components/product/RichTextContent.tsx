@@ -1,11 +1,11 @@
-import { Descendant } from "slate";
+import { CustomElement, CustomText } from "@/types";
 
 interface RichTextContentProps {
   content: string;
 }
 
 export function RichTextContent({ content }: RichTextContentProps) {
-  const renderElement = (element: any) => {
+  const renderElement = (element: CustomElement) => {
     switch (element.type) {
       case 'block-quote':
         return <blockquote className="border-l-4 border-gray-300 pl-4 my-4">{element.children.map(renderNode)}</blockquote>;
@@ -20,16 +20,14 @@ export function RichTextContent({ content }: RichTextContentProps) {
       case 'numbered-list':
         return <ol className="list-decimal list-inside my-4">{element.children.map(renderNode)}</ol>;
       case 'paragraph':
-        return <p className="my-2">{element.children.map(renderNode)}</p>;
       default:
         return <p className="my-2">{element.children.map(renderNode)}</p>;
     }
   };
 
-  const renderLeaf = (leaf: any) => {
+  const renderLeaf = (leaf: CustomText) => {
     let text = leaf.text;
 
-    // Handle multiple text decorations
     if (leaf.bold && leaf.italic && leaf.underline) {
       return <strong><em><u>{text}</u></em></strong>;
     }
@@ -55,7 +53,7 @@ export function RichTextContent({ content }: RichTextContentProps) {
     return text;
   };
 
-  const renderNode = (node: any) => {
+  const renderNode = (node: CustomElement | CustomText) => {
     if ('text' in node) {
       return renderLeaf(node);
     }
@@ -63,24 +61,24 @@ export function RichTextContent({ content }: RichTextContentProps) {
   };
 
   try {
-    let parsedContent: Descendant[];
+    let parsedContent: CustomElement[];
     
-    // Handle both string and already parsed content
     if (typeof content === 'string') {
       try {
         parsedContent = JSON.parse(content);
-      } catch {
-        // If JSON parsing fails, treat it as plain text
+        console.log('Successfully parsed content:', parsedContent);
+      } catch (error) {
+        console.error('Failed to parse content:', error);
         return <p className="text-gray-600">{content}</p>;
       }
     } else {
-      parsedContent = content as unknown as Descendant[];
+      console.error('Content must be a string');
+      return <p className="text-gray-600">Invalid content format</p>;
     }
 
-    // Validate that we have an array of nodes
     if (!Array.isArray(parsedContent)) {
-      console.error('Invalid rich text content format:', parsedContent);
-      return <p className="text-gray-600">{content}</p>;
+      console.error('Content must be an array of elements');
+      return <p className="text-gray-600">Invalid content structure</p>;
     }
 
     return (
@@ -91,8 +89,7 @@ export function RichTextContent({ content }: RichTextContentProps) {
       </div>
     );
   } catch (error) {
-    console.error('Failed to parse rich text content:', error);
-    // Fallback for plain text content
+    console.error('Error rendering rich text:', error);
     return <p className="text-gray-600">{content}</p>;
   }
 }
