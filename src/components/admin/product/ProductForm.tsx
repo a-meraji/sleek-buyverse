@@ -9,9 +9,10 @@ import { useProductForm } from "./hooks/useProductForm";
 
 interface ProductFormProps {
   onClose: () => void;
+  initialData?: Product;
 }
 
-export function ProductForm({ onClose }: ProductFormProps) {
+export function ProductForm({ onClose, initialData }: ProductFormProps) {
   const {
     formData,
     additionalImages,
@@ -25,7 +26,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
     setShowImageSelector,
     setIsSelectingMainImage,
     createProduct,
-  } = useProductForm(onClose);
+  } = useProductForm({ onClose, initialData });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

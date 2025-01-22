@@ -1,18 +1,10 @@
 import { useCallback } from "react";
-import { Slate, Editable, withReact, ReactEditor, useSlate } from "slate-react";
-import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, BaseElement } from "slate";
+import { Slate, Editable, withReact, useSlate } from "slate-react";
+import { createEditor, Descendant, Editor, Transforms, Element as SlateElement } from "slate";
 import { withHistory } from "slate-history";
 import { Button } from "@/components/ui/button";
 import { Bold, Italic, Underline, List, ListOrdered } from "lucide-react";
 import { CustomElement, CustomText } from "@/types";
-
-declare module 'slate' {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor;
-    Element: CustomElement;
-    Text: CustomText;
-  }
-}
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -43,7 +35,7 @@ const toggleMark = (editor: Editor, format: string) => {
 
 const isBlockActive = (editor: Editor, format: string) => {
   const [match] = Editor.nodes(editor, {
-    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
+    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && (n as CustomElement).type === format,
   });
   return !!match;
 };
@@ -55,7 +47,7 @@ const toggleBlock = (editor: Editor, format: string) => {
   Transforms.unwrapNodes(editor, {
     match: n => {
       if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
-        return LIST_TYPES.includes(n.type);
+        return LIST_TYPES.includes((n as CustomElement).type);
       }
       return false;
     },
@@ -64,6 +56,7 @@ const toggleBlock = (editor: Editor, format: string) => {
 
   const newProperties: Partial<CustomElement> = {
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+    children: []
   };
   
   Transforms.setNodes(editor, newProperties);

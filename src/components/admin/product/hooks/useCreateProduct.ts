@@ -3,30 +3,24 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Product, ProductVariant } from "@/types";
 
-interface CreateProductData {
-  formData: Partial<Product>;
-  variants: ProductVariant[];
-  additionalImages: { image_url: string }[];
-}
+const generateSKU = (name: string): string => {
+  const timestamp = Date.now().toString().slice(-4);
+  const namePrefix = name.slice(0, 3).toUpperCase();
+  return `${namePrefix}-${timestamp}`;
+};
 
-export function useCreateProduct(onClose: () => void) {
+export const useCreateProduct = (onClose: () => void) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const generateSKU = (name: string): string => {
-    const timestamp = Date.now().toString().slice(-4);
-    const namePrefix = name.slice(0, 3).toUpperCase();
-    return `${namePrefix}-${timestamp}`;
-  };
-
   return useMutation({
-    mutationFn: async ({ formData, variants, additionalImages }: CreateProductData) => {
+    mutationFn: async (formData: Partial<Product>) => {
       const productData = {
         name: formData.name,
         description: formData.description || "",
         category: formData.category || "",
         image_url: formData.image_url,
-        sku: formData.sku?.trim() || generateSKU(formData.name ?? ""),
+        sku: formData.sku?.trim() || generateSKU(formData.name || ""),
         discount: formData.discount || 0,
       };
 
@@ -45,36 +39,6 @@ export function useCreateProduct(onClose: () => void) {
         }
         throw productError;
       }
-
-      if (additionalImages.length > 0) {
-        const imagesData = additionalImages.map((img, index) => ({
-          product_id: product.id,
-          image_url: img.image_url,
-          display_order: index
-        }));
-
-        const { error: imagesError } = await supabase
-          .from("product_images")
-          .insert(imagesData);
-
-        if (imagesError) throw imagesError;
-      }
-
-      const variantsData = variants.map(variant => ({
-        product_id: product.id,
-        parameters: Object.fromEntries(
-          Object.entries(variant.parameters)
-            .filter(([_, value]) => value !== undefined && value !== null && value !== '')
-        ),
-        stock: variant.stock,
-        price: variant.price
-      }));
-
-      const { error: variantsError } = await supabase
-        .from("product_variants")
-        .insert(variantsData);
-
-      if (variantsError) throw variantsError;
 
       return product;
     },
@@ -95,4 +59,4 @@ export function useCreateProduct(onClose: () => void) {
       });
     },
   });
-}
+};
