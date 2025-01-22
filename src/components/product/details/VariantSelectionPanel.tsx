@@ -1,8 +1,5 @@
 import { Product, ProductVariant } from "@/types";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 export interface VariantSelectionPanelProps {
   variants: ProductVariant[] | null;
@@ -20,60 +17,9 @@ export function VariantSelectionPanel({
   variants,
   selectedParameters,
   onParameterSelect,
-  product,
-  userId,
-  selectedVariant,
-  finalSelectedVariantPrice,
-  isLoadingVariants,
-  parameterKeys
+  parameterKeys,
+  isLoadingVariants
 }: VariantSelectionPanelProps) {
-  const { toast } = useToast();
-
-  const handleAddToCart = async () => {
-    if (!selectedVariant) {
-      toast({
-        title: "Please select all options",
-        description: "You need to select all variant options before adding to cart",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!userId) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to add items to cart",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('cart_items')
-        .insert({
-          user_id: userId,
-          product_id: product.id,
-          variant_id: selectedVariant.id,
-          quantity: 1
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Added to cart",
-        description: "Item has been added to your cart"
-      });
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add item to cart",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (isLoadingVariants) {
     return <div>Loading variants...</div>;
   }
@@ -107,15 +53,6 @@ export function VariantSelectionPanel({
           </div>
         );
       })}
-
-      <Button 
-        onClick={handleAddToCart}
-        className="w-full"
-        disabled={!selectedVariant}
-      >
-        <ShoppingCart className="mr-2 h-4 w-4" />
-        Add to Cart
-      </Button>
     </div>
   );
 }

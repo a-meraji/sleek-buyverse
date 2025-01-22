@@ -19,6 +19,8 @@ export function RichTextContent({ content }: RichTextContentProps) {
         return <li className="my-1">{element.children.map(renderNode)}</li>;
       case 'numbered-list':
         return <ol className="list-decimal list-inside my-4">{element.children.map(renderNode)}</ol>;
+      case 'paragraph':
+        return <p className="my-2">{element.children.map(renderNode)}</p>;
       default:
         return <p className="my-2">{element.children.map(renderNode)}</p>;
     }
@@ -26,20 +28,34 @@ export function RichTextContent({ content }: RichTextContentProps) {
 
   const renderLeaf = (leaf: any) => {
     let text = leaf.text;
+
+    if (leaf.bold && leaf.italic && leaf.underline) {
+      return <strong><em><u>{text}</u></em></strong>;
+    }
+    if (leaf.bold && leaf.italic) {
+      return <strong><em>{text}</em></strong>;
+    }
+    if (leaf.bold && leaf.underline) {
+      return <strong><u>{text}</u></strong>;
+    }
+    if (leaf.italic && leaf.underline) {
+      return <em><u>{text}</u></em>;
+    }
     if (leaf.bold) {
-      text = <strong>{text}</strong>;
+      return <strong>{text}</strong>;
     }
     if (leaf.italic) {
-      text = <em>{text}</em>;
+      return <em>{text}</em>;
     }
     if (leaf.underline) {
-      text = <u>{text}</u>;
+      return <u>{text}</u>;
     }
+
     return text;
   };
 
   const renderNode = (node: any) => {
-    if (node.text !== undefined) {
+    if ('text' in node) {
       return renderLeaf(node);
     }
     return renderElement(node);
@@ -55,6 +71,7 @@ export function RichTextContent({ content }: RichTextContentProps) {
       </div>
     );
   } catch (error) {
+    console.error('Failed to parse rich text content:', error);
     // Fallback for plain text content
     return <p className="text-gray-600">{content}</p>;
   }
