@@ -1,23 +1,9 @@
 import { useState } from "react";
-import { Plus, X, MinusCircle } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { ProductVariant } from "@/types/variant";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
+import { ParameterInput } from "./variants/ParameterInput";
+import { VariantTable } from "./variants/VariantTable";
 
 interface VariantsManagerProps {
   variants: ProductVariant[];
@@ -26,18 +12,11 @@ interface VariantsManagerProps {
 }
 
 export function VariantsManager({ variants, onChange, productId }: VariantsManagerProps) {
-  // Extract unique parameter keys from existing variants
-  const existingParameterKeys = Array.from(
-    new Set(
-      variants.flatMap(variant => 
-        Object.keys(variant.parameters || {})
-      )
-    )
-  );
-
   const [parameters, setParameters] = useState<Record<string, string>>({});
   const [newParameterKey, setNewParameterKey] = useState("");
-  const [definedParameters, setDefinedParameters] = useState<string[]>(existingParameterKeys);
+  const [definedParameters, setDefinedParameters] = useState<string[]>(
+    Array.from(new Set(variants.flatMap(variant => Object.keys(variant.parameters || {}))))
+  );
 
   const handleAddParameter = () => {
     if (!newParameterKey.trim()) return;
@@ -51,7 +30,6 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
     setDefinedParameters(prev => [...prev, paramKey]);
     setNewParameterKey("");
     
-    // Initialize the parameter value for all existing variants
     const updatedVariants = variants.map(variant => ({
       ...variant,
       parameters: {
@@ -65,7 +43,6 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
   const handleRemoveParameter = (paramKey: string) => {
     setDefinedParameters(prev => prev.filter(key => key !== paramKey));
     
-    // Remove the parameter from all variants
     const updatedVariants = variants.map(variant => {
       const { [paramKey]: removed, ...remainingParams } = variant.parameters;
       return {
@@ -100,10 +77,6 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
     setParameters({});
   };
 
-  const handleRemoveVariant = (variantToRemove: ProductVariant) => {
-    onChange(variants.filter(v => v.id !== variantToRemove.id));
-  };
-
   const handleUpdateVariant = (variantId: string, field: string, value: string | number) => {
     onChange(
       variants.map(v => {
@@ -133,105 +106,22 @@ export function VariantsManager({ variants, onChange, productId }: VariantsManag
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-medium">Product Variants</h3>
 
-        <div className="flex gap-2 items-center">
-          <Input
-            placeholder="New parameter name (e.g., Size, Color, Weight)"
-            value={newParameterKey}
-            onChange={(e) => setNewParameterKey(e.target.value)}
-            className="max-w-xs"
-          />
-          <Button 
-            type="button" 
-            onClick={handleAddParameter} 
-            size="sm"
-            variant="outline"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Parameter
-          </Button>
-        </div>
-
-        {definedParameters.length > 0 && (
-          <div className="flex gap-2 flex-wrap">
-            {definedParameters.map(param => (
-              <Badge 
-                key={param} 
-                variant="secondary"
-                className="flex items-center gap-1"
-              >
-                {param}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-4 w-4 p-0"
-                  onClick={() => handleRemoveParameter(param)}
-                >
-                  <MinusCircle className="h-3 w-3" />
-                </Button>
-              </Badge>
-            ))}
-          </div>
-        )}
+        <ParameterInput
+          newParameterKey={newParameterKey}
+          onParameterKeyChange={setNewParameterKey}
+          onAddParameter={handleAddParameter}
+          definedParameters={definedParameters}
+          onRemoveParameter={handleRemoveParameter}
+        />
 
         {definedParameters.length > 0 && (
           <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {definedParameters.map(param => (
-                    <TableHead key={param} className="capitalize">{param}</TableHead>
-                  ))}
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {variants.map((variant) => (
-                  <TableRow key={variant.id}>
-                    {definedParameters.map(param => (
-                      <TableCell key={param}>
-                        <Input
-                          value={variant.parameters[param] || ""}
-                          onChange={(e) => handleUpdateVariant(variant.id, param, e.target.value)}
-                          className="w-full"
-                        />
-                      </TableCell>
-                    ))}
-                    <TableCell>
-                      <Input
-                        type="number"
-                        min="0"
-                        value={variant.stock}
-                        onChange={(e) => handleUpdateVariant(variant.id, 'stock', e.target.value)}
-                        className="w-24"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={variant.price}
-                        onChange={(e) => handleUpdateVariant(variant.id, 'price', e.target.value)}
-                        className="w-24"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveVariant(variant)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <VariantTable
+              variants={variants}
+              definedParameters={definedParameters}
+              onUpdateVariant={handleUpdateVariant}
+              onRemoveVariant={(variant) => onChange(variants.filter(v => v.id !== variant.id))}
+            />
 
             <Button 
               type="button" 
