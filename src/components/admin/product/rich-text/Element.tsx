@@ -9,9 +9,9 @@ interface ElementProps {
 export const Element = ({ attributes, children, element }: ElementProps) => {
   switch (element.type) {
     case 'bulleted-list':
-      return <ul {...attributes}>{children}</ul>;
+      return <ul {...attributes} className="list-disc pl-6">{children}</ul>;
     case 'numbered-list':
-      return <ol {...attributes}>{children}</ol>;
+      return <ol {...attributes} className="list-decimal pl-6">{children}</ol>;
     case 'list-item':
       return <li {...attributes}>{children}</li>;
     default:

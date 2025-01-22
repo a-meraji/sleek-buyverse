@@ -35,7 +35,7 @@ const toggleBlock = (editor: CustomEditor, format: CustomElement['type']) => {
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
   };
 
-  Transforms.setNodes(editor, newProperties);
+  Transforms.setNodes<CustomElement>(editor, newProperties);
 
   if (!isActive && isList) {
     const block: CustomElement = { type: format, children: [] };
@@ -50,6 +50,7 @@ const isMarkActive = (editor: CustomEditor, format: keyof Omit<CustomText, 'text
 
 const toggleMark = (editor: CustomEditor, format: keyof Omit<CustomText, 'text'>) => {
   const isActive = isMarkActive(editor, format);
+
   if (isActive) {
     Editor.removeMark(editor, format);
   } else {
@@ -69,20 +70,22 @@ const ToolbarButton = ({ format, icon: Icon, isBlock = false }: ToolbarButtonPro
     ? isBlockActive(editor, format as CustomElement['type'])
     : isMarkActive(editor, format as keyof Omit<CustomText, 'text'>);
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent focus loss
+    if (isBlock) {
+      toggleBlock(editor, format as CustomElement['type']);
+    } else {
+      toggleMark(editor, format as keyof Omit<CustomText, 'text'>);
+    }
+  };
+
   return (
     <Button
       type="button"
       variant={isActive ? "secondary" : "ghost"}
       size="icon"
       className={`${isActive ? 'bg-secondary' : ''}`}
-      onClick={(e) => {
-        e.preventDefault();
-        if (isBlock) {
-          toggleBlock(editor, format as CustomElement['type']);
-        } else {
-          toggleMark(editor, format as keyof Omit<CustomText, 'text'>);
-        }
-      }}
+      onMouseDown={handleMouseDown}
     >
       <Icon className="h-4 w-4" />
     </Button>
