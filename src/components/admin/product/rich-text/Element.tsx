@@ -1,4 +1,4 @@
-import { CustomElement } from "./types";
+import { CustomElement } from './types';
 
 interface ElementProps {
   attributes: any;
@@ -8,11 +8,11 @@ interface ElementProps {
 
 export const Element = ({ attributes, children, element }: ElementProps) => {
   switch (element.type) {
-    case "bulleted-list":
+    case 'bulleted-list':
       return <ul {...attributes}>{children}</ul>;
-    case "numbered-list":
+    case 'numbered-list':
       return <ol {...attributes}>{children}</ol>;
-    case "list-item":
+    case 'list-item':
       return <li {...attributes}>{children}</li>;
     default:
       return <p {...attributes}>{children}</p>;

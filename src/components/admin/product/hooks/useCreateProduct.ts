@@ -1,22 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
-import { ProductVariant } from "@/types/variant";
 import { useToast } from "@/hooks/use-toast";
+import { Product } from "@/types/product";
 
-interface CreateProductData {
-  formData: Partial<Product>;
-  variants: ProductVariant[];
-  additionalImages: { image_url: string }[];
-}
-
-export const useCreateProduct = (onSuccess: () => void) => {
+export const useCreateProduct = (onSuccess?: () => void) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ formData, variants, additionalImages }: CreateProductData) => {
-      console.log('Creating product with data:', { formData, variants, additionalImages });
+    mutationFn: async (data: {
+      formData: Partial<Product>;
+      variants: any[];
+      additionalImages: any[];
+    }) => {
+      const { formData, variants, additionalImages } = data;
       
       const { data: product, error: productError } = await supabase
         .from("products")
@@ -24,16 +21,13 @@ export const useCreateProduct = (onSuccess: () => void) => {
         .select()
         .single();
 
-      if (productError) {
-        console.error('Error creating product:', productError);
-        throw productError;
-      }
+      if (productError) throw productError;
 
       if (additionalImages.length > 0) {
         const imagesData = additionalImages.map((img, index) => ({
           product_id: product.id,
           image_url: img.image_url,
-          display_order: index
+          display_order: index,
         }));
 
         const { error: imagesError } = await supabase
@@ -43,16 +37,18 @@ export const useCreateProduct = (onSuccess: () => void) => {
         if (imagesError) throw imagesError;
       }
 
-      const variantsData = variants.map(variant => ({
-        ...variant,
-        product_id: product.id
-      }));
+      if (variants.length > 0) {
+        const variantsData = variants.map(variant => ({
+          product_id: product.id,
+          ...variant,
+        }));
 
-      const { error: variantsError } = await supabase
-        .from("product_variants")
-        .insert(variantsData);
+        const { error: variantsError } = await supabase
+          .from("product_variants")
+          .insert(variantsData);
 
-      if (variantsError) throw variantsError;
+        if (variantsError) throw variantsError;
+      }
 
       return product;
     },
@@ -62,7 +58,7 @@ export const useCreateProduct = (onSuccess: () => void) => {
         title: "Success",
         description: "Product created successfully",
       });
-      onSuccess();
+      if (onSuccess) onSuccess();
     },
     onError: (error: Error) => {
       console.error("Error creating product:", error);
