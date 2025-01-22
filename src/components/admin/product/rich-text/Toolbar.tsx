@@ -27,13 +27,15 @@ const toggleBlock = (editor: CustomEditor, format: CustomElement['type']) => {
     match: n =>
       !Editor.isEditor(n) &&
       SlateElement.isElement(n) &&
-      ['bulleted-list', 'numbered-list'].includes(n.type as string),
+      ['bulleted-list', 'numbered-list'].includes(n.type),
     split: true,
   });
 
-  Transforms.setNodes(editor, {
+  const newProperties: Partial<CustomElement> = {
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-  } as Partial<CustomElement>);
+  };
+
+  Transforms.setNodes(editor, newProperties);
 
   if (!isActive && isList) {
     const block: CustomElement = { type: format, children: [] };
@@ -72,6 +74,7 @@ const ToolbarButton = ({ format, icon: Icon, isBlock = false }: ToolbarButtonPro
       type="button"
       variant={isActive ? "secondary" : "ghost"}
       size="icon"
+      className={`${isActive ? 'bg-secondary' : ''}`}
       onClick={(e) => {
         e.preventDefault();
         if (isBlock) {

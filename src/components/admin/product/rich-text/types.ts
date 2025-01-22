@@ -1,5 +1,6 @@
-import { BaseEditor, Descendant } from 'slate';
+import { BaseEditor, Descendant, Element as SlateElement } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { HistoryEditor } from 'slate-history';
 
 export type CustomText = {
   text: string;
@@ -13,7 +14,15 @@ export type CustomElement = {
   children: Descendant[];
 };
 
-export type CustomEditor = BaseEditor & ReactEditor;
+export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: CustomEditor;
+    Element: CustomElement;
+    Text: CustomText;
+  }
+}
 
 export const defaultValue: CustomElement[] = [
   {
