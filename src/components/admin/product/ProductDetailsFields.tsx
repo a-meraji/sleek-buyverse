@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "./RichTextEditor";
+import { Descendant } from "slate";
 
 interface ProductDetailsFieldsProps {
   name: string;
@@ -29,6 +30,11 @@ export function ProductDetailsFields({
     }
   };
 
+  // Parse the description string to Slate's format
+  const initialValue: Descendant[] = description ? 
+    JSON.parse(description) : 
+    [{ type: 'paragraph', children: [{ text: '' }] }];
+
   return (
     <>
       <div className="space-y-2">
@@ -43,10 +49,9 @@ export function ProductDetailsFields({
 
       <div className="space-y-2">
         <label htmlFor="description" className="text-sm font-medium">Description</label>
-        <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => onDescriptionChange(e.target.value)}
+        <RichTextEditor
+          value={initialValue}
+          onChange={(value) => onDescriptionChange(JSON.stringify(value))}
         />
       </div>
 

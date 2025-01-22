@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ProductHeader } from "./ProductHeader";
 import { PriceDisplay } from "./PriceDisplay";
 import { ProductVariantSection } from "./ProductVariantSection";
+import { RichTextContent } from "../RichTextContent";
 
 interface ProductDetailsProps {
   product: Product;
@@ -39,7 +40,6 @@ export const ProductDetails = ({ product, userId }: ProductDetailsProps) => {
     )
   );
   
-  // Calculate minimum price from all variants
   const minPrice = variants?.length 
     ? Math.min(...variants.map(v => Number(v.price)))
     : 0;
@@ -52,7 +52,6 @@ export const ProductDetails = ({ product, userId }: ProductDetailsProps) => {
     ? selectedVariantPrice * (1 - product.discount / 100) 
     : selectedVariantPrice;
 
-  // Get unique parameter keys from variants
   const parameterKeys = variants?.length 
     ? [...new Set(variants.flatMap(v => Object.keys(v.parameters)))]
     : [];
@@ -71,7 +70,7 @@ export const ProductDetails = ({ product, userId }: ProductDetailsProps) => {
         minPrice={minPrice}
       />
 
-      <p className="text-gray-600">{product.description}</p>
+      <RichTextContent content={product.description || ''} />
       
       <ProductVariantSection
         variants={variants}
@@ -91,4 +90,4 @@ export const ProductDetails = ({ product, userId }: ProductDetailsProps) => {
       />
     </div>
   );
-};
+}
