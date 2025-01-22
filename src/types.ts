@@ -1,5 +1,5 @@
 import { ProductVariant } from './types/variant';
-export type { ProductVariant };  // Re-export ProductVariant
+export type { ProductVariant };
 export type ProductSize = string;
 
 export interface ProductImage {
@@ -90,4 +90,17 @@ export interface ProductFormProps {
 export interface ProductFormContainerProps {
   onClose: () => void;
   initialData?: Product;
+}
+
+export interface Review {
+  id: string;
+  product_id: string;
+  reviewer_id?: string;
+  reviewer_first_name: string;
+  reviewer_last_name: string;
+  title: string;
+  review_text: string;
+  rating: number;
+  status: "approved" | "pending" | "rejected";
+  created_at: string;
 }
