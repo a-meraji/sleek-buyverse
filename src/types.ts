@@ -32,7 +32,7 @@ export interface VariantSelectionPanelProps {
   variants: ProductVariant[];
   selectedParameters: Record<string, string | number>;
   onParameterSelect: (key: string, value: string | number) => void;
-  selectedVariant: ProductVariant;
+  selectedVariant: ProductVariant | null;
   finalSelectedVariantPrice: number;
   parameterKeys: string[];
 }
@@ -65,10 +65,13 @@ export interface CartItemHeaderProps {
   variant?: ProductVariant;
   onRemove: () => void;
   readonly: boolean;
+  productName: string;
+  parameters?: string;
 }
 
 export interface CartItemPriceProps {
   price: number;
   quantity: number;
   discount?: number;
+  variantPrice: number;
 }

@@ -28,11 +28,7 @@ export const CartContent = ({
               key={item.id}
               item={item}
               userId={userId}
-              onQuantityChange={(id, currentQuantity, delta) => {
-                const newQuantity = currentQuantity + delta;
-                if (newQuantity < 1) return;
-                updateQuantity(id, newQuantity);
-              }}
+              onQuantityChange={updateQuantity}
               onRemove={removeItem}
               readonly={readonly}
             />

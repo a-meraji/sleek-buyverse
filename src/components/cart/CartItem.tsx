@@ -3,15 +3,12 @@ import { CartItemHeader } from "./item/CartItemHeader";
 import { CartItemImage } from "./item/CartItemImage";
 import { CartItemPrice } from "./item/CartItemPrice";
 import { CartItemQuantity } from "./item/CartItemQuantity";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 
 export const CartItem = ({
   item,
   onQuantityChange,
   onRemove,
   readonly = false,
-  userId
 }: CartItemProps) => {
   if (!item.product) {
     console.error('Cart item has no associated product:', item);
@@ -37,6 +34,7 @@ export const CartItem = ({
           parameters={formattedParameters}
           onRemove={() => onRemove(item.id)}
           readonly={readonly}
+          name={item.product.name}
         />
         
         {!readonly && (
@@ -44,7 +42,7 @@ export const CartItem = ({
             <CartItemQuantity
               quantity={item.quantity}
               onQuantityChange={(delta) => 
-                onQuantityChange(item.id, item.quantity, delta)
+                onQuantityChange(item.id, item.quantity + delta)
               }
             />
           </div>
@@ -52,9 +50,10 @@ export const CartItem = ({
       </div>
 
       <CartItemPrice
-        variantPrice={variantPrice}
+        price={variantPrice}
         quantity={item.quantity}
         discount={item.product.discount}
+        variantPrice={variantPrice}
       />
     </div>
   );
