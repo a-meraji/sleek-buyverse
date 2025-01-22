@@ -29,6 +29,7 @@ export function RichTextContent({ content }: RichTextContentProps) {
   const renderLeaf = (leaf: any) => {
     let text = leaf.text;
 
+    // Handle multiple text decorations
     if (leaf.bold && leaf.italic && leaf.underline) {
       return <strong><em><u>{text}</u></em></strong>;
     }
@@ -62,7 +63,26 @@ export function RichTextContent({ content }: RichTextContentProps) {
   };
 
   try {
-    const parsedContent: Descendant[] = JSON.parse(content);
+    let parsedContent: Descendant[];
+    
+    // Handle both string and already parsed content
+    if (typeof content === 'string') {
+      try {
+        parsedContent = JSON.parse(content);
+      } catch {
+        // If JSON parsing fails, treat it as plain text
+        return <p className="text-gray-600">{content}</p>;
+      }
+    } else {
+      parsedContent = content as unknown as Descendant[];
+    }
+
+    // Validate that we have an array of nodes
+    if (!Array.isArray(parsedContent)) {
+      console.error('Invalid rich text content format:', parsedContent);
+      return <p className="text-gray-600">{content}</p>;
+    }
+
     return (
       <div className="prose prose-sm max-w-none">
         {parsedContent.map((node, i) => (
