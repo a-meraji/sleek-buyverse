@@ -1,86 +1,83 @@
-import { Product, ProductImage } from "@/types";
-import { ProductVariant } from "@/types/variant";
-import { ProductDetailsFields } from "../ProductDetailsFields";
-import { CategorySelector } from "../CategorySelector";
-import { VariantsManager } from "../VariantsManager";
-import { FormActions } from "../FormActions";
-import { ProductImageSection } from "./ProductImageSection";
+import { Product } from "@/types";
+import { ImageSelector } from "../../ImageSelector";
+import { useProductForm } from "./useProductForm";
+import { ProductBasicInfo } from "./ProductBasicInfo";
+import { ProductCategorySection } from "./ProductCategorySection";
+import { ProductVariantsSection } from "./ProductVariantsSection";
+import { ProductImagesSection } from "./ProductImagesSection";
+import { ProductFormActions } from "./ProductFormActions";
+import { useCreateProduct } from "../hooks/useCreateProduct";
 
 interface ProductFormProps {
-  formData: Partial<Product>;
-  variants: ProductVariant[];
-  additionalImages?: ProductImage[];
-  showImageSelector: boolean;
-  isSelectingMainImage: boolean;
-  onFormChange: (updates: Partial<Product>) => void;
-  onVariantsChange: (variants: ProductVariant[]) => void;
-  onChooseMainImage: () => void;
-  onAddAdditionalImage: () => void;
-  onImageSelect: (url: string) => void;
-  onCloseImageSelector: () => void;
-  onRemoveImage?: (imageUrl: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
-  isSubmitting: boolean;
 }
 
-export function ProductForm({
-  formData,
-  variants,
-  additionalImages = [],
-  showImageSelector,
-  isSelectingMainImage,
-  onFormChange,
-  onVariantsChange,
-  onChooseMainImage,
-  onAddAdditionalImage,
-  onImageSelect,
-  onCloseImageSelector,
-  onRemoveImage,
-  onSubmit,
-  onClose,
-  isSubmitting,
-}: ProductFormProps) {
+export function ProductForm({ onClose }: ProductFormProps) {
+  const {
+    formData,
+    additionalImages,
+    variants,
+    showImageSelector,
+    isSelectingMainImage,
+    handleFormChange,
+    handleImageSelect,
+    handleRemoveImage,
+    setVariants,
+    setShowImageSelector,
+    setIsSelectingMainImage,
+  } = useProductForm();
+
+  const createProduct = useCreateProduct(onClose);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createProduct.mutate({ formData, variants, additionalImages });
+  };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <ProductDetailsFields
-        name={formData.name ?? ""}
-        description={formData.description ?? ""}
-        sku={formData.sku ?? ""}
-        discount={formData.discount}
-        onNameChange={(value) => onFormChange({ name: value })}
-        onDescriptionChange={(value) => onFormChange({ description: value })}
-        onSkuChange={(value) => onFormChange({ sku: value })}
-        onDiscountChange={(value) => onFormChange({ discount: value })}
-      />
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
+        <ProductBasicInfo
+          formData={formData}
+          onFormChange={handleFormChange}
+        />
 
-      <CategorySelector
-        value={formData.category ?? ""}
-        onChange={(value) => onFormChange({ category: value })}
-      />
+        <ProductCategorySection
+          category={formData.category ?? ""}
+          onChange={(value) => handleFormChange({ category: value })}
+        />
 
-      <ProductImageSection
-        mainImage={formData.image_url ?? ""}
-        productName={formData.name}
-        additionalImages={additionalImages}
-        showImageSelector={showImageSelector}
-        isSelectingMainImage={isSelectingMainImage}
-        onChooseMainImage={onChooseMainImage}
-        onAddAdditionalImage={onAddAdditionalImage}
-        onImageSelect={onImageSelect}
-        onCloseImageSelector={onCloseImageSelector}
-        onRemoveImage={onRemoveImage}
-      />
+        <ProductVariantsSection
+          variants={variants}
+          onChange={setVariants}
+        />
 
-      <VariantsManager
-        variants={variants}
-        onChange={onVariantsChange}
-      />
+        <ProductImagesSection
+          mainImage={formData.image_url ?? ""}
+          productName={formData.name}
+          additionalImages={additionalImages}
+          onChooseMainImage={() => {
+            setIsSelectingMainImage(true);
+            setShowImageSelector(true);
+          }}
+          onAddAdditionalImage={() => {
+            setIsSelectingMainImage(false);
+            setShowImageSelector(true);
+          }}
+          onRemoveImage={handleRemoveImage}
+        />
 
-      <FormActions
-        isSubmitting={isSubmitting}
-        onCancel={onClose}
+        <ProductFormActions
+          isSubmitting={createProduct.isPending}
+          onCancel={onClose}
+        />
+      </form>
+
+      <ImageSelector
+        open={showImageSelector}
+        onClose={() => setShowImageSelector(false)}
+        onSelect={handleImageSelect}
       />
-    </form>
+    </>
   );
 }
