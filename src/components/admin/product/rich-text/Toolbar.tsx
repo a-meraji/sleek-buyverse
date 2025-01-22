@@ -2,7 +2,7 @@ import { Editor, Element as SlateElement, Transforms } from 'slate';
 import { useSlate } from 'slate-react';
 import { Button } from '@/components/ui/button';
 import { Bold, Italic, Underline, List, ListOrdered } from 'lucide-react';
-import { CustomElement, CustomEditor } from './types';
+import { CustomElement, CustomEditor, CustomText } from './types';
 
 const isBlockActive = (editor: CustomEditor, format: CustomElement['type']) => {
   const { selection } = editor;
@@ -27,7 +27,7 @@ const toggleBlock = (editor: CustomEditor, format: CustomElement['type']) => {
     match: n =>
       !Editor.isEditor(n) &&
       SlateElement.isElement(n) &&
-      ['bulleted-list', 'numbered-list'].includes(n.type),
+      ['bulleted-list', 'numbered-list'].includes(n.type as string),
     split: true,
   });
 

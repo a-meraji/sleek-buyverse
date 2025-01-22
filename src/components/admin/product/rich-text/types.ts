@@ -1,11 +1,5 @@
 import { BaseEditor, Descendant } from 'slate';
 import { ReactEditor } from 'slate-react';
-import { HistoryEditor } from 'slate-history';
-
-export type CustomElement = {
-  type: 'paragraph' | 'bulleted-list' | 'numbered-list' | 'list-item';
-  children: CustomText[];
-};
 
 export type CustomText = {
   text: string;
@@ -14,17 +8,14 @@ export type CustomText = {
   underline?: boolean;
 };
 
-export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
+export type CustomElement = {
+  type: 'paragraph' | 'bulleted-list' | 'numbered-list' | 'list-item';
+  children: Descendant[];
+};
 
-declare module 'slate' {
-  interface CustomTypes {
-    Editor: CustomEditor;
-    Element: CustomElement;
-    Text: CustomText;
-  }
-}
+export type CustomEditor = BaseEditor & ReactEditor;
 
-export const defaultValue: Descendant[] = [
+export const defaultValue: CustomElement[] = [
   {
     type: 'paragraph',
     children: [{ text: '' }],

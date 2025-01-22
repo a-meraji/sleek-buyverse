@@ -5,11 +5,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { ProductVariant } from "@/types/variant";
-import { ImageSelector } from "./ImageSelector";
-import { ProductDetailsFields } from "./product/ProductDetailsFields";
-import { CategorySelector } from "./product/CategorySelector";
-import { ImagePreview } from "./product/ImagePreview";
-import { VariantsManager } from "./product/VariantsManager";
+import { ImageSelector } from "@/components/admin/ImageSelector";
+import { ProductDetailsFields } from "@/components/admin/product/ProductDetailsFields";
+import { CategorySelector } from "@/components/admin/product/CategorySelector";
+import { ImagePreview } from "@/components/admin/product/ImagePreview";
+import { VariantsManager } from "@/components/admin/product/VariantsManager";
+
 import { defaultValue } from "./rich-text/types";
 
 interface ProductFormProps {
