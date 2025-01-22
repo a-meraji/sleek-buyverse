@@ -104,3 +104,12 @@ export interface Review {
   status: "approved" | "pending" | "rejected";
   created_at: string;
 }
+
+export interface ProductFormState {
+  formData: Partial<Product>;
+  additionalImages: ProductImage[];
+  variants: ProductVariant[];
+  showImageSelector: boolean;
+  isSelectingMainImage: boolean;
+  createProduct: any;
+}

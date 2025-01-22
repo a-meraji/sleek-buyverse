@@ -1,17 +1,13 @@
-import { Product } from "@/types";
+import { Product, ProductFormProps } from "@/types";
 import { ImageSelector } from "../../ImageSelector";
-import { useProductForm } from "./useProductForm";
 import { ProductBasicInfo } from "./ProductBasicInfo";
 import { ProductCategorySection } from "./ProductCategorySection";
 import { ProductVariantsSection } from "./ProductVariantsSection";
 import { ProductImagesSection } from "./ProductImagesSection";
 import { ProductFormActions } from "./ProductFormActions";
+import { useProductForm } from "./useProductForm";
 
-interface ProductFormProps {
-  onClose: () => void;
-}
-
-export function ProductForm({ onClose }: ProductFormProps) {
+export function ProductForm({ onClose, initialData }: ProductFormProps) {
   const {
     formData,
     additionalImages,
@@ -25,11 +21,15 @@ export function ProductForm({ onClose }: ProductFormProps) {
     setShowImageSelector,
     setIsSelectingMainImage,
     createProduct,
-  } = useProductForm(onClose);
+  } = useProductForm({ onClose, initialData });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createProduct.mutate();
+    createProduct.mutate({
+      formData,
+      variants,
+      additionalImages
+    });
   };
 
   return (

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Product } from "@/types/product";
-import { ProductVariant } from "@/types/variant";
+import { Product, ProductFormProps, ProductImage, ProductVariant } from "@/types";
+import { useCreateProduct } from "./useCreateProduct";
 
-export function useProductForm() {
-  const [formData, setFormData] = useState<Partial<Product>>({
+export function useProductForm({ onClose, initialData }: ProductFormProps) {
+  const [formData, setFormData] = useState<Partial<Product>>(initialData || {
     name: "",
     description: "",
     category: "",
@@ -11,10 +11,13 @@ export function useProductForm() {
     sku: "",
     discount: 0,
   });
-  const [additionalImages, setAdditionalImages] = useState<{ image_url: string }[]>([]);
+  
+  const [additionalImages, setAdditionalImages] = useState<ProductImage[]>([]);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
+
+  const createProduct = useCreateProduct(onClose);
 
   const handleFormChange = (updates: Partial<Product>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -25,7 +28,13 @@ export function useProductForm() {
     if (isSelectingMainImage) {
       handleFormChange({ image_url: url });
     } else {
-      setAdditionalImages(prev => [...prev, { image_url: url }]);
+      const newImage: ProductImage = {
+        id: `temp-${Date.now()}`,
+        product_id: '',
+        image_url: url,
+        display_order: additionalImages.length
+      };
+      setAdditionalImages(prev => [...prev, newImage]);
     }
     setShowImageSelector(false);
   };
@@ -50,5 +59,6 @@ export function useProductForm() {
     setVariants,
     setShowImageSelector,
     setIsSelectingMainImage,
+    createProduct,
   };
 }
