@@ -12,7 +12,7 @@ export function WatchBrands() {
     <section className="py-16 bg-secondary">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-12">Our Brands</h2>
-        <div className="overflow-x-auto pb-4">
+        <div className="overflow-x-auto scrollbar-hide pb-4">
           <div className="flex space-x-12 w-max">
             {brands.map((brand) => (
               <div

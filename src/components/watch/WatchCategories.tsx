@@ -49,7 +49,7 @@ export function WatchCategories() {
   return (
     <div className="py-6">
       <div className="container mx-auto px-4">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-hide">
           <div className="flex gap-4 w-max pb-4">
             {categories.map((category) => (
               <button
