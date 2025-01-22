@@ -2,9 +2,9 @@ import { Editor, Element as SlateElement, Transforms } from 'slate';
 import { useSlate } from 'slate-react';
 import { Button } from '@/components/ui/button';
 import { Bold, Italic, Underline, List, ListOrdered } from 'lucide-react';
-import { CustomEditor } from './types';
+import { CustomElement, CustomEditor } from './types';
 
-const isBlockActive = (editor: Editor, format: string) => {
+const isBlockActive = (editor: CustomEditor, format: CustomElement['type']) => {
   const { selection } = editor;
   if (!selection) return false;
 
@@ -19,7 +19,7 @@ const isBlockActive = (editor: Editor, format: string) => {
   return !!match;
 };
 
-const toggleBlock = (editor: Editor, format: string) => {
+const toggleBlock = (editor: CustomEditor, format: CustomElement['type']) => {
   const isActive = isBlockActive(editor, format);
   const isList = format === 'bulleted-list' || format === 'numbered-list';
 
@@ -33,20 +33,20 @@ const toggleBlock = (editor: Editor, format: string) => {
 
   Transforms.setNodes(editor, {
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-  });
+  } as Partial<CustomElement>);
 
   if (!isActive && isList) {
-    const block = { type: format, children: [] };
+    const block: CustomElement = { type: format, children: [] };
     Transforms.wrapNodes(editor, block);
   }
 };
 
-const isMarkActive = (editor: Editor, format: string) => {
+const isMarkActive = (editor: CustomEditor, format: keyof Omit<CustomText, 'text'>) => {
   const marks = Editor.marks(editor);
   return marks ? marks[format] === true : false;
 };
 
-const toggleMark = (editor: Editor, format: string) => {
+const toggleMark = (editor: CustomEditor, format: keyof Omit<CustomText, 'text'>) => {
   const isActive = isMarkActive(editor, format);
   if (isActive) {
     Editor.removeMark(editor, format);
@@ -64,8 +64,8 @@ interface ToolbarButtonProps {
 const ToolbarButton = ({ format, icon: Icon, isBlock = false }: ToolbarButtonProps) => {
   const editor = useSlate();
   const isActive = isBlock
-    ? isBlockActive(editor, format)
-    : isMarkActive(editor, format);
+    ? isBlockActive(editor, format as CustomElement['type'])
+    : isMarkActive(editor, format as keyof Omit<CustomText, 'text'>);
 
   return (
     <Button
@@ -75,9 +75,9 @@ const ToolbarButton = ({ format, icon: Icon, isBlock = false }: ToolbarButtonPro
       onClick={(e) => {
         e.preventDefault();
         if (isBlock) {
-          toggleBlock(editor, format);
+          toggleBlock(editor, format as CustomElement['type']);
         } else {
-          toggleMark(editor, format);
+          toggleMark(editor, format as keyof Omit<CustomText, 'text'>);
         }
       }}
     >
