@@ -35,7 +35,7 @@ const toggleMark = (editor: Editor, format: string) => {
 
 const isBlockActive = (editor: Editor, format: string) => {
   const [match] = Editor.nodes(editor, {
-    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
+    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && (n as CustomElement).type === format,
   });
   return !!match;
 };
@@ -45,7 +45,7 @@ const toggleBlock = (editor: Editor, format: string) => {
   const isList = LIST_TYPES.includes(format);
 
   Transforms.unwrapNodes(editor, {
-    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && LIST_TYPES.includes(n.type),
+    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && LIST_TYPES.includes((n as CustomElement).type),
     split: true,
   });
 
@@ -87,7 +87,8 @@ const FormatButton = ({ format, icon: Icon, isBlock = false }: { format: string;
 
 export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const renderElement = useCallback((props: any) => {
-    switch (props.element.type) {
+    const element = props.element as CustomElement;
+    switch (element.type) {
       case 'block-quote':
         return <blockquote {...props.attributes}>{props.children}</blockquote>;
       case 'bulleted-list':
@@ -106,13 +107,14 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   }, []);
 
   const renderLeaf = useCallback((props: any) => {
+    const leaf = props.leaf as CustomText;
     return (
       <span
         {...props.attributes}
         style={{
-          fontWeight: props.leaf.bold ? 'bold' : 'normal',
-          fontStyle: props.leaf.italic ? 'italic' : 'normal',
-          textDecoration: props.leaf.underline ? 'underline' : 'none',
+          fontWeight: leaf.bold ? 'bold' : 'normal',
+          fontStyle: leaf.italic ? 'italic' : 'normal',
+          textDecoration: leaf.underline ? 'underline' : 'none',
         }}
       >
         {props.children}
@@ -127,11 +129,11 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
     {
       type: 'paragraph',
       children: [{ text: '' }],
-    },
+    } as CustomElement,
   ] : value;
 
   return (
-    <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
+    <Slate editor={editor} value={initialValue} onChange={onChange}>
       <div className="border rounded-md p-4">
         <div className="flex gap-1 mb-2 border-b pb-2">
           <FormatButton format="bold" icon={Bold} />

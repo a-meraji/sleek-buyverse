@@ -3,30 +3,34 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product, ProductVariant } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 
-interface CreateProductParams {
-  formData: Partial<Product>;
-  variants: ProductVariant[];
-  additionalImages: { image_url: string }[];
-}
-
-export function useCreateProduct(onClose: () => void) {
+export const useCreateProduct = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const generateSKU = (name: string): string => {
+    const timestamp = Date.now().toString().slice(-4);
+    const namePrefix = name.slice(0, 3).toUpperCase();
+    return `${namePrefix}-${timestamp}`;
+  };
+
   return useMutation({
-    mutationFn: async ({ formData, variants, additionalImages }: CreateProductParams) => {
-      const generateSKU = (name: string): string => {
-        const timestamp = Date.now().toString().slice(-4);
-        const namePrefix = name.slice(0, 3).toUpperCase();
-        return `${namePrefix}-${timestamp}`;
-      };
+    mutationFn: async (data: {
+      formData: Partial<Product>;
+      variants: ProductVariant[];
+      additionalImages: { image_url: string }[];
+    }) => {
+      const { formData, variants, additionalImages } = data;
+
+      if (!formData.name || !formData.image_url) {
+        throw new Error("Product name and image are required");
+      }
 
       const productData = {
         name: formData.name,
         description: formData.description || "",
         category: formData.category || "",
         image_url: formData.image_url,
-        sku: formData.sku?.trim() || generateSKU(formData.name || ""),
+        sku: formData.sku?.trim() || generateSKU(formData.name),
         discount: formData.discount || 0,
       };
 
@@ -40,6 +44,9 @@ export function useCreateProduct(onClose: () => void) {
 
       if (productError) {
         console.error('Error creating product:', productError);
+        if (productError.code === '23505' && productError.message.includes('products_sku_key')) {
+          throw new Error("A product with this SKU already exists. Please use a different SKU.");
+        }
         throw productError;
       }
 
@@ -67,8 +74,6 @@ export function useCreateProduct(onClose: () => void) {
         price: variant.price
       }));
 
-      console.log('Saving variants with data:', variantsData);
-
       const { error: variantsError } = await supabase
         .from("product_variants")
         .insert(variantsData);
@@ -84,15 +89,14 @@ export function useCreateProduct(onClose: () => void) {
         title: "Success",
         description: "Product created successfully",
       });
-      onClose();
     },
     onError: (error: Error) => {
       console.error("Error creating product:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create product",
+        description: error.message || "Failed to create product. Please try again.",
         variant: "destructive",
       });
     },
   });
-}
+};

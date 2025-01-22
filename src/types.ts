@@ -3,6 +3,13 @@ import { Product } from './types/product';
 import { ProductVariant } from './types/variant';
 import { ProductImage } from './types/product';
 
+export type { Product } from './types/product';
+export type { ProductVariant } from './types/variant';
+export type { ProductImage } from './types/product';
+export type { ProductSize } from './types/product';
+export type { ProductFormProps } from './types/product';
+export type { ProductFormContainerProps } from './types/product';
+
 export interface CustomElement {
   type: string;
   children: CustomText[];
@@ -56,23 +63,15 @@ export interface CartItemProps {
 export interface CartItemHeaderProps {
   name: string;
   variant?: ProductVariant;
+  productName: string;
+  parameters: string;
+  onRemove: () => void;
+  readonly: boolean;
 }
 
 export interface CartItemPriceProps {
   price: number;
   quantity: number;
   discount?: number;
-}
-
-export interface Review {
-  id: string;
-  product_id: string;
-  reviewer_id?: string;
-  reviewer_first_name: string;
-  reviewer_last_name: string;
-  title: string;
-  review_text: string;
-  rating: number;
-  status: 'pending' | 'approved' | 'rejected';
-  created_at: string;
+  variantPrice: number;
 }
