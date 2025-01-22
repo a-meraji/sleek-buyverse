@@ -113,3 +113,15 @@ export interface ProductFormState {
   isSelectingMainImage: boolean;
   createProduct: any;
 }
+
+export interface CustomElement {
+  type: string;
+  children: CustomText[];
+}
+
+export interface CustomText {
+  text: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+}

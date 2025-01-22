@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { Product } from "@/types/product";
-import { ProductVariant } from "@/types/variant";
+import { Product, ProductVariant } from "@/types";
 import { useCreateProduct } from "./useCreateProduct";
 
-export function useProductForm(onClose: () => void) {
-  const [formData, setFormData] = useState<Partial<Product>>({
+interface UseProductFormProps {
+  onClose: () => void;
+  initialData?: Product;
+}
+
+export function useProductForm({ onClose, initialData }: UseProductFormProps) {
+  const [formData, setFormData] = useState<Partial<Product>>(initialData || {
     name: "",
     description: "",
     category: "",
@@ -12,6 +16,7 @@ export function useProductForm(onClose: () => void) {
     sku: "",
     discount: 0,
   });
+  
   const [additionalImages, setAdditionalImages] = useState<{ image_url: string }[]>([]);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [showImageSelector, setShowImageSelector] = useState(false);

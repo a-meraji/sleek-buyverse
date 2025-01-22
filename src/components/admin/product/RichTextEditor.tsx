@@ -1,9 +1,18 @@
 import { useCallback } from "react";
-import { Slate, Editable, withReact, ReactEditor } from "slate-react";
-import { createEditor, Descendant, Editor, Transforms, Element as SlateElement } from "slate";
+import { Slate, Editable, withReact, ReactEditor, useSlate } from "slate-react";
+import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, BaseElement } from "slate";
 import { withHistory } from "slate-history";
 import { Button } from "@/components/ui/button";
 import { Bold, Italic, Underline, List, ListOrdered } from "lucide-react";
+import { CustomElement, CustomText } from "@/types";
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor;
+    Element: CustomElement;
+    Text: CustomText;
+  }
+}
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -44,22 +53,29 @@ const toggleBlock = (editor: Editor, format: string) => {
   const isList = LIST_TYPES.includes(format);
 
   Transforms.unwrapNodes(editor, {
-    match: n => LIST_TYPES.includes(!Editor.isEditor(n) && SlateElement.isElement(n) ? n.type : ''),
+    match: n => {
+      if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
+        return LIST_TYPES.includes(n.type);
+      }
+      return false;
+    },
     split: true,
   });
 
-  Transforms.setNodes(editor, {
+  const newProperties: Partial<CustomElement> = {
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-  });
+  };
+  
+  Transforms.setNodes(editor, newProperties);
 
   if (!isActive && isList) {
-    const block = { type: format, children: [] };
+    const block: CustomElement = { type: format, children: [] };
     Transforms.wrapNodes(editor, block);
   }
 };
 
 const FormatButton = ({ format, icon: Icon, isBlock = false }: { format: string; icon: any; isBlock?: boolean }) => {
-  const editor = ReactEditor.useSlate();
+  const editor = useSlate();
   const isActive = isBlock ? isBlockActive(editor, format) : isMarkActive(editor, format);
 
   return (

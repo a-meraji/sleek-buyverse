@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
-import { ProductVariant } from "@/types/variant";
+import { Product, ProductVariant } from "@/types";
 
 interface CreateProductData {
   formData: Partial<Product>;
@@ -63,10 +62,10 @@ export function useCreateProduct(onClose: () => void) {
 
       const variantsData = variants.map(variant => ({
         product_id: product.id,
-        parameters: {
-          size: variant.parameters.size,
-          color: variant.parameters.color
-        },
+        parameters: Object.fromEntries(
+          Object.entries(variant.parameters)
+            .filter(([_, value]) => value !== undefined && value !== null && value !== '')
+        ),
         stock: variant.stock,
         price: variant.price
       }));
