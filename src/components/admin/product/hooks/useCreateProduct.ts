@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductVariant } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { Product, ProductVariant } from "@/types/product";
 
-export const useCreateProduct = () => {
+export function useCreateProduct(onClose: () => void) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -13,25 +13,47 @@ export const useCreateProduct = () => {
     return `${namePrefix}-${timestamp}`;
   };
 
-  return useMutation({
-    mutationFn: async (data: {
-      formData: Partial<Product>;
-      variants: ProductVariant[];
-      additionalImages: { image_url: string }[];
-    }) => {
-      const { formData, variants, additionalImages } = data;
+  const validateForm = (formData: Partial<Product>, variants: ProductVariant[]): boolean => {
+    if (!formData.name || formData.name.trim() === "") {
+      toast({
+        title: "Validation Error",
+        description: "Product name is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.image_url || formData.image_url.trim() === "") {
+      toast({
+        title: "Validation Error",
+        description: "Product image is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (variants.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "At least one variant is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
 
-      if (!formData.name || !formData.image_url) {
-        throw new Error("Product name and image are required");
+  return useMutation({
+    mutationFn: async (data: { formData: Partial<Product>, variants: ProductVariant[] }) => {
+      if (!validateForm(data.formData, data.variants)) {
+        throw new Error("Validation failed");
       }
 
       const productData = {
-        name: formData.name,
-        description: formData.description || "",
-        category: formData.category || "",
-        image_url: formData.image_url,
-        sku: formData.sku?.trim() || generateSKU(formData.name),
-        discount: formData.discount || 0,
+        name: data.formData.name,
+        description: data.formData.description || "",
+        category: data.formData.category || "",
+        image_url: data.formData.image_url,
+        sku: data.formData.sku?.trim() || generateSKU(data.formData.name!),
+        discount: data.formData.discount || 0,
       };
 
       console.log('Creating product with data:', productData);
@@ -50,21 +72,10 @@ export const useCreateProduct = () => {
         throw productError;
       }
 
-      if (additionalImages.length > 0) {
-        const imagesData = additionalImages.map((img, index) => ({
-          product_id: product.id,
-          image_url: img.image_url,
-          display_order: index
-        }));
+      console.log('Product created:', product);
 
-        const { error: imagesError } = await supabase
-          .from("product_images")
-          .insert(imagesData);
-
-        if (imagesError) throw imagesError;
-      }
-
-      const variantsData = variants.map(variant => ({
+      // Ensure parameters are properly formatted before saving
+      const variantsData = data.variants.map(variant => ({
         product_id: product.id,
         parameters: Object.fromEntries(
           Object.entries(variant.parameters)
@@ -74,11 +85,16 @@ export const useCreateProduct = () => {
         price: variant.price
       }));
 
+      console.log('Saving variants with data:', variantsData);
+
       const { error: variantsError } = await supabase
         .from("product_variants")
         .insert(variantsData);
 
-      if (variantsError) throw variantsError;
+      if (variantsError) {
+        console.error('Error saving variants:', variantsError);
+        throw variantsError;
+      }
 
       return product;
     },
@@ -89,6 +105,7 @@ export const useCreateProduct = () => {
         title: "Success",
         description: "Product created successfully",
       });
+      onClose();
     },
     onError: (error: Error) => {
       console.error("Error creating product:", error);
@@ -99,4 +116,4 @@ export const useCreateProduct = () => {
       });
     },
   });
-};
+}

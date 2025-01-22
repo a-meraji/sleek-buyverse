@@ -1,3 +1,5 @@
+import { ProductVariant } from "./variant";
+
 export interface Product {
   id: string;
   name: string;
@@ -23,17 +25,24 @@ export interface ProductFormData extends Omit<Product, 'id'> {
   product_images?: ProductImage[];
 }
 
-export interface ProductSize {
-  label: string;
-  value: string;
-}
-
 export interface ProductFormProps {
   onClose: () => void;
   initialData?: Product;
 }
 
 export interface ProductFormContainerProps {
-  children: React.ReactNode;
-  onSubmit: (e: React.FormEvent) => void;
+  onClose: () => void;
+}
+
+export interface Review {
+  id: string;
+  product_id: string;
+  reviewer_id?: string;
+  reviewer_first_name: string;
+  reviewer_last_name: string;
+  title: string;
+  review_text: string;
+  rating: number;
+  status: string;
+  created_at: string;
 }

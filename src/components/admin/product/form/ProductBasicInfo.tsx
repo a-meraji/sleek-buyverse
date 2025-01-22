@@ -1,4 +1,4 @@
-import { Product } from "@/types";
+import { Product } from "@/types/product";
 import { ProductDetailsFields } from "../ProductDetailsFields";
 
 interface ProductBasicInfoProps {

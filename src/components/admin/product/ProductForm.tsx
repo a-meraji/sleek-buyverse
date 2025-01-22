@@ -1,11 +1,13 @@
-import { Product } from "@/types";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { ImageSelector } from "../ImageSelector";
-import { ProductDetailsFields } from "./ProductDetailsFields";
 import { CategorySelector } from "./CategorySelector";
 import { VariantsManager } from "./VariantsManager";
-import { ImagePreview } from "./ImagePreview";
+import { FormSection } from "./form/FormSection";
+import { ProductBasicInfo } from "./form/ProductBasicInfo";
+import { ProductImageSection } from "./form/ProductImageSection";
+import { ProductFormActions } from "./form/ProductFormActions";
 import { useProductForm } from "./hooks/useProductForm";
+import { Product } from "@/types/product";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -35,56 +37,54 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-        <ProductDetailsFields
-          name={formData.name ?? ""}
-          description={formData.description ?? ""}
-          sku={formData.sku ?? ""}
-          discount={formData.discount}
-          onNameChange={(value) => handleFormChange({ name: value })}
-          onDescriptionChange={(value) => handleFormChange({ description: value })}
-          onSkuChange={(value) => handleFormChange({ sku: value })}
-          onDiscountChange={(value) => handleFormChange({ discount: value })}
-        />
+      <form onSubmit={handleSubmit} className="space-y-6 p-4 border rounded-lg">
+        <FormSection>
+          <ProductBasicInfo
+            formData={formData}
+            onFormChange={handleFormChange}
+          />
+        </FormSection>
 
-        <CategorySelector
-          value={formData.category ?? ""}
-          onChange={(value) => handleFormChange({ category: value })}
-        />
+        <FormSection>
+          <CategorySelector
+            value={formData.category ?? ""}
+            onChange={(value) => handleFormChange({ category: value })}
+          />
+        </FormSection>
 
-        <VariantsManager
-          variants={variants}
-          onChange={setVariants}
-        />
+        <FormSection title="Product Variants">
+          <VariantsManager
+            variants={variants}
+            onChange={setVariants}
+          />
+        </FormSection>
 
-        <ImagePreview
-          imageUrl={formData.image_url}
-          productName={formData.name}
-          additionalImages={additionalImages.map((img, index) => ({
-            id: `new-${index}`,
-            image_url: img.image_url,
-            product_id: '',
-            display_order: index
-          }))}
-          onChooseImage={() => {
-            setIsSelectingMainImage(true);
-            setShowImageSelector(true);
-          }}
-          onAddAdditionalImage={() => {
-            setIsSelectingMainImage(false);
-            setShowImageSelector(true);
-          }}
-          onRemoveImage={handleRemoveImage}
-        />
+        <FormSection title="Product Images">
+          <ProductImageSection
+            mainImage={formData.image_url ?? ""}
+            productName={formData.name}
+            additionalImages={additionalImages.map((img, index) => ({
+              id: `new-${index}`,
+              image_url: img.image_url,
+              product_id: '',
+              display_order: index
+            }))}
+            onChooseMainImage={() => {
+              setIsSelectingMainImage(true);
+              setShowImageSelector(true);
+            }}
+            onAddAdditionalImage={() => {
+              setIsSelectingMainImage(false);
+              setShowImageSelector(true);
+            }}
+            onRemoveImage={handleRemoveImage}
+          />
+        </FormSection>
 
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={createProduct.isPending}>
-            Create Product
-          </Button>
-        </div>
+        <ProductFormActions
+          isSubmitting={createProduct.isPending}
+          onCancel={onClose}
+        />
       </form>
 
       <ImageSelector
