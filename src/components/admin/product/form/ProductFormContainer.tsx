@@ -20,7 +20,7 @@ export function ProductFormContainer({ onClose, initialData }: ProductFormContai
   );
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { formData, variants, setVariants, handleFormChange } = useProductForm(initialData);
+  const { formData, variants, setVariants, handleFormChange } = useProductForm();
 
   const generateSKU = (name: string): string => {
     const timestamp = Date.now().toString().slice(-4);
@@ -167,27 +167,7 @@ export function ProductFormContainer({ onClose, initialData }: ProductFormContai
 
   return (
     <ProductForm
-      formData={formData}
-      variants={variants}
-      additionalImages={additionalImages}
-      showImageSelector={showImageSelector}
-      isSelectingMainImage={isSelectingMainImage}
-      onFormChange={handleFormChange}
-      onVariantsChange={setVariants}
-      onChooseMainImage={() => {
-        setIsSelectingMainImage(true);
-        setShowImageSelector(true);
-      }}
-      onAddAdditionalImage={() => {
-        setIsSelectingMainImage(false);
-        setShowImageSelector(true);
-      }}
-      onImageSelect={handleImageSelect}
-      onCloseImageSelector={() => setShowImageSelector(false)}
-      onRemoveImage={handleRemoveImage}
-      onSubmit={handleSubmit}
       onClose={onClose}
-      isSubmitting={createProduct.isPending}
     />
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Product, ProductImage } from "@/types";
+import { Product } from "@/types/product";
 import { ProductVariant } from "@/types/variant";
 
 export function useProductForm() {
@@ -11,7 +11,7 @@ export function useProductForm() {
     sku: "",
     discount: 0,
   });
-  const [additionalImages, setAdditionalImages] = useState<ProductImage[]>([]);
+  const [additionalImages, setAdditionalImages] = useState<{ image_url: string }[]>([]);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
@@ -21,15 +21,11 @@ export function useProductForm() {
   };
 
   const handleImageSelect = (url: string) => {
+    console.log('Selected image URL:', url);
     if (isSelectingMainImage) {
       handleFormChange({ image_url: url });
     } else {
-      setAdditionalImages(prev => [...prev, {
-        id: crypto.randomUUID(),
-        product_id: '',
-        image_url: url,
-        display_order: prev.length
-      }]);
+      setAdditionalImages(prev => [...prev, { image_url: url }]);
     }
     setShowImageSelector(false);
   };

@@ -6,7 +6,6 @@ import { ProductCategorySection } from "./ProductCategorySection";
 import { ProductVariantsSection } from "./ProductVariantsSection";
 import { ProductImagesSection } from "./ProductImagesSection";
 import { ProductFormActions } from "./ProductFormActions";
-import { useCreateProduct } from "../hooks/useCreateProduct";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -25,13 +24,12 @@ export function ProductForm({ onClose }: ProductFormProps) {
     setVariants,
     setShowImageSelector,
     setIsSelectingMainImage,
-  } = useProductForm();
-
-  const createProduct = useCreateProduct(onClose);
+    createProduct,
+  } = useProductForm(onClose);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createProduct.mutate({ formData, variants, additionalImages });
+    createProduct.mutate();
   };
 
   return (
