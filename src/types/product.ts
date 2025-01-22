@@ -1,4 +1,4 @@
-import { ProductVariant } from "./variant";
+import { ProductVariant } from './variant';
 
 export interface Product {
   id: string;
@@ -20,18 +20,9 @@ export interface ProductImage {
   display_order: number;
 }
 
-export interface ProductFormData extends Omit<Product, 'id'> {
-  product_variants: ProductVariant[];
-  product_images?: ProductImage[];
-}
-
-export interface ProductFormProps {
-  onClose: () => void;
-  initialData?: Product;
-}
-
-export interface ProductFormContainerProps {
-  onClose: () => void;
+export interface ProductSize {
+  label: string;
+  value: string;
 }
 
 export interface Review {
@@ -45,4 +36,13 @@ export interface Review {
   rating: number;
   status: string;
   created_at: string;
+}
+
+export interface ProductFormProps {
+  onClose: () => void;
+  initialData?: Product;
+}
+
+export interface ProductFormContainerProps {
+  onClose: () => void;
 }

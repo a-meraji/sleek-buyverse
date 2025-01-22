@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Slate, Editable, withReact, useSlate } from "slate-react";
+import { Slate, Editable, withReact } from "slate-react";
 import { createEditor, Descendant, Editor, Transforms, Element as SlateElement } from "slate";
 import { withHistory } from "slate-history";
 import { Button } from "@/components/ui/button";
@@ -125,15 +125,15 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const editor = withHistory(withReact(createEditor()));
 
   // Initialize with a default paragraph if empty
-  const initialValue = value.length === 0 ? [
+  const initialValue = value?.length > 0 ? value : [
     {
       type: 'paragraph',
       children: [{ text: '' }],
     } as CustomElement,
-  ] : value;
+  ];
 
   return (
-    <Slate editor={editor} value={initialValue} onChange={onChange}>
+    <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
       <div className="border rounded-md p-4">
         <div className="flex gap-1 mb-2 border-b pb-2">
           <FormatButton format="bold" icon={Bold} />

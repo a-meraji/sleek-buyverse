@@ -1,12 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
 import { Product } from './types/product';
 import { ProductVariant } from './types/variant';
-import { ProductImage } from './types/product';
+import { ProductImage, ProductSize, Review } from './types/product';
 
 export type { Product } from './types/product';
 export type { ProductVariant } from './types/variant';
-export type { ProductImage } from './types/product';
-export type { ProductSize } from './types/product';
+export type { ProductImage, ProductSize, Review } from './types/product';
 export type { ProductFormProps } from './types/product';
 export type { ProductFormContainerProps } from './types/product';
 
@@ -41,7 +40,7 @@ export interface VariantSelectionPanelProps {
 export interface ProductImageProps {
   image: string;
   name: string;
-  discount: number;
+  discount?: number;
 }
 
 export interface CartItem {
@@ -55,6 +54,7 @@ export interface CartItem {
 
 export interface CartItemProps {
   item: CartItem;
+  userId?: string;
   onQuantityChange: (id: string, quantity: number) => void;
   onRemove: (id: string) => void;
   readonly?: boolean;
@@ -63,8 +63,6 @@ export interface CartItemProps {
 export interface CartItemHeaderProps {
   name: string;
   variant?: ProductVariant;
-  productName: string;
-  parameters: string;
   onRemove: () => void;
   readonly: boolean;
 }
@@ -73,5 +71,4 @@ export interface CartItemPriceProps {
   price: number;
   quantity: number;
   discount?: number;
-  variantPrice: number;
 }
