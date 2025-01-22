@@ -1,10 +1,10 @@
-import { Editor, Element as SlateElement } from 'slate';
+import { Editor, Element as SlateElement, Transforms } from 'slate';
 import { useSlate } from 'slate-react';
 import { Button } from '@/components/ui/button';
 import { Bold, Italic, Underline, List, ListOrdered } from 'lucide-react';
 import { CustomEditor } from './types';
 
-const isBlockActive = (editor: CustomEditor, format: string) => {
+const isBlockActive = (editor: Editor, format: string) => {
   const { selection } = editor;
   if (!selection) return false;
 
@@ -19,11 +19,11 @@ const isBlockActive = (editor: CustomEditor, format: string) => {
   return !!match;
 };
 
-const toggleBlock = (editor: CustomEditor, format: string) => {
+const toggleBlock = (editor: Editor, format: string) => {
   const isActive = isBlockActive(editor, format);
   const isList = format === 'bulleted-list' || format === 'numbered-list';
 
-  Editor.unwrapNodes(editor, {
+  Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) &&
       SlateElement.isElement(n) &&
@@ -31,23 +31,23 @@ const toggleBlock = (editor: CustomEditor, format: string) => {
     split: true,
   });
 
-  Editor.setNodes(editor, {
+  Transforms.setNodes(editor, {
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
   });
 
   if (!isActive && isList) {
     const block = { type: format, children: [] };
-    Editor.wrapNodes(editor, block);
+    Transforms.wrapNodes(editor, block);
   }
 };
 
-const isMarkActive = (editor: CustomEditor, format: keyof Omit<CustomEditor, 'text'>) => {
+const isMarkActive = (editor: Editor, format: string) => {
   const marks = Editor.marks(editor);
   return marks ? marks[format] === true : false;
 };
 
-const toggleMark = (editor: CustomEditor, format: string) => {
-  const isActive = isMarkActive(editor, format as any);
+const toggleMark = (editor: Editor, format: string) => {
+  const isActive = isMarkActive(editor, format);
   if (isActive) {
     Editor.removeMark(editor, format);
   } else {
@@ -65,7 +65,7 @@ const ToolbarButton = ({ format, icon: Icon, isBlock = false }: ToolbarButtonPro
   const editor = useSlate();
   const isActive = isBlock
     ? isBlockActive(editor, format)
-    : isMarkActive(editor, format as any);
+    : isMarkActive(editor, format);
 
   return (
     <Button
