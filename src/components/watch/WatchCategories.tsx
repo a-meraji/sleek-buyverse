@@ -1,21 +1,47 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
-interface Category {
-  name: string;
-  image: string;
+interface CategoryData {
+  category: string;
+  image_url: string;
 }
 
 export function WatchCategories() {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<Category[]>([
-    { name: "Luxury", image: "/watches/luxury.jpg" },
-    { name: "Sport", image: "/watches/sport.jpg" },
-    { name: "Smart", image: "/watches/smart.jpg" },
-    { name: "Classic", image: "/watches/classic.jpg" },
-    { name: "Digital", image: "/watches/digital.jpg" }
-  ]);
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['watch-categories'],
+    queryFn: async () => {
+      console.log('Fetching categories for watch page');
+      const { data, error } = await supabase
+        .from('products')
+        .select('category, image_url')
+        .not('category', 'is', null)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching categories:', error);
+        throw error;
+      }
+
+      // Get unique categories with their first product image
+      const uniqueCategories = Array.from(
+        new Map(
+          data
+            .filter(product => product.category && product.image_url)
+            .map(product => [product.category, {
+              category: product.category,
+              image_url: product.image_url
+            }])
+        ).values()
+      );
+
+      console.log('Unique categories with images:', uniqueCategories);
+      return uniqueCategories as CategoryData[];
+    }
+  });
 
   const handleCategoryClick = (category: string) => {
     navigate(`/products?category=${category.toLowerCase()}`);
@@ -27,18 +53,18 @@ export function WatchCategories() {
         <div className="flex gap-4">
           {categories.map((category) => (
             <button
-              key={category.name}
-              onClick={() => handleCategoryClick(category.name)}
+              key={category.category}
+              onClick={() => handleCategoryClick(category.category)}
               className="flex-shrink-0 group"
             >
               <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary p-0.5 group-hover:ring-4 transition-all">
                 <img
-                  src={category.image}
-                  alt={category.name}
+                  src={category.image_url}
+                  alt={category.category}
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
-              <p className="mt-2 text-sm text-center">{category.name}</p>
+              <p className="mt-2 text-sm text-center">{category.category}</p>
             </button>
           ))}
         </div>
