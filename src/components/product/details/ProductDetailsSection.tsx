@@ -12,7 +12,6 @@ interface ProductDetailsSectionProps {
 }
 
 export const ProductDetailsSection = ({ product, userId }: ProductDetailsSectionProps) => {
-  const [selectedSize, setSelectedSize] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
 
@@ -71,8 +70,6 @@ export const ProductDetailsSection = ({ product, userId }: ProductDetailsSection
         <ProductDetails
           product={product}
           userId={userId}
-          selectedSize={selectedSize}
-          onSizeSelect={setSelectedSize}
         />
         <Button
           variant="ghost"
