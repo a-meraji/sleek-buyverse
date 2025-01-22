@@ -1,5 +1,3 @@
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-
 const brands = [
   { name: "SEIKO", logo: "/brands/seiko.svg" },
   { name: "ROLEX", logo: "/brands/rolex.svg" },
@@ -14,12 +12,12 @@ export function WatchBrands() {
     <section className="py-16 bg-secondary">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-12">Our Brands</h2>
-        <ScrollArea className="w-full whitespace-nowrap rounded-md">
-          <div className="flex w-max space-x-12 p-4">
+        <div className="overflow-x-auto pb-4">
+          <div className="flex space-x-12 w-max">
             {brands.map((brand) => (
               <div
                 key={brand.name}
-                className="w-40 h-40 flex flex-col items-center justify-center bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                className="w-40 h-40 flex-shrink-0 flex flex-col items-center justify-center bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
               >
                 <img
                   src={brand.logo}
@@ -30,8 +28,7 @@ export function WatchBrands() {
               </div>
             ))}
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        </div>
       </div>
     </section>
   );

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -48,25 +47,27 @@ export function WatchCategories() {
   };
 
   return (
-    <div className="py-6 overflow-x-auto">
+    <div className="py-6">
       <div className="container mx-auto px-4">
-        <div className="flex gap-4">
-          {categories.map((category) => (
-            <button
-              key={category.category}
-              onClick={() => handleCategoryClick(category.category)}
-              className="flex-shrink-0 group"
-            >
-              <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary p-0.5 group-hover:ring-4 transition-all">
-                <img
-                  src={category.image_url}
-                  alt={category.category}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </div>
-              <p className="mt-2 text-sm text-center">{category.category}</p>
-            </button>
-          ))}
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 w-max pb-4">
+            {categories.map((category) => (
+              <button
+                key={category.category}
+                onClick={() => handleCategoryClick(category.category)}
+                className="flex-shrink-0 group"
+              >
+                <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary p-0.5 group-hover:ring-4 transition-all">
+                  <img
+                    src={category.image_url}
+                    alt={category.category}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </div>
+                <p className="mt-2 text-sm text-center">{category.category}</p>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
