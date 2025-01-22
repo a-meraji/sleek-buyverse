@@ -35,7 +35,7 @@ const toggleMark = (editor: Editor, format: string) => {
 
 const isBlockActive = (editor: Editor, format: string) => {
   const [match] = Editor.nodes(editor, {
-    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && (n as CustomElement).type === format,
+    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
   });
   return !!match;
 };
@@ -45,12 +45,7 @@ const toggleBlock = (editor: Editor, format: string) => {
   const isList = LIST_TYPES.includes(format);
 
   Transforms.unwrapNodes(editor, {
-    match: n => {
-      if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
-        return LIST_TYPES.includes((n as CustomElement).type);
-      }
-      return false;
-    },
+    match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && LIST_TYPES.includes(n.type),
     split: true,
   });
 
@@ -62,7 +57,7 @@ const toggleBlock = (editor: Editor, format: string) => {
   Transforms.setNodes(editor, newProperties);
 
   if (!isActive && isList) {
-    const block: CustomElement = { type: format, children: [] };
+    const block = { type: format, children: [] };
     Transforms.wrapNodes(editor, block);
   }
 };
@@ -127,8 +122,16 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
 
   const editor = withHistory(withReact(createEditor()));
 
+  // Initialize with a default paragraph if empty
+  const initialValue = value.length === 0 ? [
+    {
+      type: 'paragraph',
+      children: [{ text: '' }],
+    },
+  ] : value;
+
   return (
-    <Slate editor={editor} initialValue={value} onChange={onChange}>
+    <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
       <div className="border rounded-md p-4">
         <div className="flex gap-1 mb-2 border-b pb-2">
           <FormatButton format="bold" icon={Bold} />

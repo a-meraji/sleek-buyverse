@@ -1,20 +1,26 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Product, ProductVariant } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
-const generateSKU = (name: string): string => {
-  const timestamp = Date.now().toString().slice(-4);
-  const namePrefix = name.slice(0, 3).toUpperCase();
-  return `${namePrefix}-${timestamp}`;
-};
+interface CreateProductParams {
+  formData: Partial<Product>;
+  variants: ProductVariant[];
+  additionalImages: { image_url: string }[];
+}
 
-export const useCreateProduct = (onClose: () => void) => {
+export function useCreateProduct(onClose: () => void) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (formData: Partial<Product>) => {
+    mutationFn: async ({ formData, variants, additionalImages }: CreateProductParams) => {
+      const generateSKU = (name: string): string => {
+        const timestamp = Date.now().toString().slice(-4);
+        const namePrefix = name.slice(0, 3).toUpperCase();
+        return `${namePrefix}-${timestamp}`;
+      };
+
       const productData = {
         name: formData.name,
         description: formData.description || "",
@@ -34,16 +40,46 @@ export const useCreateProduct = (onClose: () => void) => {
 
       if (productError) {
         console.error('Error creating product:', productError);
-        if (productError.code === '23505' && productError.message.includes('products_sku_key')) {
-          throw new Error("A product with this SKU already exists. Please use a different SKU.");
-        }
         throw productError;
       }
+
+      if (additionalImages.length > 0) {
+        const imagesData = additionalImages.map((img, index) => ({
+          product_id: product.id,
+          image_url: img.image_url,
+          display_order: index
+        }));
+
+        const { error: imagesError } = await supabase
+          .from("product_images")
+          .insert(imagesData);
+
+        if (imagesError) throw imagesError;
+      }
+
+      const variantsData = variants.map(variant => ({
+        product_id: product.id,
+        parameters: Object.fromEntries(
+          Object.entries(variant.parameters)
+            .filter(([_, value]) => value !== undefined && value !== null && value !== '')
+        ),
+        stock: variant.stock,
+        price: variant.price
+      }));
+
+      console.log('Saving variants with data:', variantsData);
+
+      const { error: variantsError } = await supabase
+        .from("product_variants")
+        .insert(variantsData);
+
+      if (variantsError) throw variantsError;
 
       return product;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-product-variants"] });
       toast({
         title: "Success",
         description: "Product created successfully",
@@ -54,9 +90,9 @@ export const useCreateProduct = (onClose: () => void) => {
       console.error("Error creating product:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create product. Please try again.",
+        description: error.message || "Failed to create product",
         variant: "destructive",
       });
     },
   });
-};
+}
