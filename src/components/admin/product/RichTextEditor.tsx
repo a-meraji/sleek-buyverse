@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { Slate, Editable, withReact, ReactEditor } from "slate-react";
-import { createEditor, Descendant, Editor, Element as SlateElement } from "slate";
+import { createEditor, Descendant, BaseRange } from "slate";
 import { withHistory } from "slate-history";
 
-const HOTKEYS: { [key: string]: string } = {
+const HOTKEYS = {
   'mod+b': 'bold',
   'mod+i': 'italic',
   'mod+u': 'underline',
@@ -54,7 +54,11 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const editor = withHistory(withReact(createEditor()));
 
   return (
-    <Slate editor={editor} value={value} onChange={onChange}>
+    <Slate 
+      editor={editor} 
+      initialValue={value} 
+      onChange={onChange}
+    >
       <div className="border rounded-md p-4">
         <Editable
           renderElement={renderElement}
