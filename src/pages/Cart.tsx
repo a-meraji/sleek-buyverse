@@ -58,11 +58,7 @@ const Cart = () => {
                   key={item.id}
                   item={item}
                   userId={session?.user?.id || null}
-                  onQuantityChange={(id, currentQuantity, delta) => {
-                    const newQuantity = currentQuantity + delta;
-                    if (newQuantity < 1) return;
-                    updateQuantity(id, newQuantity);
-                  }}
+                  onQuantityChange={updateQuantity}
                   onRemove={removeItem}
                 />
               ))

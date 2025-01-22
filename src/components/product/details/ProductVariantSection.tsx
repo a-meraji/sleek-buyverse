@@ -39,9 +39,12 @@ export const ProductVariantSection = ({
         variants={variants}
         selectedParameters={selectedParameters}
         onParameterSelect={onParameterSelect}
-        selectedVariant={selectedVariant}
+        selectedVariant={selectedVariant || null}
         finalSelectedVariantPrice={finalSelectedVariantPrice}
         parameterKeys={parameterKeys}
+        product={product}
+        userId={userId}
+        isLoadingVariants={isLoadingVariants}
       />
 
       <AddToCartButton

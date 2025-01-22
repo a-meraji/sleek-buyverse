@@ -24,8 +24,6 @@ export interface CustomText {
 export interface ProductDetailsProps {
   product: Product;
   userId: string;
-  selectedSize: string;
-  onSizeSelect: Dispatch<SetStateAction<string>>;
 }
 
 export interface VariantSelectionPanelProps {
@@ -35,6 +33,9 @@ export interface VariantSelectionPanelProps {
   selectedVariant: ProductVariant | null;
   finalSelectedVariantPrice: number;
   parameterKeys: string[];
+  product: Product;
+  userId: string | null;
+  isLoadingVariants: boolean;
 }
 
 export interface ProductImageProps {
