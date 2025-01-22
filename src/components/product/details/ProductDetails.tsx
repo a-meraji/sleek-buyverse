@@ -70,7 +70,9 @@ export const ProductDetails = ({ product, userId }: ProductDetailsProps) => {
         minPrice={minPrice}
       />
 
-      <RichTextContent content={product.description || ''} />
+      <div className="prose prose-sm max-w-none">
+        <RichTextContent content={product.description || ''} />
+      </div>
       
       <ProductVariantSection
         variants={variants}
@@ -90,4 +92,4 @@ export const ProductDetails = ({ product, userId }: ProductDetailsProps) => {
       />
     </div>
   );
-}
+};

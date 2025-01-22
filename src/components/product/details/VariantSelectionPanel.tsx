@@ -1,64 +1,121 @@
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ProductVariant } from "@/types/variant";
+import { Product, ProductVariant } from "@/types";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-interface VariantSelectionPanelProps {
-  variants: ProductVariant[];
+export interface VariantSelectionPanelProps {
+  variants: ProductVariant[] | null;
   selectedParameters: Record<string, string | number>;
   onParameterSelect: (key: string, value: string | number) => void;
+  product: Product;
+  userId: string | null;
+  selectedVariant: ProductVariant | undefined;
+  finalSelectedVariantPrice: number;
+  isLoadingVariants: boolean;
+  parameterKeys: string[];
 }
 
-export const VariantSelectionPanel = ({
+export function VariantSelectionPanel({
   variants,
   selectedParameters,
   onParameterSelect,
-}: VariantSelectionPanelProps) => {
-  if (!variants?.length) return null;
+  product,
+  userId,
+  selectedVariant,
+  finalSelectedVariantPrice,
+  isLoadingVariants,
+  parameterKeys
+}: VariantSelectionPanelProps) {
+  const { toast } = useToast();
 
-  // Get unique parameter keys from all variants
-  const parameterKeys = Array.from(
-    new Set(
-      variants.flatMap(variant => 
-        Object.keys(variant.parameters || {})
-      )
-    )
-  );
+  const handleAddToCart = async () => {
+    if (!selectedVariant) {
+      toast({
+        title: "Please select all options",
+        description: "You need to select all variant options before adding to cart",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  // Get unique values for each parameter
-  const getUniqueValuesForParameter = (key: string) => {
-    return Array.from(
-      new Set(
-        variants
-          .map(variant => variant.parameters?.[key])
-          .filter(Boolean)
-      )
-    );
+    if (!userId) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to add items to cart",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('cart_items')
+        .insert({
+          user_id: userId,
+          product_id: product.id,
+          variant_id: selectedVariant.id,
+          quantity: 1
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Added to cart",
+        description: "Item has been added to your cart"
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart",
+        variant: "destructive",
+      });
+    }
   };
 
+  if (isLoadingVariants) {
+    return <div>Loading variants...</div>;
+  }
+
+  if (!variants?.length) {
+    return <div>No variants available</div>;
+  }
+
   return (
-    <div className="space-y-4">
-      {parameterKeys.map(key => (
-        <div key={key} className="space-y-2">
-          <Label className="capitalize">{key}</Label>
-          <RadioGroup
-            value={selectedParameters[key]?.toString()}
-            onValueChange={(value) => onParameterSelect(key, value)}
-            className="flex flex-wrap gap-2"
-          >
-            {getUniqueValuesForParameter(key).map((value) => (
-              <div key={`${key}-${value}`} className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value={value?.toString() || ''}
-                  id={`${key}-${value}`}
-                />
-                <Label htmlFor={`${key}-${value}`} className="capitalize">
-                  {value?.toString()}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-      ))}
+    <div className="space-y-6">
+      {parameterKeys.map(key => {
+        const uniqueValues = [...new Set(variants.map(v => v.parameters[key]))];
+        
+        return (
+          <div key={key} className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 capitalize">
+              {key}
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {uniqueValues.map((value) => (
+                <Button
+                  key={`${key}-${value}`}
+                  onClick={() => onParameterSelect(key, value)}
+                  variant={selectedParameters[key] === value ? "default" : "outline"}
+                  className="min-w-[4rem]"
+                >
+                  {value}
+                </Button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      <Button 
+        onClick={handleAddToCart}
+        className="w-full"
+        disabled={!selectedVariant}
+      >
+        <ShoppingCart className="mr-2 h-4 w-4" />
+        Add to Cart
+      </Button>
     </div>
   );
-};
+}
