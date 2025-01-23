@@ -6,7 +6,7 @@ interface SidebarContextValue {
 }
 
 export const SidebarContext = createContext<SidebarContextValue>({
-  expanded: true,
+  expanded: false,
   setExpanded: () => null,
 })
 
