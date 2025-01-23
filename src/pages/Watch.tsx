@@ -9,6 +9,7 @@ import { ReviewsScroll } from "@/components/home/ReviewsScroll";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
+import { CampaignBanner } from "@/components/watch/campaign/CampaignBanner";
 
 export default function Watch() {
   const { data: products = [], isLoading: isLoadingProducts } = useQuery({
@@ -61,6 +62,7 @@ export default function Watch() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow">
+        <CampaignBanner />
         <WatchCategories />
         <WatchBanners />
         <WatchBrands />
