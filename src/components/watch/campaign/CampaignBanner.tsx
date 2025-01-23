@@ -20,6 +20,7 @@ interface Campaign {
       image_url: string;
       product_variants: any[];
       discount?: number;
+      price: number; // Added price field
     };
   }[];
 }
@@ -39,7 +40,10 @@ export function CampaignBanner() {
           *,
           campaign_products(
             product(
-              *,
+              id,
+              name,
+              image_url,
+              discount,
               product_variants(*)
             )
           )
@@ -52,8 +56,23 @@ export function CampaignBanner() {
         throw error;
       }
 
-      console.log('Fetched campaigns:', data);
-      return data as Campaign[];
+      // Transform the data to include a default price if needed
+      const transformedData = data.map(campaign => ({
+        ...campaign,
+        campaign_products: campaign.campaign_products.map(cp => ({
+          ...cp,
+          product: {
+            ...cp.product,
+            // Set price as the minimum price from variants or 0 if no variants
+            price: cp.product.product_variants?.length > 0
+              ? Math.min(...cp.product.product_variants.map(v => v.price))
+              : 0
+          }
+        }))
+      }));
+
+      console.log('Fetched campaigns:', transformedData);
+      return transformedData as Campaign[];
     },
   });
 
