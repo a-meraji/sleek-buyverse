@@ -21,12 +21,13 @@ export function CampaignList() {
 
       switch (selectedTab) {
         case 'active':
-          // Active campaigns are either:
-          // 1. Active and timeless
-          // 2. Active and within their date range
+          // Active campaigns are:
+          // 1. Active status AND either:
+          //    a. Timeless campaigns
+          //    b. Non-timeless campaigns within their date range
           query = query
             .eq('status', 'active')
-            .or(`is_timeless.eq.true,and(start_date.lte.${now},end_date.gte.${now})`);
+            .or(`is_timeless.eq.true,and(is_timeless.eq.false,start_date.lte.${now},end_date.gte.${now})`);
           break;
         case 'inactive':
           // Inactive (draft) campaigns
@@ -34,8 +35,7 @@ export function CampaignList() {
           break;
         case 'ended':
           // Ended campaigns are:
-          // Non-timeless campaigns that have passed their end date
-          // AND were active (we don't show ended inactive campaigns)
+          // Active, non-timeless campaigns that have passed their end date
           query = query
             .eq('status', 'active')
             .eq('is_timeless', false)
