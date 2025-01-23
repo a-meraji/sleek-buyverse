@@ -1,8 +1,7 @@
-export { useSidebarContext } from "./sidebar-context"
-export { SidebarProvider } from "./sidebar-provider"
 export {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,3 +11,8 @@ export {
   SidebarMenuItem,
   SidebarTrigger,
 } from "./sidebar-components"
+
+export {
+  SidebarProvider,
+  useSidebarContext,
+} from "./sidebar-context"
