@@ -11,8 +11,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
     <div 
       className={cn(
         "pb-12 transition-all duration-300",
-        "group hover:bg-background",
-        !expanded && "bg-transparent",
+        expanded ? "hover:bg-background/90" : "bg-transparent",
         className
       )} 
       {...props}
@@ -22,60 +21,72 @@ export function Sidebar({ className, ...props }: SidebarProps) {
   )
 }
 
+export interface SidebarHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
+  return (
+    <div className={cn("px-3 py-2", className)} {...props}>
+      {props.children}
+    </div>
+  )
+}
+
 export interface SidebarContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function SidebarContent({ className, ...props }: SidebarContentProps) {
-  return <div className={cn("space-y-4", className)} {...props} />
+  return (
+    <div className={cn("space-y-4", className)} {...props}>
+      {props.children}
+    </div>
+  )
 }
 
 export interface SidebarGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function SidebarGroup({ className, ...props }: SidebarGroupProps) {
-  return <div className={cn("px-3 py-2", className)} {...props} />
-}
-
-export interface SidebarGroupContentProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export function SidebarGroupContent({ className, ...props }: SidebarGroupContentProps) {
-  return <div className={cn("space-y-1", className)} {...props} />
-}
-
-export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export function SidebarGroupLabel({ className, ...props }: SidebarGroupLabelProps) {
   return (
-    <h2 className={cn("mb-2 px-4 text-lg font-semibold tracking-tight", className)} {...props} />
+    <div className={cn("px-3 py-2", className)} {...props}>
+      {props.children}
+    </div>
   )
 }
 
-export interface SidebarMenuProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface SidebarGroupLabelProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {}
 
-export function SidebarMenu({ className, ...props }: SidebarMenuProps) {
-  return <nav className={cn("space-y-1", className)} {...props} />
+export function SidebarGroupLabel({
+  className,
+  children,
+  ...props
+}: SidebarGroupLabelProps) {
+  return (
+    <p
+      className={cn("mb-2 text-xs font-semibold text-muted-foreground", className)}
+      {...props}
+    >
+      {children}
+    </p>
+  )
 }
 
-export interface SidebarMenuItemProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface SidebarMenuButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
-export function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
-  return <div className={cn("px-3 py-1", className)} {...props} />
-}
-
-export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: LucideIcon
-}
-
-export function SidebarMenuButton({ className, children, icon: Icon, ...props }: SidebarMenuButtonProps) {
+export function SidebarMenuButton({
+  className,
+  children,
+  ...props
+}: SidebarMenuButtonProps) {
   return (
     <button
       className={cn(
         "flex w-full items-center rounded-lg p-2 text-sm font-medium",
-        "hover:bg-accent hover:text-accent-foreground",
+        "hover:bg-accent/50 hover:text-accent-foreground",
         "transition-colors duration-200",
         className
       )}
       {...props}
     >
-      {Icon && <Icon className="mr-2 h-4 w-4" />}
       {children}
     </button>
   )
@@ -89,7 +100,7 @@ export function SidebarTrigger({ className, ...props }: SidebarTriggerProps) {
   return (
     <button
       onClick={() => setExpanded(!expanded)}
-      className={cn("p-2 hover:bg-accent rounded-md", className)}
+      className={cn("p-2 hover:bg-accent/50 rounded-md", className)}
       {...props}
     >
       <span className="sr-only">Toggle sidebar</span>
