@@ -78,41 +78,43 @@ export default function Admin() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Sidebar className="w-[60px] hover:w-64 transition-all duration-300 group">
-          <SidebarContent>
-            <div className="mb-4 px-4">
-              <Link to="/">
-                <Button variant="outline" className="w-full gap-2 overflow-hidden whitespace-nowrap">
-                  <Store className="h-4 w-4 flex-shrink-0" />
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Store</span>
-                </Button>
-              </Link>
-            </div>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center gap-2 relative ${
-                      activeTab === item.id ? "bg-accent" : ""
-                    }`}
-                  >
-                    <item.icon className="h-4 w-4 flex-shrink-0" />
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                      {item.label}
-                    </span>
-                    {item.badge > 0 && (
-                      <SessionBadge count={item.badge} />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
-        </Sidebar>
+      <div className="min-h-screen flex">
+        <div className="fixed z-50">
+          <Sidebar className="w-[60px] hover:w-64 transition-all duration-300 group">
+            <SidebarContent>
+              <div className="mb-4 px-4">
+                <Link to="/">
+                  <Button variant="outline" className="w-full gap-2 overflow-hidden whitespace-nowrap">
+                    <Store className="h-4 w-4 flex-shrink-0" />
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Store</span>
+                  </Button>
+                </Link>
+              </div>
+              <SidebarMenu>
+                {menuItems.map((item) => (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full flex items-center gap-2 relative ${
+                        activeTab === item.id ? "bg-accent" : ""
+                      }`}
+                    >
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                        {item.label}
+                      </span>
+                      {item.badge > 0 && (
+                        <SessionBadge count={item.badge} />
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarContent>
+          </Sidebar>
+        </div>
 
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-8 ml-[60px]">
           <SidebarTrigger className="mb-4" />
           <div className="space-y-4">
             {ActiveComponent && <ActiveComponent />}
