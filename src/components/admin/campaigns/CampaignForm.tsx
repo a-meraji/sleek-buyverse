@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ProductSelector } from "./ProductSelector";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +11,7 @@ import { ImageSection } from "./form/ImageSection";
 import { DateSection } from "./form/DateSection";
 import { StatusSection } from "./form/StatusSection";
 import { CampaignFormData } from "./types";
+import { CustomProductSelector } from "./product-selector/CustomProductSelector";
 
 interface CampaignFormProps {
   campaign?: any;
@@ -20,6 +20,7 @@ interface CampaignFormProps {
 
 export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
   const [showImageSelector, setShowImageSelector] = useState(false);
+  const [showProductSelector, setShowProductSelector] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -106,10 +107,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
     },
   });
 
-  const onSubmit = (data: CampaignFormData) => {
-    console.log('Submitting form with data:', data);
-    saveCampaign(data);
-  };
+  const selectedProducts = watch("selectedProducts");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -139,12 +137,25 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
 
       <div>
         <Label>Products</Label>
-        <ProductSelector
-          selectedProducts={watch("selectedProducts")}
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full justify-between"
+          onClick={() => setShowProductSelector(true)}
+        >
+          {selectedProducts.length > 0
+            ? `${selectedProducts.length} products selected`
+            : "Select products..."}
+        </Button>
+
+        <CustomProductSelector
+          selectedProducts={selectedProducts}
           onProductsChange={(products) => {
             console.log('Updating selected products:', products);
             setValue("selectedProducts", products);
           }}
+          isOpen={showProductSelector}
+          onClose={() => setShowProductSelector(false)}
         />
       </div>
 
