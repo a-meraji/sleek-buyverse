@@ -1,23 +1,20 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
+import { Label } from "@/components/ui/label";
+import { ChevronsUpDown } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { ProductSearchInput } from "./product-selector/ProductSearchInput";
+import { ProductList } from "./product-selector/ProductList";
+import { SelectedProducts } from "./product-selector/SelectedProducts";
+import { Product } from "@/types";
+
+const PRODUCTS_PER_PAGE = 20;
 
 interface ProductSelectorProps {
   selectedProducts: string[];
@@ -26,20 +23,32 @@ interface ProductSelectorProps {
 
 export function ProductSelector({ selectedProducts = [], onProductsChange }: ProductSelectorProps) {
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ['products'],
+    queryKey: ['products', searchTerm, currentPage],
     queryFn: async () => {
-      console.log('Fetching products for selector');
-      const { data, error } = await supabase
+      console.log('Fetching products with filters:', { searchTerm, currentPage });
+      
+      let query = supabase
         .from('products')
-        .select('id, name, image_url');
+        .select('*')
+        .range((currentPage - 1) * PRODUCTS_PER_PAGE, currentPage * PRODUCTS_PER_PAGE - 1);
+
+      if (searchTerm) {
+        query = query.ilike('name', `%${searchTerm}%`);
+      }
+
+      const { data, error } = await query;
+
       if (error) {
         console.error('Error fetching products:', error);
         throw error;
       }
+
       console.log('Fetched products:', data);
-      return data || [];
+      return data as Product[];
     },
   });
 
@@ -72,55 +81,57 @@ export function ProductSelector({ selectedProducts = [], onProductsChange }: Pro
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0">
-          <Command>
-            <CommandInput placeholder="Search products..." />
-            <CommandEmpty>No products found.</CommandEmpty>
-            <CommandGroup>
-              <ScrollArea className="h-72">
-                {(products || []).map((product) => (
-                  <CommandItem
-                    key={product.id}
-                    onSelect={() => toggleProduct(product.id)}
-                    className="flex items-center gap-2"
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedProducts.includes(product.id)
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-8 h-8 object-cover rounded"
-                    />
-                    {product.name}
-                  </CommandItem>
-                ))}
-              </ScrollArea>
-            </CommandGroup>
-          </Command>
+        <PopoverContent className="w-[400px] p-0" align="start">
+          <div className="p-2 space-y-2">
+            <ProductSearchInput
+              value={searchTerm}
+              onChange={(value) => {
+                setSearchTerm(value);
+                setCurrentPage(1);
+              }}
+            />
+            {products && products.length > 0 ? (
+              <ProductList
+                products={products}
+                selectedProducts={selectedProducts}
+                onToggleProduct={toggleProduct}
+              />
+            ) : (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                No products found
+              </div>
+            )}
+            <div className="flex justify-between items-center px-2 pt-2 border-t">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => prev + 1)}
+                disabled={!products || products.length < PRODUCTS_PER_PAGE}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         </PopoverContent>
       </Popover>
 
-      {selectedProducts.length > 0 && products && (
-        <div className="flex flex-wrap gap-2">
-          {products
-            .filter(p => selectedProducts.includes(p.id))
-            .map(product => (
-              <Badge
-                key={product.id}
-                variant="secondary"
-                className="cursor-pointer"
-                onClick={() => toggleProduct(product.id)}
-              >
-                {product.name}
-              </Badge>
-            ))}
-        </div>
+      {products && (
+        <SelectedProducts
+          products={products}
+          selectedProducts={selectedProducts}
+          onRemove={toggleProduct}
+        />
       )}
     </div>
   );
