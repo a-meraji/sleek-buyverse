@@ -51,8 +51,17 @@ export function SidebarGroup({ className, ...props }: SidebarGroupProps) {
   )
 }
 
-export interface SidebarGroupLabelProps
-  extends React.HTMLAttributes<HTMLParagraphElement> {}
+export interface SidebarGroupContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function SidebarGroupContent({ className, ...props }: SidebarGroupContentProps) {
+  return (
+    <div className={cn("space-y-1", className)} {...props}>
+      {props.children}
+    </div>
+  )
+}
+
+export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLParagraphElement> {}
 
 export function SidebarGroupLabel({
   className,
@@ -69,8 +78,27 @@ export function SidebarGroupLabel({
   )
 }
 
-export interface SidebarMenuButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+export interface SidebarMenuProps extends React.HTMLAttributes<"nav"> {}
+
+export function SidebarMenu({ className, ...props }: SidebarMenuProps) {
+  return (
+    <nav className={cn("space-y-1", className)} {...props}>
+      {props.children}
+    </nav>
+  )
+}
+
+export interface SidebarMenuItemProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
+  return (
+    <div className={cn("px-3 py-1", className)} {...props}>
+      {props.children}
+    </div>
+  )
+}
+
+export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 export function SidebarMenuButton({
   className,
