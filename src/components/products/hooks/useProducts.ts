@@ -7,7 +7,7 @@ export const useProducts = () => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
   const sort = searchParams.get('sort');
-  const category = searchParams.get('category')?.toLowerCase();
+  const category = searchParams.get('category');
   const discount = searchParams.get('discount') === 'true';
 
   const { data: products, isLoading, error } = useQuery({
@@ -27,7 +27,8 @@ export const useProducts = () => {
       // Apply category filter if present
       if (category) {
         console.log('Filtering by category:', category);
-        query = query.ilike('category', `%${category}%`);
+        // Use eq with direct match after converting both to lowercase
+        query = query.eq('category', category);
       }
 
       // Apply discount filter
