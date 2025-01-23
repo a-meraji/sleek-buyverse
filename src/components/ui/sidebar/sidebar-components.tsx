@@ -1,131 +1,69 @@
-import * as React from "react"
 import { cn } from "@/lib/utils"
+import { LucideIcon } from "lucide-react"
 
-export const Sidebar = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "fixed top-0 left-0 z-50 h-full bg-background border-r border-sidebar-border",
-      className
-    )}
-    {...props}
-  />
-))
-Sidebar.displayName = "Sidebar"
+export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const SidebarContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex h-full w-full flex-col overflow-hidden bg-background", className)}
-    {...props}
-  />
-))
-SidebarContent.displayName = "SidebarContent"
+export function Sidebar({ className, ...props }: SidebarProps) {
+  return (
+    <div className={cn("pb-12", className)} {...props}>
+      {props.children}
+    </div>
+  )
+}
 
-export const SidebarHeader = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex h-14 items-center border-b px-4", className)}
-    {...props}
-  />
-))
-SidebarHeader.displayName = "SidebarHeader"
+export interface SidebarContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const SidebarFooter = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex h-14 items-center border-t px-4", className)}
-    {...props}
-  />
-))
-SidebarFooter.displayName = "SidebarFooter"
+export function SidebarContent({ className, ...props }: SidebarContentProps) {
+  return <div className={cn("space-y-4", className)} {...props} />
+}
 
-export const SidebarGroup = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex flex-col space-y-1 p-2", className)}
-    {...props}
-  />
-))
-SidebarGroup.displayName = "SidebarGroup"
+export interface SidebarGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const SidebarGroupLabel = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("px-2 py-1 text-xs font-medium text-muted-foreground", className)}
-    {...props}
-  />
-))
-SidebarGroupLabel.displayName = "SidebarGroupLabel"
+export function SidebarGroup({ className, ...props }: SidebarGroupProps) {
+  return <div className={cn("px-3 py-2", className)} {...props} />
+}
 
-export const SidebarInput = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->(({ className, ...props }, ref) => (
-  <input
-    ref={ref}
-    className={cn(
-      "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-      className
-    )}
-    {...props}
-  />
-))
-SidebarInput.displayName = "SidebarInput"
+export interface SidebarGroupContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const SidebarRail = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex h-full w-2 bg-muted", className)}
-    {...props}
-  />
-))
-SidebarRail.displayName = "SidebarRail"
+export function SidebarGroupContent({ className, ...props }: SidebarGroupContentProps) {
+  return <div className={cn("space-y-1", className)} {...props} />
+}
 
-export const SidebarSeparator = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("my-2 h-px bg-border", className)}
-    {...props}
-  />
-))
-SidebarSeparator.displayName = "SidebarSeparator"
+export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const SidebarTrigger = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => (
-  <button
-    ref={ref}
-    className={cn(
-      "inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-      className
-    )}
-    {...props}
-  />
-))
-SidebarTrigger.displayName = "SidebarTrigger"
+export function SidebarGroupLabel({ className, ...props }: SidebarGroupLabelProps) {
+  return (
+    <h2 className={cn("mb-2 px-4 text-lg font-semibold tracking-tight", className)} {...props} />
+  )
+}
+
+export interface SidebarMenuProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function SidebarMenu({ className, ...props }: SidebarMenuProps) {
+  return <nav className={cn("space-y-1", className)} {...props} />
+}
+
+export interface SidebarMenuItemProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
+  return <div className={cn("px-3 py-1", className)} {...props} />
+}
+
+export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  icon?: LucideIcon
+}
+
+export function SidebarMenuButton({ className, children, icon: Icon, ...props }: SidebarMenuButtonProps) {
+  return (
+    <button
+      className={cn(
+        "flex w-full items-center rounded-lg p-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+        className
+      )}
+      {...props}
+    >
+      {Icon && <Icon className="mr-2 h-4 w-4" />}
+      {children}
+    </button>
+  )
+}
