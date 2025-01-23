@@ -25,6 +25,8 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
+// ... keep existing code (component logic)
+
 export default function Admin() {
   const navigate = useNavigate();
   const { toast } = useToast();
