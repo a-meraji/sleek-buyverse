@@ -7,12 +7,13 @@ export const useProducts = () => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
   const sort = searchParams.get('sort');
+  const category = searchParams.get('category');
   const discount = searchParams.get('discount') === 'true';
 
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ['products', searchQuery, sort, discount],
+    queryKey: ['products', searchQuery, sort, discount, category],
     queryFn: async () => {
-      console.log('Fetching products with filters:', { searchQuery, sort, discount });
+      console.log('Fetching products with filters:', { searchQuery, sort, discount, category });
       
       let query = supabase
         .from('products')
@@ -21,6 +22,12 @@ export const useProducts = () => {
       // Apply search filter if present
       if (searchQuery) {
         query = query.ilike('name', `%${searchQuery}%`);
+      }
+
+      // Apply category filter if present
+      if (category) {
+        console.log('Filtering by category:', category);
+        query = query.eq('category', category);
       }
 
       // Apply discount filter
