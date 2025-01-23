@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CampaignCard } from "./CampaignCard";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-type TabValue = 'all' | 'active' | 'scheduled' | 'ended';
+type TabValue = 'active' | 'inactive' | 'ended';
 
 export function CampaignList() {
   const [selectedTab, setSelectedTab] = useState<TabValue>('active');
@@ -22,31 +22,24 @@ export function CampaignList() {
       switch (selectedTab) {
         case 'active':
           // Active campaigns are either:
-          // 1. Timeless and active
-          // 2. Within their date range and active
+          // 1. Active and timeless
+          // 2. Active and within their date range
           query = query
             .eq('status', 'active')
             .or(`is_timeless.eq.true,and(start_date.lte.${now},end_date.gte.${now})`);
           break;
-        case 'scheduled':
-          // Scheduled campaigns are:
-          // 1. Inactive (draft) campaigns
-          // 2. Active campaigns that haven't started yet (excluding timeless)
-          query = query
-            .or(
-              `status.eq.inactive,and(status.eq.active,is_timeless.eq.false,start_date.gt.${now})`
-            );
+        case 'inactive':
+          // Inactive (draft) campaigns
+          query = query.eq('status', 'inactive');
           break;
         case 'ended':
           // Ended campaigns are:
           // Non-timeless campaigns that have passed their end date
+          // AND were active (we don't show ended inactive campaigns)
           query = query
             .eq('status', 'active')
             .eq('is_timeless', false)
             .lt('end_date', now);
-          break;
-        case 'all':
-          // No additional filters for 'all' tab
           break;
       }
 
@@ -67,15 +60,25 @@ export function CampaignList() {
   }
 
   return (
-    <div className="grid gap-4">
-      {campaigns?.map((campaign) => (
-        <CampaignCard key={campaign.id} campaign={campaign} />
-      ))}
-      {campaigns?.length === 0 && (
-        <p className="text-center text-muted-foreground py-8">
-          No campaigns found
-        </p>
-      )}
+    <div className="space-y-4">
+      <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as TabValue)} className="w-full">
+        <TabsList>
+          <TabsTrigger value="active">Active</TabsTrigger>
+          <TabsTrigger value="inactive">Inactive</TabsTrigger>
+          <TabsTrigger value="ended">Ended</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <div className="grid gap-4">
+        {campaigns?.map((campaign) => (
+          <CampaignCard key={campaign.id} campaign={campaign} />
+        ))}
+        {campaigns?.length === 0 && (
+          <p className="text-center text-muted-foreground py-8">
+            No campaigns found
+          </p>
+        )}
+      </div>
     </div>
   );
 }
