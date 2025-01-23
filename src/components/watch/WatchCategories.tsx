@@ -72,7 +72,10 @@ export function WatchCategories() {
 
   const handleCategoryClick = (category: string) => {
     if (!isDragging) {
-      navigate(`/products?category=${category.toLowerCase()}`);
+      console.log('Navigating to products with category:', category);
+      const searchParams = new URLSearchParams();
+      searchParams.set('category', category.toLowerCase());
+      navigate(`/products?${searchParams.toString()}`);
     }
   };
 

@@ -1,90 +1,81 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CampaignCard } from "./CampaignCard";
-import { Loader2 } from "lucide-react";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-interface CampaignListProps {
-  status: 'active' | 'scheduled' | 'ended';
-}
+type TabValue = 'all' | 'active' | 'scheduled' | 'ended';
 
-export function CampaignList({ status }: CampaignListProps) {
+export function CampaignList() {
+  const [selectedTab, setSelectedTab] = useState<TabValue>('all');
+
   const { data: campaigns, isLoading } = useQuery({
-    queryKey: ['campaigns', status],
+    queryKey: ['campaigns', selectedTab],
     queryFn: async () => {
-      console.log('Fetching campaigns with status:', status);
       const now = new Date().toISOString();
       let query = supabase
         .from('marketing_campaigns')
-        .select(`
-          *,
-          campaign_products (
-            product:products (
-              id,
-              name,
-              image_url,
-              category,
-              product_variants (
-                price
-              )
-            )
-          )
-        `);
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      switch (status) {
-        case 'active':
-          query = query
-            .eq('status', 'active')
-            .lte('start_date', now)
-            .gte('end_date', now);
-          break;
-        case 'scheduled':
-          // Updated logic for scheduled campaigns
-          query = query.or(
-            `status.eq.inactive,and(status.eq.active,start_date.gt.${now})`
-          );
-          break;
-        case 'ended':
-          query = query.and(
-            `end_date.lt.${now},status.eq.active`
-          );
-          break;
+      if (selectedTab) {
+        switch (selectedTab) {
+          case 'active':
+            query = query
+              .eq('status', 'active')
+              .lte('start_date', now)
+              .gte('end_date', now);
+            break;
+          case 'scheduled':
+            query = query.or(
+              `status.eq.inactive,and(status.eq.active,start_date.gt.${now})`
+            );
+            break;
+          case 'ended':
+            query = query
+              .eq('status', 'active')
+              .lt('end_date', now);
+            break;
+        }
       }
 
       const { data, error } = await query;
-      console.log('Campaigns fetched:', data);
+      
       if (error) {
         console.error('Error fetching campaigns:', error);
         throw error;
       }
-      return data || [];
-    },
-    staleTime: 30000,
-    gcTime: 5 * 60 * 1000,
-    retry: 1,
-    refetchOnWindowFocus: false,
+
+      return data;
+    }
   });
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!campaigns?.length) {
-    return (
-      <div className="text-center p-8 text-muted-foreground">
-        No {status} campaigns found
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {campaigns.map((campaign) => (
-        <CampaignCard key={campaign.id} campaign={campaign} />
-      ))}
+    <div className="space-y-6">
+      <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as TabValue)}>
+        <TabsList>
+          <TabsTrigger value="all">All Campaigns</TabsTrigger>
+          <TabsTrigger value="active">Active</TabsTrigger>
+          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+          <TabsTrigger value="ended">Ended</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <div className="grid gap-4">
+        {campaigns?.map((campaign) => (
+          <CampaignCard key={campaign.id} campaign={campaign} />
+        ))}
+        {campaigns?.length === 0 && (
+          <p className="text-center text-muted-foreground py-8">
+            No campaigns found
+          </p>
+        )}
+      </div>
     </div>
   );
 }
