@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +9,8 @@ import { DateSection } from "./form/DateSection";
 import { StatusSection } from "./form/StatusSection";
 import { CampaignFormData } from "./types";
 import { CustomProductSelector } from "./product-selector/CustomProductSelector";
+import { CampaignBasicInfo } from "./form/CampaignBasicInfo";
+import { CampaignFormActions } from "./form/CampaignFormActions";
 
 interface CampaignFormProps {
   campaign?: any;
@@ -115,15 +114,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
 
   return (
     <form onSubmit={onSubmitHandler} className="space-y-6">
-      <div>
-        <Label htmlFor="title">Campaign Title</Label>
-        <Input id="title" {...register("title", { required: true })} />
-      </div>
-
-      <div>
-        <Label htmlFor="description">Description</Label>
-        <Textarea id="description" {...register("description")} />
-      </div>
+      <CampaignBasicInfo register={register} />
 
       <ImageSection
         imageUrl={watch("image_url")}
@@ -140,7 +131,6 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
       />
 
       <div>
-        <Label>Products</Label>
         <Button
           type="button"
           variant="outline"
@@ -163,14 +153,11 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
         />
       </div>
 
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isPending}>
-          {campaign ? "Update" : "Create"} Campaign
-        </Button>
-      </div>
+      <CampaignFormActions 
+        onClose={onClose}
+        isPending={isPending}
+        isEditing={!!campaign}
+      />
     </form>
   );
 }
