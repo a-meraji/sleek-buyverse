@@ -6,13 +6,14 @@ import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { AdminReviews } from "@/components/admin/AdminReviews";
+import { AdminCampaigns } from "@/components/admin/AdminCampaigns";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Store } from "lucide-react";
+import { Store, Megaphone } from "lucide-react";
 import { useUnreadAdminMessages } from "@/components/admin/chat/hooks/useUnreadAdminMessages";
 import { SessionBadge } from "@/components/admin/chat/components/session-card/SessionBadge";
 
@@ -74,6 +75,12 @@ export default function Admin() {
         <TabsList>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="products">Products</TabsTrigger>
+          <TabsTrigger value="campaigns">
+            <div className="flex items-center gap-2">
+              <Megaphone className="h-4 w-4" />
+              Campaigns
+            </div>
+          </TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="reviews" className="relative">
@@ -92,6 +99,9 @@ export default function Admin() {
         </TabsContent>
         <TabsContent value="products" className="space-y-4">
           <AdminProducts />
+        </TabsContent>
+        <TabsContent value="campaigns" className="space-y-4">
+          <AdminCampaigns />
         </TabsContent>
         <TabsContent value="orders" className="space-y-4">
           <AdminOrders />
