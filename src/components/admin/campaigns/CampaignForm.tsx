@@ -43,14 +43,17 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
   const { mutate: saveCampaign, isPending } = useMutation({
     mutationFn: async (data: CampaignFormData) => {
       console.log('Saving campaign with data:', data);
+      
+      // Prepare campaign data with proper date handling for timeless campaigns
       const campaignData = {
         title: data.title,
         description: data.description,
         image_url: data.image_url,
-        start_date: new Date(data.start_date).toISOString(),
-        end_date: new Date(data.end_date).toISOString(),
         status: data.status ? "active" : "inactive",
         is_timeless: data.is_timeless,
+        // For timeless campaigns, set dates to far future/past
+        start_date: data.is_timeless ? new Date('2000-01-01').toISOString() : new Date(data.start_date).toISOString(),
+        end_date: data.is_timeless ? new Date('2099-12-31').toISOString() : new Date(data.end_date).toISOString(),
       };
 
       let campaignId = campaign?.id;
