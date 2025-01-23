@@ -1,11 +1,22 @@
 import { cn } from "@/lib/utils"
 import { LucideIcon } from "lucide-react"
+import { useSidebarContext } from "./sidebar-context"
 
 export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className, ...props }: SidebarProps) {
+  const { expanded } = useSidebarContext()
+  
   return (
-    <div className={cn("pb-12", className)} {...props}>
+    <div 
+      className={cn(
+        "pb-12 transition-all duration-300",
+        "group hover:bg-background",
+        !expanded && "bg-transparent",
+        className
+      )} 
+      {...props}
+    >
       {props.children}
     </div>
   )
@@ -57,13 +68,32 @@ export function SidebarMenuButton({ className, children, icon: Icon, ...props }:
   return (
     <button
       className={cn(
-        "flex w-full items-center rounded-lg p-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+        "flex w-full items-center rounded-lg p-2 text-sm font-medium",
+        "hover:bg-accent hover:text-accent-foreground",
+        "transition-colors duration-200",
         className
       )}
       {...props}
     >
       {Icon && <Icon className="mr-2 h-4 w-4" />}
       {children}
+    </button>
+  )
+}
+
+export interface SidebarTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+
+export function SidebarTrigger({ className, ...props }: SidebarTriggerProps) {
+  const { expanded, setExpanded } = useSidebarContext()
+  
+  return (
+    <button
+      onClick={() => setExpanded(!expanded)}
+      className={cn("p-2 hover:bg-accent rounded-md", className)}
+      {...props}
+    >
+      <span className="sr-only">Toggle sidebar</span>
+      {/* Add your toggle icon here */}
     </button>
   )
 }
