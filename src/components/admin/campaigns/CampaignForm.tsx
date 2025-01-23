@@ -34,7 +34,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
       start_date: campaign?.start_date ? new Date(campaign.start_date).toISOString().slice(0, 16) : "",
       end_date: campaign?.end_date ? new Date(campaign.end_date).toISOString().slice(0, 16) : "",
       status: campaign?.status === "active",
-      selectedProducts: campaign?.campaign_products?.map((cp: any) => cp.product_id) || [],
+      selectedProducts: campaign?.campaign_products?.map((cp: any) => cp.product.id) || [],
     },
   });
 
@@ -77,7 +77,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
         if (deleteError) throw deleteError;
       }
 
-      if (data.selectedProducts.length > 0) {
+      if (data.selectedProducts && data.selectedProducts.length > 0) {
         const campaignProducts = data.selectedProducts.map((productId: string) => ({
           campaign_id: campaignId,
           product_id: productId,

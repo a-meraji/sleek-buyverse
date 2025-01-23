@@ -65,9 +65,12 @@ export function CustomProductSelector({
   }, [isOpen, onClose]);
 
   const toggleProduct = (productId: string) => {
+    console.log('Toggling product:', productId);
+    console.log('Current selected products:', selectedProducts);
     const newSelection = selectedProducts.includes(productId)
       ? selectedProducts.filter(id => id !== productId)
       : [...selectedProducts, productId];
+    console.log('New selection:', newSelection);
     onProductsChange(newSelection);
   };
 
