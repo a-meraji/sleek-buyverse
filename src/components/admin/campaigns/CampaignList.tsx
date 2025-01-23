@@ -11,6 +11,7 @@ export function CampaignList({ status }: CampaignListProps) {
   const { data: campaigns, isLoading } = useQuery({
     queryKey: ['campaigns', status],
     queryFn: async () => {
+      console.log('Fetching campaigns with status:', status);
       const now = new Date().toISOString();
       let query = supabase
         .from('marketing_campaigns')
@@ -42,9 +43,17 @@ export function CampaignList({ status }: CampaignListProps) {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      console.log('Campaigns fetched:', data?.length, 'results');
+      if (error) {
+        console.error('Error fetching campaigns:', error);
+        throw error;
+      }
       return data;
     },
+    staleTime: 30000, // Data will be considered fresh for 30 seconds
+    cacheTime: 5 * 60 * 1000, // Cache data for 5 minutes
+    retry: 1, // Only retry once on failure
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
   });
 
   if (isLoading) {
