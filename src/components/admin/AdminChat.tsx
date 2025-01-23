@@ -27,7 +27,10 @@ export const AdminChat = () => {
       <div className="col-span-4 overflow-hidden">
         <SessionList
           selectedSession={selectedSession}
-          onSelectSession={setSelectedSession}
+          onSelectSession={(sessionId: string) => {
+            console.log('Selecting session:', sessionId);
+            setSelectedSession(sessionId);
+          }}
         />
       </div>
 
@@ -38,7 +41,13 @@ export const AdminChat = () => {
           </CardHeader>
           <CardContent className="flex-1 flex flex-col p-0">
             <div className="flex-1 px-6 overflow-auto">
-              <MessageList sessionId={selectedSession} />
+              {selectedSession ? (
+                <MessageList sessionId={selectedSession} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  Select a chat session to view messages
+                </div>
+              )}
             </div>
             <div className="flex-none p-6 pt-4 border-t bg-background w-full">
               <MessageInput sessionId={selectedSession} />
