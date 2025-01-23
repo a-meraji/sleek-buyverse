@@ -16,12 +16,22 @@ interface CampaignFormProps {
   onClose: () => void;
 }
 
+type CampaignFormData = {
+  title: string;
+  description: string;
+  image_url: string;
+  start_date: string;
+  end_date: string;
+  status: boolean;
+  selectedProducts: string[];
+};
+
 export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
   const [showImageSelector, setShowImageSelector] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, setValue, watch } = useForm({
+  const { register, handleSubmit, setValue, watch } = useForm<CampaignFormData>({
     defaultValues: {
       title: campaign?.title || "",
       description: campaign?.description || "",
@@ -33,8 +43,8 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
     },
   });
 
-  const { mutate: saveCampaign, isLoading } = useMutation({
-    mutationFn: async (data: any) => {
+  const { mutate: saveCampaign, isPending } = useMutation({
+    mutationFn: async (data: CampaignFormData) => {
       const campaignData = {
         title: data.title,
         description: data.description,
@@ -101,6 +111,10 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
     },
   });
 
+  const onSubmit = (data: CampaignFormData) => {
+    saveCampaign(data);
+  };
+
   const handleImageSelect = (url: string) => {
     setValue("image_url", url);
     setShowImageSelector(false);
@@ -109,7 +123,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
   const imageUrl = watch("image_url");
 
   return (
-    <form onSubmit={handleSubmit(saveCampaign)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
         <Label htmlFor="title">Campaign Title</Label>
         <Input id="title" {...register("title", { required: true })} />
@@ -176,7 +190,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
         <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isPending}>
           {campaign ? "Update" : "Create"} Campaign
         </Button>
       </div>

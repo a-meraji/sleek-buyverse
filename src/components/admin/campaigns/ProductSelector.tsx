@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -43,11 +44,6 @@ export function ProductSelector({ selectedProducts, onProductsChange }: ProductS
       : [...selectedProducts, productId];
     onProductsChange(newSelection);
   };
-
-  const selectedProductNames = products
-    ?.filter(p => selectedProducts.includes(p.id))
-    .map(p => p.name)
-    .join(", ");
 
   return (
     <div className="space-y-2">
