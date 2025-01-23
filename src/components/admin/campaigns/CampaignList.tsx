@@ -45,6 +45,9 @@ export function CampaignList() {
             .eq('is_timeless', false)
             .lt('end_date', now);
           break;
+        case 'all':
+          // No additional filters for 'all' tab
+          break;
       }
 
       const { data, error } = await query;
