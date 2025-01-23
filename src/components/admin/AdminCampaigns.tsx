@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CampaignList } from "./campaigns/CampaignList";
 import { CampaignAnalytics } from "./campaigns/CampaignAnalytics";
-import { CampaignForm } from "./campaigns/CampaignForm";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { CampaignForm } from "./campaigns/CampaignForm";
 
 export function AdminCampaigns() {
   const [showNewCampaignDialog, setShowNewCampaignDialog] = useState(false);
@@ -20,30 +19,12 @@ export function AdminCampaigns() {
         </Button>
       </div>
 
-      <Tabs defaultValue="active" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="active">Active Campaigns</TabsTrigger>
-          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-          <TabsTrigger value="ended">Ended</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+      <CampaignList />
 
-        <TabsContent value="active">
-          <CampaignList />
-        </TabsContent>
-        
-        <TabsContent value="scheduled">
-          <CampaignList />
-        </TabsContent>
-        
-        <TabsContent value="ended">
-          <CampaignList />
-        </TabsContent>
-
-        <TabsContent value="analytics">
-          <CampaignAnalytics />
-        </TabsContent>
-      </Tabs>
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Campaign Analytics</h3>
+        <CampaignAnalytics />
+      </div>
 
       <Dialog open={showNewCampaignDialog} onOpenChange={setShowNewCampaignDialog}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
