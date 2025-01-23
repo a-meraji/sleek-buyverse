@@ -48,10 +48,10 @@ export function CampaignList({ status }: CampaignListProps) {
         console.error('Error fetching campaigns:', error);
         throw error;
       }
-      return data;
+      return data || []; // Ensure we always return an array
     },
     staleTime: 30000, // Data will be considered fresh for 30 seconds
-    cacheTime: 5 * 60 * 1000, // Cache data for 5 minutes
+    gcTime: 5 * 60 * 1000, // Cache data for 5 minutes (replaced cacheTime with gcTime)
     retry: 1, // Only retry once on failure
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
   });
