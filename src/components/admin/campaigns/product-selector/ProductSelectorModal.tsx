@@ -1,5 +1,6 @@
 import { Search, X, Check } from "lucide-react";
 import { Product } from "@/types";
+import { Button } from "@/components/ui/button";
 
 interface ProductSelectorModalProps {
   products: Product[] | null;
@@ -12,6 +13,8 @@ interface ProductSelectorModalProps {
   currentPage: number;
   onPageChange: (page: number) => void;
   PRODUCTS_PER_PAGE: number;
+  onToggleSelectAll: () => void;
+  isSelectingAll: boolean;
 }
 
 export function ProductSelectorModal({
@@ -25,6 +28,8 @@ export function ProductSelectorModal({
   currentPage,
   onPageChange,
   PRODUCTS_PER_PAGE,
+  onToggleSelectAll,
+  isSelectingAll,
 }: ProductSelectorModalProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -39,7 +44,7 @@ export function ProductSelectorModal({
           </button>
         </div>
 
-        <div className="p-4 border-b">
+        <div className="p-4 border-b space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
@@ -50,6 +55,13 @@ export function ProductSelectorModal({
               className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <Button
+            onClick={onToggleSelectAll}
+            variant={isSelectingAll ? "default" : "outline"}
+            className="w-full"
+          >
+            {isSelectingAll ? "Deselect All Products" : "Select All Products"}
+          </Button>
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0 p-4">

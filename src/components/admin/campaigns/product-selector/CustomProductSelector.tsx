@@ -21,11 +21,13 @@ export function CustomProductSelector({
 }: CustomProductSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSelectingAll, setIsSelectingAll] = useState(false);
 
+  // Query for paginated products
   const { data: products, isLoading } = useQuery({
     queryKey: ['products', searchTerm, currentPage],
     queryFn: async () => {
-      console.log('Fetching products with filters:', { searchTerm, currentPage });
+      console.log('Fetching paginated products with filters:', { searchTerm, currentPage });
       
       let query = supabase
         .from('products')
@@ -44,6 +46,24 @@ export function CustomProductSelector({
       }
 
       return data as Product[];
+    },
+  });
+
+  // Query for all product IDs (used for select all functionality)
+  const { data: allProductIds } = useQuery({
+    queryKey: ['all-product-ids'],
+    queryFn: async () => {
+      console.log('Fetching all product IDs');
+      const { data, error } = await supabase
+        .from('products')
+        .select('id');
+
+      if (error) {
+        console.error('Error fetching all product IDs:', error);
+        throw error;
+      }
+
+      return data.map(product => product.id);
     },
   });
 
@@ -73,6 +93,23 @@ export function CustomProductSelector({
     onProductsChange(newSelection);
   };
 
+  const toggleSelectAll = () => {
+    if (!allProductIds) return;
+    
+    console.log('Toggling select all products');
+    console.log('Current selection state:', isSelectingAll);
+    
+    if (!isSelectingAll) {
+      console.log('Selecting all products:', allProductIds);
+      onProductsChange(allProductIds);
+    } else {
+      console.log('Deselecting all products');
+      onProductsChange([]);
+    }
+    
+    setIsSelectingAll(!isSelectingAll);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -87,6 +124,8 @@ export function CustomProductSelector({
       currentPage={currentPage}
       onPageChange={setCurrentPage}
       PRODUCTS_PER_PAGE={PRODUCTS_PER_PAGE}
+      onToggleSelectAll={toggleSelectAll}
+      isSelectingAll={isSelectingAll}
     />
   );
 }
