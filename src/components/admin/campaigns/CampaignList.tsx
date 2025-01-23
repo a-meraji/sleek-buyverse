@@ -21,17 +21,25 @@ export function CampaignList() {
 
       switch (selectedTab) {
         case 'active':
+          // Active campaigns are either:
+          // 1. Timeless and active
+          // 2. Within their date range and active
           query = query
             .eq('status', 'active')
             .or(`is_timeless.eq.true,and(start_date.lte.${now},end_date.gte.${now})`);
           break;
         case 'scheduled':
+          // Scheduled campaigns are:
+          // 1. Inactive (draft) campaigns
+          // 2. Active campaigns that haven't started yet (excluding timeless)
           query = query
             .or(
               `status.eq.inactive,and(status.eq.active,is_timeless.eq.false,start_date.gt.${now})`
             );
           break;
         case 'ended':
+          // Ended campaigns are:
+          // Non-timeless campaigns that have passed their end date
           query = query
             .eq('status', 'active')
             .eq('is_timeless', false)
