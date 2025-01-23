@@ -109,8 +109,12 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
 
   const selectedProducts = watch("selectedProducts");
 
+  const onSubmitHandler = handleSubmit((data) => {
+    saveCampaign(data);
+  });
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={onSubmitHandler} className="space-y-6">
       <div>
         <Label htmlFor="title">Campaign Title</Label>
         <Input id="title" {...register("title", { required: true })} />
