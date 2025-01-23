@@ -38,13 +38,15 @@ export function CampaignList({ status }: CampaignListProps) {
             .gte('end_date', now);
           break;
         case 'scheduled':
-          query = query
-            .or(`status.eq.active,and(status.eq.inactive,end_date.gt.${now})`)
-            .gt('start_date', now);
+          // Updated logic for scheduled campaigns
+          query = query.or(
+            `status.eq.inactive,and(status.eq.active,start_date.gt.${now})`
+          );
           break;
         case 'ended':
-          query = query
-            .or(`and(status.eq.active,end_date.lt.${now}),and(status.eq.inactive,end_date.lt.${now})`);
+          query = query.and(
+            `end_date.lt.${now},status.eq.active`
+          );
           break;
       }
 
