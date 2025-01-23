@@ -23,6 +23,8 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  console.log('Initializing campaign form with:', campaign);
+
   const { register, handleSubmit, setValue, watch } = useForm<CampaignFormData>({
     defaultValues: {
       title: campaign?.title || "",
@@ -31,12 +33,13 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
       start_date: campaign?.start_date ? new Date(campaign.start_date).toISOString().slice(0, 16) : "",
       end_date: campaign?.end_date ? new Date(campaign.end_date).toISOString().slice(0, 16) : "",
       status: campaign?.status === "active",
-      selectedProducts: campaign?.campaign_products?.map((cp: any) => cp.product.id) || [],
+      selectedProducts: campaign?.campaign_products?.map((cp: any) => cp.product_id) || [],
     },
   });
 
   const { mutate: saveCampaign, isPending } = useMutation({
     mutationFn: async (data: CampaignFormData) => {
+      console.log('Saving campaign with data:', data);
       const campaignData = {
         title: data.title,
         description: data.description,
@@ -104,6 +107,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
   });
 
   const onSubmit = (data: CampaignFormData) => {
+    console.log('Submitting form with data:', data);
     saveCampaign(data);
   };
 
@@ -137,7 +141,10 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
         <Label>Products</Label>
         <ProductSelector
           selectedProducts={watch("selectedProducts")}
-          onProductsChange={(products) => setValue("selectedProducts", products)}
+          onProductsChange={(products) => {
+            console.log('Updating selected products:', products);
+            setValue("selectedProducts", products);
+          }}
         />
       </div>
 

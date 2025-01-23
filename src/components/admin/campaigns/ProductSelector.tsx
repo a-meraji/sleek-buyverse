@@ -24,26 +24,37 @@ interface ProductSelectorProps {
   onProductsChange: (products: string[]) => void;
 }
 
-export function ProductSelector({ selectedProducts, onProductsChange }: ProductSelectorProps) {
+export function ProductSelector({ selectedProducts = [], onProductsChange }: ProductSelectorProps) {
   const [open, setOpen] = useState(false);
 
-  const { data: products } = useQuery({
+  const { data: products, isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
+      console.log('Fetching products for selector');
       const { data, error } = await supabase
         .from('products')
         .select('id, name, image_url');
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+      }
+      console.log('Fetched products:', data);
+      return data || [];
     },
   });
 
   const toggleProduct = (productId: string) => {
+    console.log('Toggling product:', productId);
     const newSelection = selectedProducts.includes(productId)
       ? selectedProducts.filter(id => id !== productId)
       : [...selectedProducts, productId];
+    console.log('New selection:', newSelection);
     onProductsChange(newSelection);
   };
+
+  if (isLoading) {
+    return <div>Loading products...</div>;
+  }
 
   return (
     <div className="space-y-2">
@@ -67,7 +78,7 @@ export function ProductSelector({ selectedProducts, onProductsChange }: ProductS
             <CommandEmpty>No products found.</CommandEmpty>
             <CommandGroup>
               <ScrollArea className="h-72">
-                {products?.map((product) => (
+                {(products || []).map((product) => (
                   <CommandItem
                     key={product.id}
                     onSelect={() => toggleProduct(product.id)}
@@ -95,10 +106,10 @@ export function ProductSelector({ selectedProducts, onProductsChange }: ProductS
         </PopoverContent>
       </Popover>
 
-      {selectedProducts.length > 0 && (
+      {selectedProducts.length > 0 && products && (
         <div className="flex flex-wrap gap-2">
           {products
-            ?.filter(p => selectedProducts.includes(p.id))
+            .filter(p => selectedProducts.includes(p.id))
             .map(product => (
               <Badge
                 key={product.id}
