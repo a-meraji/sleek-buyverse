@@ -32,16 +32,19 @@ export function CampaignList({ status }: CampaignListProps) {
 
       switch (status) {
         case 'active':
-          query = query.eq('status', 'active')
+          query = query
+            .eq('status', 'active')
             .lte('start_date', now)
             .gte('end_date', now);
           break;
         case 'scheduled':
-          query = query.eq('status', 'active')
+          query = query
+            .or(`status.eq.active,and(status.eq.inactive,end_date.gt.${now})`)
             .gt('start_date', now);
           break;
         case 'ended':
-          query = query.or(`status.eq.inactive,and(status.eq.active,end_date.lt.${now})`);
+          query = query
+            .or(`and(status.eq.active,end_date.lt.${now}),and(status.eq.inactive,end_date.lt.${now})`);
           break;
       }
 
@@ -51,12 +54,12 @@ export function CampaignList({ status }: CampaignListProps) {
         console.error('Error fetching campaigns:', error);
         throw error;
       }
-      return data || []; // Ensure we always return an array
+      return data || [];
     },
-    staleTime: 30000, // Data will be considered fresh for 30 seconds
-    gcTime: 5 * 60 * 1000, // Cache data for 5 minutes
-    retry: 1, // Only retry once on failure
-    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000,
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {
