@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import { LucideIcon } from "lucide-react"
 import { useSidebarContext } from "./sidebar-context"
+import { HTMLAttributes, ButtonHTMLAttributes } from "react"
 
 export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -78,7 +79,7 @@ export function SidebarGroupLabel({
   )
 }
 
-export interface SidebarMenuProps extends React.HTMLAttributes<"nav"> {}
+export interface SidebarMenuProps extends HTMLAttributes<HTMLElement> {}
 
 export function SidebarMenu({ className, ...props }: SidebarMenuProps) {
   return (
@@ -98,7 +99,7 @@ export function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
   )
 }
 
-export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+export interface SidebarMenuButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
 
 export function SidebarMenuButton({
   className,
@@ -120,7 +121,7 @@ export function SidebarMenuButton({
   )
 }
 
-export interface SidebarTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+export interface SidebarTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
 
 export function SidebarTrigger({ className, ...props }: SidebarTriggerProps) {
   const { expanded, setExpanded } = useSidebarContext()
@@ -132,7 +133,7 @@ export function SidebarTrigger({ className, ...props }: SidebarTriggerProps) {
       {...props}
     >
       <span className="sr-only">Toggle sidebar</span>
-      {/* Add your toggle icon here */}
+      {props.children}
     </button>
   )
 }
