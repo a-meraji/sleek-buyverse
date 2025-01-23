@@ -11,6 +11,8 @@ import { CampaignFormData } from "./types";
 import { CustomProductSelector } from "./product-selector/CustomProductSelector";
 import { CampaignBasicInfo } from "./form/CampaignBasicInfo";
 import { CampaignFormActions } from "./form/CampaignFormActions";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface CampaignFormProps {
   campaign?: any;
@@ -33,6 +35,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
       start_date: campaign?.start_date ? new Date(campaign.start_date).toISOString().slice(0, 16) : "",
       end_date: campaign?.end_date ? new Date(campaign.end_date).toISOString().slice(0, 16) : "",
       status: campaign?.status === "active",
+      is_timeless: campaign?.is_timeless || false,
       selectedProducts: campaign?.campaign_products?.map((cp: any) => cp.product.id) || [],
     },
   });
@@ -47,6 +50,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
         start_date: new Date(data.start_date).toISOString(),
         end_date: new Date(data.end_date).toISOString(),
         status: data.status ? "active" : "inactive",
+        is_timeless: data.is_timeless,
       };
 
       let campaignId = campaign?.id;
@@ -107,6 +111,7 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
   });
 
   const selectedProducts = watch("selectedProducts");
+  const isTimeless = watch("is_timeless");
 
   const onSubmitHandler = handleSubmit((data) => {
     saveCampaign(data);
@@ -123,7 +128,18 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
         onShowImageSelector={setShowImageSelector}
       />
 
-      <DateSection register={register} />
+      <div className="flex items-center space-x-2 mb-4">
+        <Switch
+          id="is_timeless"
+          checked={isTimeless}
+          onCheckedChange={(checked) => setValue("is_timeless", checked)}
+        />
+        <Label htmlFor="is_timeless">Timeless Campaign</Label>
+      </div>
+
+      {!isTimeless && (
+        <DateSection register={register} />
+      )}
 
       <StatusSection
         value={watch("status")}

@@ -209,6 +209,7 @@ export type Database = {
           end_date: string
           id: string
           image_url: string
+          is_timeless: boolean
           start_date: string
           status: string
           title: string
@@ -220,6 +221,7 @@ export type Database = {
           end_date: string
           id?: string
           image_url: string
+          is_timeless?: boolean
           start_date: string
           status?: string
           title: string
@@ -231,6 +233,7 @@ export type Database = {
           end_date?: string
           id?: string
           image_url?: string
+          is_timeless?: boolean
           start_date?: string
           status?: string
           title?: string

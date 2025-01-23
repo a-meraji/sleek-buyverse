@@ -5,5 +5,6 @@ export type CampaignFormData = {
   start_date: string;
   end_date: string;
   status: boolean;
+  is_timeless: boolean;
   selectedProducts: string[];
 };
