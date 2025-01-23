@@ -17,9 +17,8 @@ export function Sidebar({ className, ...props }: SidebarProps) {
         "overflow-hidden",
         "relative",
         "duration-300",
-        "bg-transparent",
         "border-r",
-        expanded ? "w-64" : "w-16",
+        expanded ? "w-64 bg-white" : "w-16 bg-transparent",
         className
       )}
       {...props}
