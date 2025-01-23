@@ -8,7 +8,7 @@ export const Sidebar = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "fixed top-0 left-0 z-50 h-full bg-sidebar border-r border-sidebar-border",
+      "fixed top-0 left-0 z-50 h-full bg-background border-r border-sidebar-border",
       className
     )}
     {...props}
@@ -22,7 +22,7 @@ export const SidebarContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex h-full w-full flex-col overflow-hidden", className)}
+    className={cn("flex h-full w-full flex-col overflow-hidden bg-background", className)}
     {...props}
   />
 ))
