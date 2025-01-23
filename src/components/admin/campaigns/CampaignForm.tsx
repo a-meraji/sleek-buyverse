@@ -4,27 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageSelector } from "../ImageSelector";
 import { ProductSelector } from "./ProductSelector";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Switch } from "@/components/ui/switch";
+import { ImageSection } from "./form/ImageSection";
+import { DateSection } from "./form/DateSection";
+import { StatusSection } from "./form/StatusSection";
+import { CampaignFormData } from "./types";
 
 interface CampaignFormProps {
   campaign?: any;
   onClose: () => void;
 }
-
-type CampaignFormData = {
-  title: string;
-  description: string;
-  image_url: string;
-  start_date: string;
-  end_date: string;
-  status: boolean;
-  selectedProducts: string[];
-};
 
 export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
   const [showImageSelector, setShowImageSelector] = useState(false);
@@ -115,13 +107,6 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
     saveCampaign(data);
   };
 
-  const handleImageSelect = (url: string) => {
-    setValue("image_url", url);
-    setShowImageSelector(false);
-  };
-
-  const imageUrl = watch("image_url");
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
@@ -134,49 +119,19 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
         <Textarea id="description" {...register("description")} />
       </div>
 
-      <div>
-        <Label>Campaign Image</Label>
-        <div className="mt-2 space-y-2">
-          {imageUrl && (
-            <img
-              src={imageUrl}
-              alt="Campaign"
-              className="w-full h-48 object-cover rounded-lg"
-            />
-          )}
-          <Button type="button" onClick={() => setShowImageSelector(true)}>
-            {imageUrl ? "Change Image" : "Select Image"}
-          </Button>
-        </div>
-      </div>
+      <ImageSection
+        imageUrl={watch("image_url")}
+        showImageSelector={showImageSelector}
+        onImageSelect={(url) => setValue("image_url", url)}
+        onShowImageSelector={setShowImageSelector}
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="start_date">Start Date</Label>
-          <Input
-            id="start_date"
-            type="datetime-local"
-            {...register("start_date", { required: true })}
-          />
-        </div>
-        <div>
-          <Label htmlFor="end_date">End Date</Label>
-          <Input
-            id="end_date"
-            type="datetime-local"
-            {...register("end_date", { required: true })}
-          />
-        </div>
-      </div>
+      <DateSection register={register} />
 
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="status"
-          checked={watch("status")}
-          onCheckedChange={(checked) => setValue("status", checked)}
-        />
-        <Label htmlFor="status">Active Campaign</Label>
-      </div>
+      <StatusSection
+        value={watch("status")}
+        onChange={(checked) => setValue("status", checked)}
+      />
 
       <div>
         <Label>Products</Label>
@@ -194,12 +149,6 @@ export function CampaignForm({ campaign, onClose }: CampaignFormProps) {
           {campaign ? "Update" : "Create"} Campaign
         </Button>
       </div>
-
-      <ImageSelector
-        open={showImageSelector}
-        onClose={() => setShowImageSelector(false)}
-        onSelect={handleImageSelect}
-      />
     </form>
   );
 }

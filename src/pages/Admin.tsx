@@ -1,5 +1,11 @@
 import { useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate, Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { useAdmin } from "@/hooks/useAdmin";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Store, LayoutDashboard, Package, ShoppingCart, Users, MessageSquare, Star, Megaphone } from "lucide-react";
 import { AdminProducts } from "@/components/admin/AdminProducts";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminUsers } from "@/components/admin/AdminUsers";
@@ -7,15 +13,17 @@ import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { AdminReviews } from "@/components/admin/AdminReviews";
 import { AdminCampaigns } from "@/components/admin/AdminCampaigns";
-import { useNavigate, Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { useAdmin } from "@/hooks/useAdmin";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Store, Megaphone } from "lucide-react";
-import { useUnreadAdminMessages } from "@/components/admin/chat/hooks/useUnreadAdminMessages";
 import { SessionBadge } from "@/components/admin/chat/components/session-card/SessionBadge";
+import { useUnreadAdminMessages } from "@/components/admin/chat/hooks/useUnreadAdminMessages";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -55,67 +63,58 @@ export default function Admin() {
     return null;
   }
 
+  const menuItems = [
+    { id: "analytics", label: "Analytics", icon: LayoutDashboard, component: AdminAnalytics },
+    { id: "products", label: "Products", icon: Package, component: AdminProducts },
+    { id: "campaigns", label: "Campaigns", icon: Megaphone, component: AdminCampaigns },
+    { id: "orders", label: "Orders", icon: ShoppingCart, component: AdminOrders },
+    { id: "users", label: "Users", icon: Users, component: AdminUsers },
+    { id: "reviews", label: "Reviews", icon: Star, component: AdminReviews, badge: pendingReviewsCount },
+    { id: "chat", label: "Chat", icon: MessageSquare, component: AdminChat, badge: unreadMessages },
+  ];
+
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Role: {adminStatus.role || "Unknown"}
-          </p>
-        </div>
-        <Link to="/">
-          <Button variant="outline" className="gap-2">
-            <Store className="h-4 w-4" />
-            Go to Store
-          </Button>
-        </Link>
-      </div>
-      <Tabs defaultValue="analytics" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="campaigns">
-            <div className="flex items-center gap-2">
-              <Megaphone className="h-4 w-4" />
-              Campaigns
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <Sidebar>
+          <SidebarContent>
+            <div className="mb-4 px-4">
+              <Link to="/">
+                <Button variant="outline" className="w-full gap-2">
+                  <Store className="h-4 w-4" />
+                  <span>Store</span>
+                </Button>
+              </Link>
             </div>
-          </TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="reviews" className="relative">
-            Reviews
-            {pendingReviewsCount > 0 && (
-              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-blue-500" />
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="chat" className="relative">
-            Chat
-            <SessionBadge count={unreadMessages} />
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="analytics" className="space-y-4">
-          <AdminAnalytics />
-        </TabsContent>
-        <TabsContent value="products" className="space-y-4">
-          <AdminProducts />
-        </TabsContent>
-        <TabsContent value="campaigns" className="space-y-4">
-          <AdminCampaigns />
-        </TabsContent>
-        <TabsContent value="orders" className="space-y-4">
-          <AdminOrders />
-        </TabsContent>
-        <TabsContent value="users" className="space-y-4">
-          <AdminUsers />
-        </TabsContent>
-        <TabsContent value="reviews" className="space-y-4">
-          <AdminReviews />
-        </TabsContent>
-        <TabsContent value="chat" className="space-y-4">
-          <AdminChat />
-        </TabsContent>
-      </Tabs>
-    </div>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton asChild>
+                    <button className="w-full flex items-center gap-2 relative">
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                      {item.badge > 0 && (
+                        <SessionBadge count={item.badge} />
+                      )}
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarContent>
+        </Sidebar>
+
+        <main className="flex-1 p-8">
+          <SidebarTrigger className="mb-4" />
+          <div className="space-y-4">
+            {menuItems.map((item) => (
+              <div key={item.id} id={item.id}>
+                <item.component />
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
