@@ -16,24 +16,25 @@ export function CampaignList() {
       const now = new Date().toISOString();
       let query = supabase
         .from('marketing_campaigns')
-        .select('*')
+        .select('*, campaign_products(product:products(*))')
         .order('created_at', { ascending: false });
 
       switch (selectedTab) {
         case 'active':
           query = query
             .eq('status', 'active')
-            .lte('start_date', now)
-            .gte('end_date', now);
+            .or(`is_timeless.eq.true,and(start_date.lte.${now},end_date.gte.${now})`);
           break;
         case 'scheduled':
-          query = query.or(
-            `status.eq.inactive,and(status.eq.active,start_date.gt.${now})`
-          );
+          query = query
+            .or(
+              `status.eq.inactive,and(status.eq.active,is_timeless.eq.false,start_date.gt.${now})`
+            );
           break;
         case 'ended':
           query = query
             .eq('status', 'active')
+            .eq('is_timeless', false)
             .lt('end_date', now);
           break;
       }
@@ -45,6 +46,7 @@ export function CampaignList() {
         throw error;
       }
 
+      console.log('Fetched campaigns for tab:', selectedTab, data);
       return data;
     }
   });
