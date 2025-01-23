@@ -74,7 +74,7 @@ export default function Admin() {
     { id: "chat", label: "Chat", icon: MessageSquare, component: AdminChat, badge: unreadMessages },
   ];
 
-  const ActiveComponent = menuItems.find(item => item.id === activeTab)?.component || AdminAnalytics;
+  const ActiveComponent = menuItems.find(item => item.id === activeTab)?.component;
 
   return (
     <SidebarProvider>
@@ -115,7 +115,7 @@ export default function Admin() {
         <main className="flex-1 p-8">
           <SidebarTrigger className="mb-4" />
           <div className="space-y-4">
-            <ActiveComponent />
+            {ActiveComponent && <ActiveComponent />}
           </div>
         </main>
       </div>
