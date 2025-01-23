@@ -29,15 +29,15 @@ export function AdminCampaigns() {
         </TabsList>
 
         <TabsContent value="active">
-          <CampaignList status="active" />
+          <CampaignList />
         </TabsContent>
         
         <TabsContent value="scheduled">
-          <CampaignList status="scheduled" />
+          <CampaignList />
         </TabsContent>
         
         <TabsContent value="ended">
-          <CampaignList status="ended" />
+          <CampaignList />
         </TabsContent>
 
         <TabsContent value="analytics">
