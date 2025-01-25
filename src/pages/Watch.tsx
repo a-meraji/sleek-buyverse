@@ -58,6 +58,8 @@ export default function Watch() {
     }
   });
 
+  console.log('Rendering Watch page with CampaignBanner');
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
