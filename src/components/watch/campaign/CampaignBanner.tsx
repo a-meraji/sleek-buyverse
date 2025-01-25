@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCarousel } from "@/components/home/ProductCarousel";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface Campaign {
@@ -20,7 +20,7 @@ interface Campaign {
       image_url: string;
       product_variants: any[];
       discount?: number;
-      price: number; // Added price field
+      price: number;
     };
   }[];
 }
@@ -28,7 +28,7 @@ interface Campaign {
 export function CampaignBanner() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const { data: campaigns = [], isLoading } = useQuery({
+  const { data: campaigns = [], isLoading, error } = useQuery({
     queryKey: ['active-campaigns'],
     queryFn: async () => {
       console.log('Fetching active campaigns');
@@ -39,7 +39,7 @@ export function CampaignBanner() {
         .select(`
           *,
           campaign_products(
-            product(
+            products(
               id,
               name,
               image_url,
@@ -62,10 +62,10 @@ export function CampaignBanner() {
         campaign_products: campaign.campaign_products.map(cp => ({
           ...cp,
           product: {
-            ...cp.product,
+            ...cp.products,
             // Set price as the minimum price from variants or 0 if no variants
-            price: cp.product.product_variants?.length > 0
-              ? Math.min(...cp.product.product_variants.map(v => v.price))
+            price: cp.products.product_variants?.length > 0
+              ? Math.min(...cp.products.product_variants.map(v => v.price))
               : 0
           }
         }))
@@ -86,7 +86,19 @@ export function CampaignBanner() {
     return () => clearInterval(timer);
   }, [campaigns.length]);
 
-  if (isLoading || campaigns.length === 0) return null;
+  if (isLoading) return null;
+
+  if (error) {
+    console.error('Campaign loading error:', error);
+    return (
+      <div className="flex items-center justify-center p-4 bg-red-50 text-red-600">
+        <AlertCircle className="w-5 h-5 mr-2" />
+        <span>Failed to load campaigns</span>
+      </div>
+    );
+  }
+
+  if (campaigns.length === 0) return null;
 
   const campaign = campaigns[currentIndex];
   const products = campaign.campaign_products.map(cp => cp.product);
