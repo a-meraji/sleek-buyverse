@@ -64,10 +64,10 @@ export default function Watch() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow">
-        <CampaignBanner />
         <WatchCategories />
         <WatchBanners />
         <WatchBrands />
+        <CampaignBanner />
         <MainContent products={products} popularProducts={popularProducts} />
         <WatchPolicies />
         <ReviewsScroll />
