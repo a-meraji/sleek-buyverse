@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCarousel } from "@/components/home/ProductCarousel";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 
 interface Campaign {
   id: string;
@@ -25,8 +24,16 @@ interface Campaign {
   }[];
 }
 
+interface TimeLeft {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
 export function CampaignBanner() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   const { data: campaigns = [], isLoading, error } = useQuery({
     queryKey: ['active-campaigns'],
@@ -86,6 +93,35 @@ export function CampaignBanner() {
     return () => clearInterval(timer);
   }, [campaigns.length]);
 
+  // Countdown timer effect
+  useEffect(() => {
+    if (!campaigns.length || campaigns[currentIndex].is_timeless) {
+      setTimeLeft(null);
+      return;
+    }
+
+    const calculateTimeLeft = () => {
+      const difference = new Date(campaigns[currentIndex].end_date).getTime() - new Date().getTime();
+      
+      if (difference <= 0) {
+        setTimeLeft(null);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60)
+      });
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+
+    return () => clearInterval(timer);
+  }, [campaigns, currentIndex]);
+
   if (isLoading) return null;
 
   if (error) {
@@ -102,9 +138,6 @@ export function CampaignBanner() {
 
   const campaign = campaigns[currentIndex];
   const products = campaign.campaign_products.map(cp => cp.product);
-  const timeLeft = !campaign.is_timeless && campaign.end_date
-    ? formatDistanceToNow(new Date(campaign.end_date), { addSuffix: true })
-    : null;
 
   return (
     <section className="relative">
@@ -119,10 +152,25 @@ export function CampaignBanner() {
           <div className="text-center text-white max-w-2xl px-4">
             <h2 className="text-4xl font-bold mb-4">{campaign.title}</h2>
             <p className="text-xl mb-4">{campaign.description}</p>
-            {timeLeft && (
-              <p className="text-lg font-semibold">
-                Ends {timeLeft}
-              </p>
+            {!campaign.is_timeless && timeLeft && (
+              <div className="flex justify-center gap-4 text-lg font-semibold">
+                <div className="text-center">
+                  <span className="block text-3xl">{timeLeft.days}</span>
+                  <span className="text-sm">Days</span>
+                </div>
+                <div className="text-center">
+                  <span className="block text-3xl">{timeLeft.hours}</span>
+                  <span className="text-sm">Hours</span>
+                </div>
+                <div className="text-center">
+                  <span className="block text-3xl">{timeLeft.minutes}</span>
+                  <span className="text-sm">Minutes</span>
+                </div>
+                <div className="text-center">
+                  <span className="block text-3xl">{timeLeft.seconds}</span>
+                  <span className="text-sm">Seconds</span>
+                </div>
+              </div>
             )}
           </div>
         </div>
