@@ -33,8 +33,7 @@ export function useProductUpdate() {
         .from("products")
         .update(productData)
         .eq("id", formData.id)
-        .select()
-        .single();
+        .select();
 
       if (productError) {
         console.error('Error updating product:', productError);
