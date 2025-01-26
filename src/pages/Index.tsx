@@ -15,7 +15,11 @@ const Index = () => {
       console.log('Fetching latest products...');
       const { data: productsData, error: productsError } = await supabase
         .from('products')
-        .select('*, product_variants(*)')
+        .select(`
+          *,
+          product_variants(*),
+          brand
+        `)
         .limit(8)
         .order('created_at', { ascending: false });
 
@@ -46,7 +50,11 @@ const Index = () => {
       // Then fetch the full product details
       const { data: popularProductsData, error: productsError } = await supabase
         .from('products')
-        .select('*, product_variants(*)')
+        .select(`
+          *,
+          product_variants(*),
+          brand
+        `)
         .in('id', popularIds.map(p => p.product_id));
 
       if (productsError) throw productsError;
