@@ -20,7 +20,7 @@ export const useProducts = () => {
         .select(`
           *,
           product_variants(*),
-          brands(name)
+          brand:brands(name)
         `)
 
       // Apply search filter if present
@@ -65,7 +65,7 @@ export const useProducts = () => {
       console.log('Fetched products:', data);
       return data?.map(product => ({
         ...product,
-        brand: product.brands?.name
+        brand: product.brand?.name
       })) || [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
