@@ -43,6 +43,7 @@ export function ProductCard({ id, name, image, product_variants, discount, brand
     };
   }, []);
 
+  console.log('ProductCard brand:', brand);
   console.log('ProductCard variants:', product_variants);
 
   return (
