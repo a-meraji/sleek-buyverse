@@ -9,40 +9,27 @@ export const useFilters = (products: Product[] = []) => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 
   const filteredProducts = useMemo(() => {
-    console.log('Filtering products:', { 
+    console.log('Filtering products by price range:', { 
       totalProducts: products?.length,
-      searchQuery: urlSearchQuery,
-      selectedCategories,
       priceRange
     });
 
     return products?.filter(product => {
-      // Search filter
-      const matchesSearch = !urlSearchQuery || 
-        product.name.toLowerCase().includes(urlSearchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(urlSearchQuery.toLowerCase());
-      
-      // Category filter
-      const matchesCategory = selectedCategories.length === 0 || 
-        (product.category && selectedCategories.includes(product.category));
-      
       // Price filter - use minimum price from variants
       const minPrice = product.product_variants?.length 
         ? Math.min(...product.product_variants.map(v => v.price))
         : 0;
       const matchesPrice = minPrice >= priceRange[0] && minPrice <= priceRange[1];
 
-      const isIncluded = matchesSearch && matchesCategory && matchesPrice;
+      const isIncluded = matchesPrice;
       console.log(`Product ${product.name}:`, { 
-        matchesSearch, 
-        matchesCategory, 
         matchesPrice,
         isIncluded 
       });
 
       return isIncluded;
     }) || [];
-  }, [products, urlSearchQuery, selectedCategories, priceRange]);
+  }, [products, priceRange]);
 
   return {
     searchQuery: urlSearchQuery,

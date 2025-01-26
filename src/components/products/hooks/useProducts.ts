@@ -21,13 +21,13 @@ export const useProducts = () => {
 
       // Apply search filter if present
       if (searchQuery) {
-        query = query.ilike('name', `%${searchQuery}%`);
+        console.log('Applying search filter:', searchQuery);
+        query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
       // Apply category filter if present
       if (category) {
         console.log('Filtering by category:', category);
-        // Use eq with direct match after converting both to lowercase
         query = query.eq('category', category);
       }
 
