@@ -9,23 +9,38 @@ export function useProductUpdate() {
 
   return useMutation({
     mutationFn: async ({ formData, variants }: { formData: Product, variants: ProductVariant[] }) => {
-      console.log('Updating product with data:', formData);
-      console.log('Updating variants:', variants);
+      console.log('Starting product update with data:', formData);
+      console.log('Secondary categories before update:', formData.secondary_categories);
       
-      const { error: productError } = await supabase
-        .from("products")
-        .update({
-          name: formData.name,
-          main_category: formData.main_category,
-          secondary_categories: formData.secondary_categories,
-          category: formData.category,
-          image_url: formData.image_url,
-          sku: formData.sku,
-          discount: formData.discount,
-        })
-        .eq("id", formData.id);
+      // Ensure secondary_categories is an array
+      const secondary_categories = Array.isArray(formData.secondary_categories) 
+        ? formData.secondary_categories 
+        : [];
 
-      if (productError) throw productError;
+      const productData = {
+        name: formData.name,
+        description: formData.description,
+        main_category: formData.main_category,
+        secondary_categories, // Ensure we're passing the array directly
+        image_url: formData.image_url,
+        sku: formData.sku,
+        discount: formData.discount,
+      };
+
+      console.log('Sending update with product data:', productData);
+
+      const { data: updatedProduct, error: productError } = await supabase
+        .from("products")
+        .update(productData)
+        .eq("id", formData.id)
+        .select();
+
+      if (productError) {
+        console.error('Error updating product:', productError);
+        throw productError;
+      }
+
+      console.log('Product updated successfully:', updatedProduct);
 
       // Delete existing variants
       const { error: deleteError } = await supabase
@@ -33,7 +48,10 @@ export function useProductUpdate() {
         .delete()
         .eq("product_id", formData.id);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('Error deleting variants:', deleteError);
+        throw deleteError;
+      }
 
       // Insert new variants with properly formatted parameters
       const variantsData = variants.map(variant => ({
@@ -52,7 +70,10 @@ export function useProductUpdate() {
         .from("product_variants")
         .insert(variantsData);
 
-      if (variantsError) throw variantsError;
+      if (variantsError) {
+        console.error('Error saving variants:', variantsError);
+        throw variantsError;
+      }
 
       if (formData.product_images && formData.product_images.length > 0) {
         const { error: deleteImagesError } = await supabase
@@ -60,7 +81,10 @@ export function useProductUpdate() {
           .delete()
           .eq("product_id", formData.id);
 
-        if (deleteImagesError) throw deleteImagesError;
+        if (deleteImagesError) {
+          console.error('Error deleting images:', deleteImagesError);
+          throw deleteImagesError;
+        }
 
         const imagesData = formData.product_images.map((image, index) => ({
           product_id: formData.id,
@@ -72,13 +96,19 @@ export function useProductUpdate() {
           .from("product_images")
           .insert(imagesData);
 
-        if (imagesError) throw imagesError;
+        if (imagesError) {
+          console.error('Error saving images:', imagesError);
+          throw imagesError;
+        }
       }
+
+      return updatedProduct;
     },
     onSuccess: (_, { formData }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       queryClient.invalidateQueries({ queryKey: ["admin-product-variants"] });
       queryClient.invalidateQueries({ queryKey: ["product-details", formData.id] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast({
         title: "Success",
         description: "Product updated successfully",

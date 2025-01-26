@@ -1,5 +1,7 @@
 import React from 'react';
 import { CartItemProps } from '@/types';
+import { CartItemHeader } from './item/CartItemHeader';
+import { CartItemPrice } from './item/CartItemPrice';
 import { formatParameters } from '@/lib/utils';
 
 export function CartItem({ item, onQuantityChange, onRemove, readonly = false }: CartItemProps) {
@@ -8,24 +10,33 @@ export function CartItem({ item, onQuantityChange, onRemove, readonly = false }:
     : null;
 
   return (
-    <div className="flex items-center gap-4 p-4 border-b">
-      <div className="flex-1">
-        <h4 className="font-semibold">{item.product?.name}</h4>
-        {parameters && <p className="text-sm text-gray-500">{parameters}</p>}
-      </div>
-      <div className="flex items-center">
-        <span className="text-lg font-bold">${item.variant?.price.toFixed(2)}</span>
-        <input
-          type="number"
-          value={item.quantity}
-          onChange={(e) => onQuantityChange(item.id, Number(e.target.value))}
-          className="w-16 mx-2 border rounded"
-          min="1"
-          disabled={readonly}
+    <div className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow-sm">
+      <CartItemHeader
+        name={item.product?.name || ''}
+        productName={item.product?.name || ''}
+        parameters={parameters || ''}
+        onRemove={() => onRemove(item.id)}
+        readonly={readonly}
+      />
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <input
+            type="number"
+            value={item.quantity}
+            onChange={(e) => onQuantityChange(item.id, Number(e.target.value))}
+            className="w-16 px-2 py-1 border rounded"
+            min="1"
+            disabled={readonly}
+          />
+        </div>
+        
+        <CartItemPrice
+          price={item.variant?.price || 0}
+          variantPrice={item.variant?.price || 0}
+          quantity={item.quantity}
+          discount={item.product?.discount || 0}
         />
-        <button onClick={() => onRemove(item.id)} className="text-red-500" disabled={readonly}>
-          Remove
-        </button>
       </div>
     </div>
   );
