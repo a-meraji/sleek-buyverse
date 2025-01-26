@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductOverviewDialog } from "./product/ProductOverviewDialog";
 import { Product } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Percent } from "lucide-react";
 
 interface ProductCardProps {
   id: string;
@@ -13,9 +12,10 @@ interface ProductCardProps {
   image: string;
   product_variants?: Product['product_variants'];
   discount?: number | null;
+  brand?: string;
 }
 
-export function ProductCard({ id, name, image, product_variants, discount }: ProductCardProps) {
+export function ProductCard({ id, name, image, product_variants, discount, brand }: ProductCardProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -62,6 +62,9 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
         </div>
         <div className="mt-4">
           <h3 className="text-lg font-medium">{name}</h3>
+          {brand && (
+            <p className="text-sm text-muted-foreground mt-1">{brand}</p>
+          )}
           <p className="mt-1 text-sm">
             {product_variants?.length ? (
               <span className="flex items-center gap-2">
