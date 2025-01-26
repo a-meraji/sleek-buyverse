@@ -48,8 +48,12 @@ export function EditProductContent({
       />
 
       <CategorySelector
-        value={formData.category ?? ""}
-        onChange={(value) => onFormChange({ category: value })}
+        mainCategory={formData.main_category ?? ""}
+        secondaryCategories={formData.secondary_categories || []}
+        onMainCategoryChange={(value) => onFormChange({ main_category: value })}
+        onSecondaryCategoriesChange={(categories) => 
+          onFormChange({ secondary_categories: categories })
+        }
       />
 
       <VariantsManager

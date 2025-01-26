@@ -422,33 +422,36 @@ export type Database = {
       }
       products: {
         Row: {
-          category: string | null
           created_at: string
           description: string | null
           discount: number | null
           id: string
           image_url: string
+          main_category: string | null
           name: string
+          secondary_categories: Json | null
           sku: string | null
         }
         Insert: {
-          category?: string | null
           created_at?: string
           description?: string | null
           discount?: number | null
           id?: string
           image_url: string
+          main_category?: string | null
           name: string
+          secondary_categories?: Json | null
           sku?: string | null
         }
         Update: {
-          category?: string | null
           created_at?: string
           description?: string | null
           discount?: number | null
           id?: string
           image_url?: string
+          main_category?: string | null
           name?: string
+          secondary_categories?: Json | null
           sku?: string | null
         }
         Relationships: []
