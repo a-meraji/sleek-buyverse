@@ -25,10 +25,7 @@ export function useProductUpdate() {
         })
         .eq("id", formData.id);
 
-      if (productError) {
-        console.error('Error updating product:', productError);
-        throw productError;
-      }
+      if (productError) throw productError;
 
       // Delete existing variants
       const { error: deleteError } = await supabase
@@ -36,10 +33,7 @@ export function useProductUpdate() {
         .delete()
         .eq("product_id", formData.id);
 
-      if (deleteError) {
-        console.error('Error deleting variants:', deleteError);
-        throw deleteError;
-      }
+      if (deleteError) throw deleteError;
 
       // Insert new variants with properly formatted parameters
       const variantsData = variants.map(variant => ({
@@ -58,10 +52,7 @@ export function useProductUpdate() {
         .from("product_variants")
         .insert(variantsData);
 
-      if (variantsError) {
-        console.error('Error inserting variants:', variantsError);
-        throw variantsError;
-      }
+      if (variantsError) throw variantsError;
 
       if (formData.product_images && formData.product_images.length > 0) {
         const { error: deleteImagesError } = await supabase
@@ -69,10 +60,7 @@ export function useProductUpdate() {
           .delete()
           .eq("product_id", formData.id);
 
-        if (deleteImagesError) {
-          console.error('Error deleting images:', deleteImagesError);
-          throw deleteImagesError;
-        }
+        if (deleteImagesError) throw deleteImagesError;
 
         const imagesData = formData.product_images.map((image, index) => ({
           product_id: formData.id,
@@ -84,17 +72,14 @@ export function useProductUpdate() {
           .from("product_images")
           .insert(imagesData);
 
-        if (imagesError) {
-          console.error('Error inserting images:', imagesError);
-          throw imagesError;
-        }
+        if (imagesError) throw imagesError;
       }
     },
     onSuccess: (_, { formData }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       queryClient.invalidateQueries({ queryKey: ["admin-product-variants"] });
       queryClient.invalidateQueries({ queryKey: ["product-details", formData.id] });
-      queryClient.invalidateQueries({ queryKey: ["categories"] }); // Add this to refresh categories
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast({
         title: "Success",
         description: "Product updated successfully",
