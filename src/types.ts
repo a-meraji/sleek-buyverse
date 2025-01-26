@@ -63,18 +63,17 @@ export interface CartItemProps {
 
 export interface CartItemHeaderProps {
   name: string;
-  variant?: ProductVariant;
-  onRemove: () => void;
-  readonly: boolean;
   productName: string;
-  parameters?: string;
+  parameters: string;
+  onRemove: () => void;
+  readonly?: boolean;
 }
 
 export interface CartItemPriceProps {
   price: number;
-  quantity: number;
-  discount?: number;
   variantPrice: number;
+  quantity: number;
+  discount: number;
 }
 
 export interface ProductContainerProps {
