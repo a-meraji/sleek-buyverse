@@ -6,12 +6,12 @@ export const WatchCategories = () => {
   const navigate = useNavigate();
 
   const { data: categories = [] } = useQuery({
-    queryKey: ['main-categories'],
+    queryKey: ['main-categories-with-images'],
     queryFn: async () => {
-      console.log('Fetching main categories');
-      const { data, error } = await supabase
+      console.log('Fetching main categories with first product image');
+      const { data: products, error } = await supabase
         .from('products')
-        .select('main_category')
+        .select('main_category, image_url')
         .not('main_category', 'is', null)
         .order('main_category');
 
@@ -20,30 +20,30 @@ export const WatchCategories = () => {
         throw error;
       }
 
-      // Get unique categories
-      const uniqueCategories = Array.from(new Set(data.map(item => item.main_category)));
-      return uniqueCategories.map(category => ({
-        name: category,
-        image: getCategoryImage(category)
-      }));
+      // Create a map to store first image for each category
+      const categoryImages = new Map();
+      products?.forEach(product => {
+        if (product.main_category && !categoryImages.has(product.main_category)) {
+          categoryImages.set(product.main_category, product.image_url);
+        }
+      });
+
+      // Get unique categories with their images
+      const uniqueCategories = Array.from(new Set(products?.map(item => item.main_category)))
+        .filter(Boolean)
+        .map(category => ({
+          name: category,
+          image: categoryImages.get(category)
+        }));
+
+      console.log('Processed categories:', uniqueCategories);
+      return uniqueCategories;
     }
   });
 
   const handleCategoryClick = (category: string) => {
-    console.log('Navigating to category:', category);
-    navigate(`/products?category=${encodeURIComponent(category.toLowerCase())}`);
-  };
-
-  // Function to get category image based on category name
-  const getCategoryImage = (category: string): string => {
-    const images: Record<string, string> = {
-      'Hat': 'https://images.unsplash.com/photo-1434494878577-86c23bcb06b9',
-      'Cap': 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
-      'Hoodie': 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b',
-      'T-Shirt': 'https://images.unsplash.com/photo-1483058712412-4245e9b90334',
-      // Add more category images as needed
-    };
-    return images[category] || 'https://images.unsplash.com/photo-1434494878577-86c23bcb06b9';
+    console.log('Navigating to category with main_category:', category);
+    navigate(`/products?main_category=${encodeURIComponent(category)}`);
   };
 
   return (

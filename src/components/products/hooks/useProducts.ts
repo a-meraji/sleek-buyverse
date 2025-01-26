@@ -7,13 +7,13 @@ export const useProducts = () => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
   const sort = searchParams.get('sort');
-  const selectedCategories = searchParams.getAll('category');
+  const mainCategory = searchParams.get('main_category');
   const discount = searchParams.get('discount') === 'true';
 
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ['products', searchQuery, sort, discount, selectedCategories],
+    queryKey: ['products', searchQuery, sort, discount, mainCategory],
     queryFn: async () => {
-      console.log('Fetching products with filters:', { searchQuery, sort, discount, selectedCategories });
+      console.log('Fetching products with filters:', { searchQuery, sort, discount, mainCategory });
       
       let query = supabase
         .from('products')
@@ -25,14 +25,10 @@ export const useProducts = () => {
         query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
-      // Apply category filters
-      if (selectedCategories.length > 0) {
-        console.log('Filtering by categories:', selectedCategories);
-        query = query.or(
-          selectedCategories.map(category => 
-            `main_category.ilike.${category},secondary_categories::text.ilike.%${category}%`
-          ).join(',')
-        );
+      // Apply main category filter
+      if (mainCategory) {
+        console.log('Filtering by main category:', mainCategory);
+        query = query.eq('main_category', mainCategory);
       }
 
       // Apply discount filter
