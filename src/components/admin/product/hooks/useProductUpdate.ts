@@ -10,6 +10,7 @@ export function useProductUpdate() {
   return useMutation({
     mutationFn: async ({ formData, variants }: { formData: Product, variants: ProductVariant[] }) => {
       console.log('Starting product update with data:', formData);
+      console.log('Brand value being updated:', formData.brand);
       console.log('Secondary categories before update:', formData.secondary_categories);
       
       // Ensure secondary_categories is an array
