@@ -1,45 +1,58 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { FC, useEffect, useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 interface ProfileFormProps {
   userId: string;
-  onClose?: () => void;
+  onClose: () => void;
 }
 
-export function ProfileForm({ userId, onClose }: ProfileFormProps) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [streetAddress, setStreetAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [postalCode, setPostalCode] = useState("");
+export const ProfileForm: FC<ProfileFormProps> = ({ userId, onClose }) => {
   const { toast } = useToast();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('name, email')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch user data.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        setName(data.name);
+        setEmail(data.email);
+      }
+    };
+
+    fetchUserData();
+  }, [userId, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const { error } = await supabase
-      .from("profiles")
-      .upsert({
-        id: userId,
-        first_name: firstName,
-        last_name: lastName,
-        phone,
-        street_address: streetAddress,
-        city,
-        state,
-        postal_code: postalCode,
-      });
+      .from('users')
+      .update({ name, email })
+      .eq('id', userId);
 
     if (error) {
-      console.error("Error updating profile:", error);
+      console.error('Error updating user data:', error);
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: "Failed to update user data.",
         variant: "destructive",
       });
       return;
@@ -47,103 +60,41 @@ export function ProfileForm({ userId, onClose }: ProfileFormProps) {
 
     toast({
       title: "Success",
-      description: "Profile updated successfully",
+      description: "User data updated successfully.",
     });
-
-    if (onClose) {
-      onClose();
-    }
+    onClose();
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="firstName" className="text-sm font-medium">
-            First Name
-          </label>
-          <Input
-            id="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="lastName" className="text-sm font-medium">
-            Last Name
-          </label>
-          <Input
-            id="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-        </div>
-      </div>
-
       <div>
-        <label htmlFor="phone" className="text-sm font-medium">
-          Phone
-        </label>
-        <Input
-          id="phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+        <label htmlFor="name" className="block text-sm font-medium">Name</label>
+        <input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="mt-1 block w-full border rounded-md p-2"
+          required
         />
       </div>
-
       <div>
-        <label htmlFor="streetAddress" className="text-sm font-medium">
-          Street Address
-        </label>
-        <Input
-          id="streetAddress"
-          value={streetAddress}
-          onChange={(e) => setStreetAddress(e.target.value)}
+        <label htmlFor="email" className="block text-sm font-medium">Email</label>
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="mt-1 block w-full border rounded-md p-2"
+          required
         />
       </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="city" className="text-sm font-medium">
-            City
-          </label>
-          <Input
-            id="city"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="state" className="text-sm font-medium">
-            State
-          </label>
-          <Input
-            id="state"
-            value={state}
-            onChange={(e) => setState(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="postalCode" className="text-sm font-medium">
-          Postal Code
-        </label>
-        <Input
-          id="postalCode"
-          value={postalCode}
-          onChange={(e) => setPostalCode(e.target.value)}
-        />
-      </div>
-
-      <div className="flex justify-end gap-4">
-        {onClose && (
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-        )}
-        <Button type="submit">Save Changes</Button>
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button type="submit">Save</Button>
       </div>
     </form>
   );
-}
+};
