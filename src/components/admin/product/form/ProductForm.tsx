@@ -41,8 +41,12 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
         />
 
         <ProductCategorySection
-          category={formData.category ?? ""}
-          onChange={(value) => handleFormChange({ category: value })}
+          mainCategory={formData.main_category ?? ""}
+          secondaryCategories={formData.secondary_categories ?? []}
+          onMainCategoryChange={(value) => handleFormChange({ main_category: value })}
+          onSecondaryCategoriesChange={(categories) => 
+            handleFormChange({ secondary_categories: categories })
+          }
         />
 
         <ProductVariantsSection

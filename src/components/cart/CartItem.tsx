@@ -1,55 +1,31 @@
-import { Product } from "@/types/product";
-import { ProductVariant } from "@/types/variant";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { CartItemProps } from '@/types';
+import { formatParameters } from '@/lib/utils';
 
-export interface CartItem {
-  id: string;
-  product_id: string;
-  variant_id?: string;
-  quantity: number;
-  product?: Product;
-  variant?: ProductVariant;
-}
+export function CartItem({ item, onQuantityChange, onRemove, readonly = false }: CartItemProps) {
+  const parameters = item.variant?.parameters 
+    ? formatParameters(item.variant.parameters)
+    : null;
 
-export interface CartItemProps {
-  item: CartItem;
-  userId?: string;
-  onQuantityChange: (id: string, quantity: number) => void;
-  onRemove: (id: string) => void;
-  readonly?: boolean;
-}
-
-export function CartItem({ item, userId, onQuantityChange, onRemove, readonly = false }: CartItemProps) {
-  const variantPrice = item.variant?.price ?? 0;
-  const basePrice = item.variant?.price ?? (item.product?.product_variants?.[0]?.price ?? 0);
-  
   return (
-    <div className="flex items-center justify-between p-4 border-b">
-      <div className="flex items-center">
-        <img src={item.product?.image_url} alt={item.product?.name} className="w-16 h-16 object-cover" />
-        <div className="ml-4">
-          <h3 className="text-lg font-semibold">{item.product?.name}</h3>
-          {item.variant && <p className="text-sm text-gray-500">{item.variant.parameters}</p>}
-          <p className="text-sm font-medium">${basePrice.toFixed(2)}</p>
-        </div>
+    <div className="flex items-center gap-4 p-4 border-b">
+      <div className="flex-1">
+        <h4 className="font-semibold">{item.product?.name}</h4>
+        {parameters && <p className="text-sm text-gray-500">{parameters}</p>}
       </div>
       <div className="flex items-center">
-        <Button
-          onClick={() => onQuantityChange(item.id, item.quantity - 1)}
-          disabled={readonly || item.quantity <= 1}
-        >
-          -
-        </Button>
-        <span className="mx-2">{item.quantity}</span>
-        <Button
-          onClick={() => onQuantityChange(item.id, item.quantity + 1)}
+        <span className="text-lg font-bold">${item.variant?.price.toFixed(2)}</span>
+        <input
+          type="number"
+          value={item.quantity}
+          onChange={(e) => onQuantityChange(item.id, Number(e.target.value))}
+          className="w-16 mx-2 border rounded"
+          min="1"
           disabled={readonly}
-        >
-          +
-        </Button>
-        <Button onClick={() => onRemove(item.id)} className="ml-4" variant="destructive">
+        />
+        <button onClick={() => onRemove(item.id)} className="text-red-500" disabled={readonly}>
           Remove
-        </Button>
+        </button>
       </div>
     </div>
   );

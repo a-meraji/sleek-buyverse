@@ -49,3 +49,8 @@ export interface ProductFormContainerProps {
   onClose: () => void;
   product?: Product;
 }
+
+export interface ProductContainerProps {
+  product: Product;
+  userId?: string;
+}

@@ -9,30 +9,23 @@ export function useProductUpdate() {
 
   return useMutation({
     mutationFn: async ({ formData, variants }: { formData: Product, variants: ProductVariant[] }) => {
-      console.log('Starting product update with data:', formData);
+      console.log('Updating product with data:', formData);
       console.log('Updating variants:', variants);
       
-      // Update product
-      const { data: updatedProduct, error: productError } = await supabase
+      const { error: productError } = await supabase
         .from("products")
         .update({
           name: formData.name,
           description: formData.description,
-          category: formData.category,
+          main_category: formData.main_category,
+          secondary_categories: formData.secondary_categories,
           image_url: formData.image_url,
           sku: formData.sku,
           discount: formData.discount,
         })
-        .eq("id", formData.id)
-        .select()
-        .single();
+        .eq("id", formData.id);
 
-      if (productError) {
-        console.error('Error updating product:', productError);
-        throw productError;
-      }
-
-      console.log('Product updated successfully:', updatedProduct);
+      if (productError) throw productError;
 
       // Delete existing variants
       const { error: deleteError } = await supabase
@@ -40,14 +33,9 @@ export function useProductUpdate() {
         .delete()
         .eq("product_id", formData.id);
 
-      if (deleteError) {
-        console.error('Error deleting existing variants:', deleteError);
-        throw deleteError;
-      }
+      if (deleteError) throw deleteError;
 
-      console.log('Existing variants deleted successfully');
-
-      // Insert new variants with properly formatted parameters
+      // Insert new variants
       const variantsData = variants.map(variant => ({
         product_id: formData.id,
         parameters: Object.fromEntries(
@@ -58,33 +46,21 @@ export function useProductUpdate() {
         price: variant.price
       }));
 
-      console.log('Inserting new variants with data:', variantsData);
+      console.log('Inserting variants with data:', variantsData);
 
-      const { data: newVariants, error: variantsError } = await supabase
+      const { error: variantsError } = await supabase
         .from("product_variants")
-        .insert(variantsData)
-        .select();
+        .insert(variantsData);
 
-      if (variantsError) {
-        console.error('Error inserting new variants:', variantsError);
-        throw variantsError;
-      }
+      if (variantsError) throw variantsError;
 
-      console.log('New variants inserted successfully:', newVariants);
-
-      // Handle product images
       if (formData.product_images && formData.product_images.length > 0) {
-        console.log('Updating product images');
-        
         const { error: deleteImagesError } = await supabase
           .from("product_images")
           .delete()
           .eq("product_id", formData.id);
 
-        if (deleteImagesError) {
-          console.error('Error deleting existing images:', deleteImagesError);
-          throw deleteImagesError;
-        }
+        if (deleteImagesError) throw deleteImagesError;
 
         const imagesData = formData.product_images.map((image, index) => ({
           product_id: formData.id,
@@ -96,18 +72,10 @@ export function useProductUpdate() {
           .from("product_images")
           .insert(imagesData);
 
-        if (imagesError) {
-          console.error('Error inserting new images:', imagesError);
-          throw imagesError;
-        }
-
-        console.log('Product images updated successfully');
+        if (imagesError) throw imagesError;
       }
-
-      return updatedProduct;
     },
     onSuccess: (_, { formData }) => {
-      console.log('Product update completed successfully');
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       queryClient.invalidateQueries({ queryKey: ["admin-product-variants"] });
       queryClient.invalidateQueries({ queryKey: ["product-details", formData.id] });
