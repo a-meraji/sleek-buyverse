@@ -18,7 +18,7 @@ export const CartContent = ({
   readonly = false
 }: CartContentProps) => {
   return (
-    <div className="flex-1 overflow-auto p-4 bg-gray-50">
+    <div className="flex-1 overflow-auto p-4">
       {!cartItems?.length ? (
         <EmptyCart />
       ) : (
