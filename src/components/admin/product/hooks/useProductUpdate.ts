@@ -10,7 +10,7 @@ export function useProductUpdate() {
   return useMutation({
     mutationFn: async ({ formData, variants }: { formData: Product, variants: ProductVariant[] }) => {
       console.log('Updating product with data:', formData);
-      console.log('Updating variants:', variants);
+      console.log('Secondary categories before update:', formData.secondary_categories);
       
       const { error: productError } = await supabase
         .from("products")
@@ -29,6 +29,11 @@ export function useProductUpdate() {
         console.error('Error updating product:', productError);
         throw productError;
       }
+
+      console.log('Product updated successfully with categories:', {
+        main: formData.main_category,
+        secondary: formData.secondary_categories
+      });
 
       // Delete existing variants
       const { error: deleteError } = await supabase
