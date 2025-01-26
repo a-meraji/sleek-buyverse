@@ -4,13 +4,19 @@ import { ProductCarouselWrapper } from "./related/ProductCarouselWrapper";
 
 interface RelatedProductsProps {
   currentProductId: string;
-  category: string | null;
+  mainCategory: string | null;
+  secondaryCategories?: string[];
 }
 
-export const RelatedProducts = ({ currentProductId, category }: RelatedProductsProps) => {
+export const RelatedProducts = ({ 
+  currentProductId, 
+  mainCategory,
+  secondaryCategories 
+}: RelatedProductsProps) => {
   const { data: relatedProducts, isLoading: isLoadingRelated } = useRelatedProducts({
     currentProductId,
-    category
+    mainCategory,
+    secondaryCategories
   });
 
   const { data: popularProducts, isLoading: isLoadingPopular } = usePopularProducts(currentProductId);
