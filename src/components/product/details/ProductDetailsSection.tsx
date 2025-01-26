@@ -65,7 +65,7 @@ export const ProductDetailsSection = ({ product, userId }: ProductDetailsSection
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-start">
         <ProductDetails
           product={product}

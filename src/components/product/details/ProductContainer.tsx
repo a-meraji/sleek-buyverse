@@ -1,5 +1,6 @@
 import { Product } from "@/types";
-import { ProductImage } from "@/types/product";
+import { ProductImageCarousel } from "../ProductImageCarousel";
+import { ProductDetailsSection } from "./ProductDetailsSection";
 
 interface ProductContainerProps {
   product: Product;
@@ -8,22 +9,20 @@ interface ProductContainerProps {
 
 export function ProductContainer({ product, userId }: ProductContainerProps) {
   return (
-    <div>
-      <h1>{product.name}</h1>
-      <p>{product.description}</p>
-      <span>{product.main_category}</span>
-      <div>
-        {product.product_images?.map((image: ProductImage) => (
-          <img key={image.id} src={image.image_url} alt={product.name} />
-        ))}
-      </div>
-      <div>
-        {product.product_variants?.map((variant) => (
-          <div key={variant.id}>
-            <p>Variant: {JSON.stringify(variant.parameters)}</p>
-            <p>Price: ${variant.price}</p>
-          </div>
-        ))}
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+        <div className="lg:col-span-1">
+          <ProductImageCarousel 
+            mainImage={product.image_url} 
+            additionalImages={product.product_images}
+          />
+        </div>
+        <div className="lg:col-span-1">
+          <ProductDetailsSection 
+            product={product}
+            userId={userId}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,79 +1,225 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface ProfileFormFieldsProps {
-  profile: {
-    first_name: string;
-    last_name: string;
-    phone: string;
-    street_address: string;
-    city: string;
-    state: string;
-    postal_code: string;
-  };
-  setProfile: (profile: any) => void;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  bio: string;
+  onSubmit: (data: any) => void;
 }
 
-export function ProfileFormFields({ profile, setProfile }: ProfileFormFieldsProps) {
+const profileFormSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
+  address: z.string().min(5, "Address must be at least 5 characters"),
+  city: z.string().min(2, "City must be at least 2 characters"),
+  state: z.string().min(2, "State must be at least 2 characters"),
+  postalCode: z.string().min(4, "Postal code must be at least 4 characters"),
+  country: z.string().min(2, "Country must be at least 2 characters"),
+  bio: z.string().optional(),
+});
+
+export const ProfileFormFields = ({ 
+  userId,
+  firstName,
+  lastName,
+  email,
+  phone,
+  address,
+  city,
+  state,
+  postalCode,
+  country,
+  bio,
+  onSubmit
+}: ProfileFormFieldsProps) => {
+  const form = useForm({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      firstName,
+      lastName,
+      email,
+      phone,
+      address,
+      city,
+      state,
+      postalCode,
+      country,
+      bio,
+    },
+  });
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <Label htmlFor="first_name">First Name</Label>
-        <Input
-          id="first_name"
-          value={profile.first_name}
-          onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>First Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="last_name">Last Name</Label>
-        <Input
-          id="last_name"
-          value={profile.last_name}
-          onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
+
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone</FormLabel>
+              <FormControl>
+                <Input {...field} type="tel" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="phone">Phone</Label>
-        <Input
-          id="phone"
-          type="tel"
-          value={profile.phone}
-          onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="md:col-span-2">
-        <Label htmlFor="street_address">Street Address</Label>
-        <Input
-          id="street_address"
-          value={profile.street_address}
-          onChange={(e) => setProfile({ ...profile, street_address: e.target.value })}
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="state"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>State</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="postalCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Postal Code</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bio</FormLabel>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="city">City</Label>
-        <Input
-          id="city"
-          value={profile.city}
-          onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-        />
-      </div>
-      <div>
-        <Label htmlFor="state">State</Label>
-        <Input
-          id="state"
-          value={profile.state}
-          onChange={(e) => setProfile({ ...profile, state: e.target.value })}
-        />
-      </div>
-      <div>
-        <Label htmlFor="postal_code">Postal Code</Label>
-        <Input
-          id="postal_code"
-          value={profile.postal_code}
-          onChange={(e) => setProfile({ ...profile, postal_code: e.target.value })}
-        />
-      </div>
-    </div>
+      </form>
+    </Form>
   );
-}
+};
