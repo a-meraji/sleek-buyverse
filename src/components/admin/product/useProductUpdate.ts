@@ -16,7 +16,8 @@ export function useProductUpdate() {
         .from("products")
         .update({
           name: formData.name,
-          description: formData.description,
+          main_category: formData.main_category,
+          secondary_categories: formData.secondary_categories,
           category: formData.category,
           image_url: formData.image_url,
           sku: formData.sku,
