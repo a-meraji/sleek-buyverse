@@ -6,15 +6,19 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 interface SearchBadgeProps {
   searchQuery: string;
   selectedCategories: string[];
+  selectedBrands: string[];
   onClear: () => void;
   onClearCategory: (category: string) => void;
+  onClearBrand: (brand: string) => void;
 }
 
 export const SearchBadge = ({
   searchQuery,
   selectedCategories,
+  selectedBrands,
   onClear,
   onClearCategory,
+  onClearBrand,
 }: SearchBadgeProps) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -22,7 +26,7 @@ export const SearchBadge = ({
   const isDiscounted = searchParams.get('discount') === 'true';
   const mainCategory = searchParams.get('main_category');
 
-  if (!searchQuery && !selectedCategories.length && !sort && !isDiscounted && !mainCategory) {
+  if (!searchQuery && !selectedCategories.length && !selectedBrands.length && !sort && !isDiscounted && !mainCategory) {
     return null;
   }
 
@@ -48,7 +52,7 @@ export const SearchBadge = ({
 
   return (
     <div className="flex flex-wrap items-center gap-2 mt-4">
-      {(searchQuery || selectedCategories.length > 0 || sort || isDiscounted || mainCategory) && (
+      {(searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0 || sort || isDiscounted || mainCategory) && (
         <div className="text-sm text-gray-500">Filters:</div>
       )}
       
@@ -76,6 +80,24 @@ export const SearchBadge = ({
         </Badge>
       ))}
 
+      {selectedBrands.map((brand) => (
+        <Badge
+          key={brand}
+          variant="secondary"
+          className="flex items-center gap-1 text-sm"
+        >
+          {brand}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-auto p-0 hover:bg-transparent"
+            onClick={() => onClearBrand(brand)}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </Badge>
+      ))}
+
       {sort && (
         <Badge variant="secondary" className="text-sm">
           {getFilterLabel(sort)}
@@ -88,7 +110,7 @@ export const SearchBadge = ({
         </Badge>
       )}
 
-      {(searchQuery || selectedCategories.length > 0 || sort || isDiscounted || mainCategory) && (
+      {(searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0 || sort || isDiscounted || mainCategory) && (
         <Button
           variant="ghost"
           size="sm"

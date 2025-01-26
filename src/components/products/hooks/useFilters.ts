@@ -9,6 +9,7 @@ export const useFilters = (products: Product[] | null) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     mainCategory ? [mainCategory] : []
   );
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 
   // Update selected categories when main_category changes in URL
@@ -44,6 +45,11 @@ export const useFilters = (products: Product[] | null) => {
          selectedCategories.includes(category)
        ));
 
+    // Filter by brands
+    const matchesBrand =
+      selectedBrands.length === 0 ||
+      (product.brand && selectedBrands.includes(product.brand));
+
     // Filter by price range
     const matchesPrice = product.product_variants?.some(
       variant => 
@@ -51,14 +57,16 @@ export const useFilters = (products: Product[] | null) => {
         Number(variant.price) <= priceRange[1]
     );
 
-    return matchesSearch && matchesCategory && matchesPrice;
+    return matchesSearch && matchesCategory && matchesBrand && matchesPrice;
   });
 
   return {
     searchQuery,
     selectedCategories,
+    selectedBrands,
     priceRange,
     setSelectedCategories,
+    setSelectedBrands,
     setPriceRange,
     filteredProducts
   };

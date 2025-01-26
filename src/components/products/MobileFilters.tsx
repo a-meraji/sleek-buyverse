@@ -2,6 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { X } from "lucide-react";
 import { PriceRangeFilter } from "./filters/PriceRangeFilter";
 import { CategoryFilter } from "./filters/CategoryFilter";
+import { BrandFilter } from "./filters/BrandFilter";
 import { Dispatch, SetStateAction } from "react";
 
 interface MobileFiltersProps {
@@ -11,7 +12,10 @@ interface MobileFiltersProps {
   setPriceRange: Dispatch<SetStateAction<[number, number]>>;
   selectedCategories: string[];
   setSelectedCategories: (categories: string[]) => void;
+  selectedBrands: string[];
+  setSelectedBrands: (brands: string[]) => void;
   categories?: string[];
+  brands?: string[];
 }
 
 export const MobileFilters = ({
@@ -21,7 +25,10 @@ export const MobileFilters = ({
   setPriceRange,
   selectedCategories,
   setSelectedCategories,
+  selectedBrands,
+  setSelectedBrands,
   categories,
+  brands,
 }: MobileFiltersProps) => {
   return (
     <Dialog as="div" open={open} onClose={setOpen} className="relative z-40 lg:hidden">
@@ -51,6 +58,12 @@ export const MobileFilters = ({
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
               categories={categories}
+              isMobile
+            />
+            <BrandFilter
+              selectedBrands={selectedBrands}
+              setSelectedBrands={setSelectedBrands}
+              brands={brands}
               isMobile
             />
           </div>

@@ -17,14 +17,17 @@ export const ProductsContainer = () => {
     products,
     isLoading,
     error,
-    categories
+    categories,
+    brands
   } = useProducts();
 
   const {
     searchQuery,
     selectedCategories,
+    selectedBrands,
     priceRange,
     setSelectedCategories,
+    setSelectedBrands,
     setPriceRange,
     filteredProducts
   } = useFilters(products);
@@ -32,11 +35,16 @@ export const ProductsContainer = () => {
   const handleClearFilters = () => {
     navigate('/products');
     setSelectedCategories([]);
+    setSelectedBrands([]);
     setPriceRange([0, 1000]);
   };
 
   const handleClearCategory = (categoryToRemove: string) => {
     setSelectedCategories(selectedCategories.filter(cat => cat !== categoryToRemove));
+  };
+
+  const handleClearBrand = (brandToRemove: string) => {
+    setSelectedBrands(selectedBrands.filter(brand => brand !== brandToRemove));
   };
 
   return (
@@ -50,17 +58,22 @@ export const ProductsContainer = () => {
       <SearchBadge
         searchQuery={searchQuery}
         selectedCategories={selectedCategories}
+        selectedBrands={selectedBrands}
         onClear={handleClearFilters}
         onClearCategory={handleClearCategory}
+        onClearBrand={handleClearBrand}
       />
       
       <div className="flex gap-8 items-start mt-4">
         <FilterSidebar
           selectedCategories={selectedCategories}
           setSelectedCategories={setSelectedCategories}
+          selectedBrands={selectedBrands}
+          setSelectedBrands={setSelectedBrands}
           priceRange={priceRange}
           setPriceRange={setPriceRange}
           categories={categories}
+          brands={brands}
           className="hidden lg:block sticky top-8"
         />
         
@@ -70,9 +83,12 @@ export const ProductsContainer = () => {
             setOpen={setMobileFiltersOpen}
             selectedCategories={selectedCategories}
             setSelectedCategories={setSelectedCategories}
+            selectedBrands={selectedBrands}
+            setSelectedBrands={setSelectedBrands}
             priceRange={priceRange}
             setPriceRange={setPriceRange}
             categories={categories}
+            brands={brands}
           />
           
           <ProductGrid 

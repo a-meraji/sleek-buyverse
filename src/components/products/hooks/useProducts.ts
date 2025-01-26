@@ -81,10 +81,16 @@ export const useProducts = () => {
 
   const allCategories = [...new Set([...mainCategories, ...secondaryCategories])];
 
+  // Extract unique brands from products
+  const brands = products
+    ? [...new Set(products.filter(p => p.brand).map(p => p.brand!))]
+    : [];
+
   return {
     products,
     isLoading,
     error,
-    categories: allCategories
+    categories: allCategories,
+    brands
   };
 };
