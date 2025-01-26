@@ -81,3 +81,12 @@ export interface ProductContainerProps {
   product: Product;
   userId?: string;
 }
+
+export interface ProductTableRowProps {
+  product: Product;
+  variants: ProductVariant[];
+  onEdit: (product: Product) => void;
+  onDelete: (product: Product) => void;
+  expandedProductId: string | null;
+  onExpand: (productId: string | null) => void;
+}

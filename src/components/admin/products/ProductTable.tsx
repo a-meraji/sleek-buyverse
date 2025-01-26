@@ -1,8 +1,7 @@
 import { Table, TableBody } from "@/components/ui/table";
 import { ProductTableRow } from "./table/ProductTableRow";
 import { ProductTableHeader } from "./ProductTableHeader";
-import { Product } from "@/types";
-import { ProductVariant } from "@/types";
+import { Product, ProductVariant } from "@/types";
 
 interface ProductTableProps {
   products: Product[] | null;
@@ -21,8 +20,6 @@ export function ProductTable({
   onEdit,
   onDelete 
 }: ProductTableProps) {
-  console.log("Products with discounts:", products?.filter(p => p.discount));
-  
   return (
     <div className="border rounded-lg">
       <Table>
