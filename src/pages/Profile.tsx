@@ -1,12 +1,31 @@
-import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import ProfileForm from "@/components/ProfileForm";
-import OrdersList from "@/components/OrdersList";
+import { ProfileForm } from "@/components/navbar/ProfileForm";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Profile() {
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
+  const [userId, setUserId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error("Error fetching user:", error);
+        toast({
+          title: "Error",
+          description: "Please log in to view your profile",
+          variant: "destructive",
+        });
+        return;
+      }
+      setUserId(user?.id || null);
+    };
+
+    getUser();
+  }, [toast]);
 
   if (!userId) {
     return <div>Please log in to view your profile.</div>;
@@ -22,10 +41,11 @@ export default function Profile() {
             <TabsTrigger value="orders">Orders</TabsTrigger>
           </TabsList>
           <TabsContent value="profile">
-            <ProfileForm />
+            <ProfileForm userId={userId} />
           </TabsContent>
           <TabsContent value="orders">
-            <OrdersList />
+            {/* TODO: Implement OrdersList component */}
+            <div>Orders will be displayed here</div>
           </TabsContent>
         </Tabs>
       </div>
