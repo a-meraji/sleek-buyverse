@@ -1,5 +1,6 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface CategoryFilterProps {
   selectedCategories: string[];
@@ -16,31 +17,38 @@ export const CategoryFilter = ({
 }: CategoryFilterProps) => {
   if (!categories || categories.length === 0) return null;
 
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCategories([...selectedCategories, category]);
+    } else {
+      setSelectedCategories(selectedCategories.filter(c => c !== category));
+    }
+  };
+
   const content = (
     <div className="space-y-4">
       {categories.map((category) => (
-        <div key={category} className="flex items-center">
-          <input
-            id={`category-${isMobile ? 'mobile-' : ''}${category}`}
-            name="category"
-            value={category}
-            type="checkbox"
-            checked={selectedCategories.includes(category)}
-            onChange={(e) => {
-              if (e.target.checked) {
-                setSelectedCategories([...selectedCategories, category]);
-              } else {
-                setSelectedCategories(selectedCategories.filter(c => c !== category));
-              }
-            }}
-            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-          />
-          <label
-            htmlFor={`category-${isMobile ? 'mobile-' : ''}${category}`}
-            className="ml-3 text-sm text-gray-600"
-          >
-            {category}
-          </label>
+        <div key={category} className="flex items-center justify-between">
+          <div className="flex items-center">
+            <input
+              id={`category-${isMobile ? 'mobile-' : ''}${category}`}
+              name="category"
+              value={category}
+              type="checkbox"
+              checked={selectedCategories.includes(category)}
+              onChange={(e) => handleCategoryChange(category, e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <label
+              htmlFor={`category-${isMobile ? 'mobile-' : ''}${category}`}
+              className="ml-3 text-sm text-gray-600"
+            >
+              {category}
+            </label>
+          </div>
+          <Badge variant="secondary" className="text-xs">
+            {categories.filter(c => c === category).length}
+          </Badge>
         </div>
       ))}
     </div>

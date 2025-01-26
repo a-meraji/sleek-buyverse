@@ -1,38 +1,53 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Product } from "@/types";
+import { Product } from '@/types';
 
-export const useFilters = (products: Product[] = []) => {
+export const useFilters = (products: Product[] | null) => {
   const [searchParams] = useSearchParams();
-  const urlSearchQuery = searchParams.get('search') || '';
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const searchQuery = searchParams.get('search')?.toLowerCase() || '';
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    searchParams.getAll('category') || []
+  );
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 
-  const filteredProducts = useMemo(() => {
-    console.log('Filtering products by price range:', { 
-      totalProducts: products?.length,
-      priceRange
-    });
+  useEffect(() => {
+    if (products) {
+      const prices = products.flatMap(product => 
+        product.product_variants?.map(variant => Number(variant.price)) || []
+      );
+      const maxPrice = Math.max(...prices, 0);
+      setPriceRange([0, maxPrice]);
+    }
+  }, [products]);
 
-    return products?.filter(product => {
-      // Price filter - use minimum price from variants
-      const minPrice = product.product_variants?.length 
-        ? Math.min(...product.product_variants.map(v => v.price))
-        : 0;
-      const matchesPrice = minPrice >= priceRange[0] && minPrice <= priceRange[1];
+  const filteredProducts = products?.filter(product => {
+    // Filter by search query
+    const matchesSearch = 
+      !searchQuery || 
+      product.name.toLowerCase().includes(searchQuery) ||
+      product.description?.toLowerCase().includes(searchQuery);
 
-      const isIncluded = matchesPrice;
-      console.log(`Product ${product.name}:`, { 
-        matchesPrice,
-        isIncluded 
-      });
+    // Filter by categories
+    const matchesCategory = 
+      selectedCategories.length === 0 || 
+      selectedCategories.some(category => 
+        product.main_category === category ||
+        (Array.isArray(product.secondary_categories) && 
+         product.secondary_categories.includes(category))
+      );
 
-      return isIncluded;
-    }) || [];
-  }, [products, priceRange]);
+    // Filter by price range
+    const matchesPrice = product.product_variants?.some(
+      variant => 
+        Number(variant.price) >= priceRange[0] && 
+        Number(variant.price) <= priceRange[1]
+    );
+
+    return matchesSearch && matchesCategory && matchesPrice;
+  });
 
   return {
-    searchQuery: urlSearchQuery,
+    searchQuery,
     selectedCategories,
     priceRange,
     setSelectedCategories,

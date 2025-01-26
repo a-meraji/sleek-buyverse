@@ -7,13 +7,13 @@ export const useProducts = () => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
   const sort = searchParams.get('sort');
-  const category = searchParams.get('category')?.toLowerCase(); // Normalize category case
+  const selectedCategories = searchParams.getAll('category');
   const discount = searchParams.get('discount') === 'true';
 
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ['products', searchQuery, sort, discount, category],
+    queryKey: ['products', searchQuery, sort, discount, selectedCategories],
     queryFn: async () => {
-      console.log('Fetching products with filters:', { searchQuery, sort, discount, category });
+      console.log('Fetching products with filters:', { searchQuery, sort, discount, selectedCategories });
       
       let query = supabase
         .from('products')
@@ -25,10 +25,14 @@ export const useProducts = () => {
         query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
-      // Apply category filter if present
-      if (category) {
-        console.log('Filtering by category:', category);
-        query = query.ilike('category', category); // Use case-insensitive comparison
+      // Apply category filters
+      if (selectedCategories.length > 0) {
+        console.log('Filtering by categories:', selectedCategories);
+        query = query.or(
+          selectedCategories.map(category => 
+            `main_category.ilike.${category},secondary_categories::text.ilike.%${category}%`
+          ).join(',')
+        );
       }
 
       // Apply discount filter
@@ -66,14 +70,22 @@ export const useProducts = () => {
   });
 
   // Extract unique categories from products
-  const categories = products 
-    ? [...new Set(products.filter(p => p.category).map(p => p.category!))]
+  const mainCategories = products 
+    ? [...new Set(products.filter(p => p.main_category).map(p => p.main_category!))]
     : [];
+
+  const secondaryCategories = products
+    ? [...new Set(products.flatMap(p => 
+        Array.isArray(p.secondary_categories) ? p.secondary_categories : []
+      ))]
+    : [];
+
+  const allCategories = [...new Set([...mainCategories, ...secondaryCategories])];
 
   return {
     products,
     isLoading,
     error,
-    categories
+    categories: allCategories
   };
 };
