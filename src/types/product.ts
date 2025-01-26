@@ -35,6 +35,7 @@ export interface Product {
   secondary_categories?: string[];
   sku?: string;
   discount?: number;
+  brand?: string;
   product_images?: ProductImage[];
   product_variants?: ProductVariant[];
   created_at?: string;
