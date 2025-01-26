@@ -76,3 +76,8 @@ export interface CartItemPriceProps {
   discount?: number;
   variantPrice: number;
 }
+
+export interface ProductContainerProps {
+  product: Product;
+  userId?: string;
+}

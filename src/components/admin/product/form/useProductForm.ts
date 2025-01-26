@@ -6,7 +6,8 @@ export function useProductForm({ onClose, initialData }: ProductFormProps) {
   const [formData, setFormData] = useState<Partial<Product>>(initialData || {
     name: "",
     description: "",
-    category: "",
+    main_category: "",
+    secondary_categories: [],
     image_url: "",
     sku: "",
     discount: 0,
