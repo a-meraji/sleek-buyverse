@@ -116,7 +116,7 @@ export function CategorySelector({
         if (product.main_category) {
           mainCategories.add(product.main_category);
         }
-        if (product.secondary_categories) {
+        if (Array.isArray(product.secondary_categories)) {
           product.secondary_categories.forEach((cat: string) => {
             secondaryCategories.add(cat);
           });

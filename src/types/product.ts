@@ -52,5 +52,5 @@ export interface ProductFormContainerProps {
 
 export interface ProductContainerProps {
   product: Product;
-  userId?: string;
+  userId?: string | null;
 }
