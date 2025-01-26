@@ -71,6 +71,7 @@ export const ProductDetails = ({ product, userId }: ProductDetailsProps) => {
         name={product.name} 
         discount={product.discount} 
         productId={product.id}
+        brand={product.brand}
       />
       
       <PriceDisplay 

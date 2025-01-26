@@ -7,9 +7,10 @@ interface ProductHeaderProps {
   name: string;
   discount?: number | null;
   productId: string;
+  brand?: string | null;
 }
 
-export const ProductHeader = ({ name, discount, productId }: ProductHeaderProps) => {
+export const ProductHeader = ({ name, discount, productId, brand }: ProductHeaderProps) => {
   const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
 
   const { data: reviews } = useQuery({
@@ -39,6 +40,11 @@ export const ProductHeader = ({ name, discount, productId }: ProductHeaderProps)
   return (
     <div className="space-y-2">
       <h1 className="text-3xl font-bold">{name}</h1>
+      {brand && (
+        <div className="text-sm text-muted-foreground">
+          by {brand}
+        </div>
+      )}
       <div className="flex items-center gap-4">
         {hasValidDiscount && (
           <Badge className="bg-red-500 text-white">
