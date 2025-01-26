@@ -30,6 +30,24 @@ export type Database = {
         }
         Relationships: []
       }
+      brands: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       campaign_products: {
         Row: {
           campaign_id: string
@@ -422,6 +440,7 @@ export type Database = {
       }
       products: {
         Row: {
+          brand: string | null
           created_at: string
           description: string | null
           discount: number | null
@@ -433,6 +452,7 @@ export type Database = {
           sku: string | null
         }
         Insert: {
+          brand?: string | null
           created_at?: string
           description?: string | null
           discount?: number | null
@@ -444,6 +464,7 @@ export type Database = {
           sku?: string | null
         }
         Update: {
+          brand?: string | null
           created_at?: string
           description?: string | null
           discount?: number | null
