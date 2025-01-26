@@ -1,18 +1,10 @@
 import { ProductVariant } from "./variant";
-import { ProductImage } from "./types";
 
-export interface Product {
+export interface ProductImage {
   id: string;
-  name: string;
-  description?: string;
+  product_id: string;
   image_url: string;
-  main_category?: string;
-  secondary_categories?: string[];
-  sku?: string;
-  discount?: number;
-  product_images?: ProductImage[];
-  product_variants?: ProductVariant[];
-  created_at?: string;
+  display_order: number;
 }
 
 export interface ProductSize {
@@ -30,8 +22,22 @@ export interface Review {
   title: string;
   review_text: string;
   rating: number;
-  status: string;
+  status: "pending" | "approved" | "rejected";
   created_at: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  image_url: string;
+  main_category?: string;
+  secondary_categories?: string[];
+  sku?: string;
+  discount?: number;
+  product_images?: ProductImage[];
+  product_variants?: ProductVariant[];
+  created_at?: string;
 }
 
 export interface ProductFormProps {

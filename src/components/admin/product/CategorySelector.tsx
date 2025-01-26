@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
-interface CategorySelectorProps {
+export interface CategorySelectorProps {
   mainCategory: string;
   secondaryCategories: string[];
   onMainCategoryChange: (value: string) => void;

@@ -19,7 +19,8 @@ export function ProductForm({ onClose }: ProductFormProps) {
   const [formData, setFormData] = useState<Partial<Product>>({
     name: "",
     description: "",
-    category: "",
+    main_category: "",
+    secondary_categories: [],
     image_url: "",
     sku: "",
     discount: 0,
@@ -74,7 +75,8 @@ export function ProductForm({ onClose }: ProductFormProps) {
       const productData = {
         name: formData.name,
         description: formData.description || "",
-        category: formData.category || "",
+        main_category: formData.main_category || "",
+        secondary_categories: formData.secondary_categories || [],
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
         discount: formData.discount || 0,
@@ -112,7 +114,6 @@ export function ProductForm({ onClose }: ProductFormProps) {
         if (imagesError) throw imagesError;
       }
 
-      // Ensure parameters are properly formatted before saving
       const variantsData = variants.map(variant => ({
         product_id: product.id,
         parameters: Object.fromEntries(
@@ -197,8 +198,12 @@ export function ProductForm({ onClose }: ProductFormProps) {
         />
 
         <CategorySelector
-          value={formData.category ?? ""}
-          onChange={(value) => handleFormChange({ category: value })}
+          mainCategory={formData.main_category ?? ""}
+          secondaryCategories={formData.secondary_categories ?? []}
+          onMainCategoryChange={(value) => handleFormChange({ main_category: value })}
+          onSecondaryCategoriesChange={(categories) => 
+            handleFormChange({ secondary_categories: categories })
+          }
         />
 
         <VariantsManager
