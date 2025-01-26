@@ -3,8 +3,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { ProductActionsCell } from './ProductActionsCell';
 import { ProductVariantsCell } from './ProductVariantsCell';
 import { ProductTableRowProps } from '@/types';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export function ProductTableRow({ 
   product, 
@@ -28,7 +27,18 @@ export function ProductTableRow({
       </TableCell>
       <TableCell className="font-medium">{product.name}</TableCell>
       <TableCell>{product.sku}</TableCell>
-      <TableCell>{product.main_category}</TableCell>
+      <TableCell>
+        <div className="space-y-2">
+          <div>{product.main_category || 'No main category'}</div>
+          <div className="flex flex-wrap gap-1">
+            {product.secondary_categories?.map((category, index) => (
+              <Badge key={index} variant="secondary">
+                {category}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </TableCell>
       <TableCell>
         <ProductVariantsCell 
           variants={variants}

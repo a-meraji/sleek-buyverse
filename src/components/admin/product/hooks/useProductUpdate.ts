@@ -12,23 +12,26 @@ export function useProductUpdate() {
       console.log('Updating product with data:', formData);
       console.log('Updating variants:', variants);
       
-      const { error: productError } = await supabase
+      const { data: updatedProduct, error: productError } = await supabase
         .from("products")
         .update({
           name: formData.name,
           description: formData.description,
           main_category: formData.main_category,
-          secondary_categories: formData.secondary_categories,
+          secondary_categories: formData.secondary_categories || [],
           image_url: formData.image_url,
           sku: formData.sku,
           discount: formData.discount,
         })
-        .eq("id", formData.id);
+        .eq("id", formData.id)
+        .select();
 
       if (productError) {
         console.error('Error updating product:', productError);
         throw productError;
       }
+
+      console.log('Product updated successfully:', updatedProduct);
 
       // Delete existing variants
       const { error: deleteError } = await supabase
@@ -89,6 +92,8 @@ export function useProductUpdate() {
           throw imagesError;
         }
       }
+
+      return updatedProduct;
     },
     onSuccess: (_, { formData }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
