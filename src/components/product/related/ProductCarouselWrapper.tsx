@@ -10,9 +10,11 @@ export const ProductCarouselWrapper = ({ title, products }: ProductCarouselWrapp
   if (!products?.length) return null;
 
   return (
-    <ProductCarousel
-      title={title}
-      products={products}
-    />
+    <div className="min-w-full">
+      <ProductCarousel
+        title={title}
+        products={products}
+      />
+    </div>
   );
 };
