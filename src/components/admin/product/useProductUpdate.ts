@@ -20,6 +20,7 @@ export function useProductUpdate() {
       const productData = {
         name: formData.name,
         description: formData.description,
+        brand: formData.brand,
         main_category: formData.main_category,
         secondary_categories, // Ensure we're passing the array directly
         image_url: formData.image_url,
