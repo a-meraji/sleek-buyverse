@@ -17,7 +17,7 @@ export const useProducts = () => {
       
       let query = supabase
         .from('products')
-        .select('*, product_variants(*)')
+        .select('*, product_variants(*), brands(name)')
 
       // Apply search filter if present
       if (searchQuery) {
