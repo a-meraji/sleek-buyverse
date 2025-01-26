@@ -56,23 +56,23 @@ export const CartSummary = ({
   };
   
   return (
-    <div className="space-y-6">
+    <div className="bg-white p-6 rounded-lg shadow-sm space-y-6">
       <div className="space-y-4">
         {!readonly && (
           <>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span className="text-gray-600">Subtotal</span>
+              <span className="font-medium">${subtotal.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Tax (8%)</span>
-              <span>${tax.toFixed(2)}</span>
+              <span className="text-gray-600">Tax (8%)</span>
+              <span className="font-medium">${tax.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Shipping</span>
-              <span>${shipping.toFixed(2)}</span>
+              <span className="text-gray-600">Shipping</span>
+              <span className="font-medium">${shipping.toFixed(2)}</span>
             </div>
 
             <Separator className="my-4" />
@@ -86,7 +86,7 @@ export const CartSummary = ({
       </div>
       
       <Button 
-        className="w-full py-6 text-lg"
+        className="w-full py-6 text-lg bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
         size="lg"
         disabled={!itemsExist}
         onClick={handleCheckout}
@@ -96,7 +96,7 @@ export const CartSummary = ({
       </Button>
 
       {!isAuthenticated && (
-        <p className="text-sm text-muted-foreground text-center">
+        <p className="text-sm text-gray-500 text-center">
           You need to sign in to complete your purchase
         </p>
       )}

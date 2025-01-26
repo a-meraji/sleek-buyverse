@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductOverviewDialog } from "./product/ProductOverviewDialog";
 import { Product } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Percent } from "lucide-react";
 
 interface ProductCardProps {
   id: string;
@@ -46,9 +45,9 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
   console.log('ProductCard variants:', product_variants);
 
   return (
-    <div className="group relative rounded-lg border p-4 hover:shadow-lg transition-shadow">
+    <div className="group relative rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-lg">
       <Link to={`/product/${id}`} className="block">
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-50">
           {hasValidDiscount && (
             <Badge className="absolute top-2 left-2 bg-red-500 text-white z-10">
               {discount}% OFF
@@ -57,21 +56,21 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
           <img
             src={image}
             alt={name}
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
-        <div className="mt-4">
-          <h3 className="text-lg font-medium">{name}</h3>
-          <p className="mt-1 text-sm">
+        <div className="mt-4 space-y-1">
+          <h3 className="text-lg font-medium text-gray-900">{name}</h3>
+          <p className="text-sm">
             {product_variants?.length ? (
               <span className="flex items-center gap-2">
                 {hasValidDiscount ? (
                   <>
                     <span className="text-gray-500 line-through">From ${minPrice.toFixed(2)}</span>
-                    <span className="text-red-500">From ${discountedPrice.toFixed(2)}</span>
+                    <span className="text-red-500 font-medium">From ${discountedPrice.toFixed(2)}</span>
                   </>
                 ) : (
-                  <span className="text-gray-500">From ${minPrice.toFixed(2)}</span>
+                  <span className="text-gray-700">From ${minPrice.toFixed(2)}</span>
                 )}
               </span>
             ) : (
@@ -82,7 +81,7 @@ export function ProductCard({ id, name, image, product_variants, discount }: Pro
       </Link>
       <div className="mt-4">
         <Button 
-          className="w-full" 
+          className="w-full bg-[#9b87f5] hover:bg-[#7E69AB] text-white" 
           onClick={() => setIsDialogOpen(true)}
         >
           Add to Cart
