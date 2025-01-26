@@ -2,6 +2,8 @@ import React from 'react';
 import { CartItemProps } from '@/types';
 import { CartItemHeader } from './item/CartItemHeader';
 import { CartItemPrice } from './item/CartItemPrice';
+import { CartItemImage } from './item/CartItemImage';
+import { CartItemQuantity } from './item/CartItemQuantity';
 import { formatParameters } from '@/lib/utils';
 
 export function CartItem({ item, onQuantityChange, onRemove, readonly = false }: CartItemProps) {
@@ -19,24 +21,31 @@ export function CartItem({ item, onQuantityChange, onRemove, readonly = false }:
         readonly={readonly}
       />
       
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <input
-            type="number"
-            value={item.quantity}
-            onChange={(e) => onQuantityChange(item.id, Number(e.target.value))}
-            className="w-16 px-2 py-1 border rounded"
-            min="1"
-            disabled={readonly}
-          />
-        </div>
-        
-        <CartItemPrice
-          price={item.variant?.price || 0}
-          variantPrice={item.variant?.price || 0}
-          quantity={item.quantity}
-          discount={item.product?.discount || 0}
+      <div className="flex items-start gap-4">
+        <CartItemImage
+          imageUrl={item.product?.image_url || ''}
+          productName={item.product?.name || ''}
+          discount={item.product?.discount}
         />
+        
+        <div className="flex-1 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <CartItemQuantity
+              quantity={item.quantity}
+              onQuantityChange={(delta) => {
+                const newQuantity = Math.max(1, item.quantity + delta);
+                onQuantityChange(item.id, newQuantity);
+              }}
+            />
+            
+            <CartItemPrice
+              price={item.variant?.price || 0}
+              variantPrice={item.variant?.price || 0}
+              quantity={item.quantity}
+              discount={item.product?.discount || 0}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

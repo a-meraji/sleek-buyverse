@@ -13,10 +13,11 @@ export const CartItemQuantity = ({ quantity, onQuantityChange }: CartItemQuantit
         variant="outline" 
         size="icon"
         onClick={() => onQuantityChange(-1)}
+        disabled={quantity <= 1}
       >
         <Minus className="h-4 w-4" />
       </Button>
-      <span>{quantity}</span>
+      <span className="w-8 text-center">{quantity}</span>
       <Button 
         variant="outline" 
         size="icon"
