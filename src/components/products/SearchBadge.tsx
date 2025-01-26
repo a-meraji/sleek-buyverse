@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 interface SearchBadgeProps {
   searchQuery: string;
@@ -17,10 +17,12 @@ export const SearchBadge = ({
   onClearCategory,
 }: SearchBadgeProps) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const sort = searchParams.get('sort');
   const isDiscounted = searchParams.get('discount') === 'true';
+  const mainCategory = searchParams.get('main_category');
 
-  if (!searchQuery && !selectedCategories.length && !sort && !isDiscounted) {
+  if (!searchQuery && !selectedCategories.length && !sort && !isDiscounted && !mainCategory) {
     return null;
   }
 
@@ -35,9 +37,18 @@ export const SearchBadge = ({
     }
   };
 
+  const handleClearCategory = (category: string) => {
+    if (category === mainCategory) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete('main_category');
+      navigate(`/products?${newSearchParams.toString()}`);
+    }
+    onClearCategory(category);
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-2 mt-4">
-      {(searchQuery || selectedCategories.length > 0 || sort || isDiscounted) && (
+      {(searchQuery || selectedCategories.length > 0 || sort || isDiscounted || mainCategory) && (
         <div className="text-sm text-gray-500">Filters:</div>
       )}
       
@@ -58,7 +69,7 @@ export const SearchBadge = ({
             variant="ghost"
             size="sm"
             className="h-auto p-0 hover:bg-transparent"
-            onClick={() => onClearCategory(category)}
+            onClick={() => handleClearCategory(category)}
           >
             <X className="h-3 w-3" />
           </Button>
@@ -77,7 +88,7 @@ export const SearchBadge = ({
         </Badge>
       )}
 
-      {(searchQuery || selectedCategories.length > 0 || sort || isDiscounted) && (
+      {(searchQuery || selectedCategories.length > 0 || sort || isDiscounted || mainCategory) && (
         <Button
           variant="ghost"
           size="sm"

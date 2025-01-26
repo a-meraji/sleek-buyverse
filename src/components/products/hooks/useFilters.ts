@@ -5,10 +5,18 @@ import { Product } from '@/types';
 export const useFilters = (products: Product[] | null) => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search')?.toLowerCase() || '';
+  const mainCategory = searchParams.get('main_category');
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    searchParams.getAll('category') || []
+    mainCategory ? [mainCategory] : []
   );
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+
+  // Update selected categories when main_category changes in URL
+  useEffect(() => {
+    if (mainCategory && !selectedCategories.includes(mainCategory)) {
+      setSelectedCategories([mainCategory]);
+    }
+  }, [mainCategory]);
 
   useEffect(() => {
     if (products) {
@@ -30,11 +38,11 @@ export const useFilters = (products: Product[] | null) => {
     // Filter by categories
     const matchesCategory = 
       selectedCategories.length === 0 || 
-      selectedCategories.some(category => 
-        product.main_category === category ||
-        (Array.isArray(product.secondary_categories) && 
-         product.secondary_categories.includes(category))
-      );
+      selectedCategories.includes(product.main_category || '') ||
+      (Array.isArray(product.secondary_categories) && 
+       product.secondary_categories.some(category => 
+         selectedCategories.includes(category)
+       ));
 
     // Filter by price range
     const matchesPrice = product.product_variants?.some(
