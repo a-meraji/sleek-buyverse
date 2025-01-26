@@ -1,112 +1,83 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { CategoryDropdown } from "./CategoryDropdown";
-import { NewCategoryForm } from "./NewCategoryForm";
+import { Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
 interface CategorySelectorProps {
   mainCategory: string;
   secondaryCategories: string[];
-  onMainCategoryChange: (category: string) => void;
+  onMainCategoryChange: (value: string) => void;
   onSecondaryCategoriesChange: (categories: string[]) => void;
 }
 
-export function CategorySelector({ 
-  mainCategory, 
-  secondaryCategories, 
-  onMainCategoryChange, 
-  onSecondaryCategoriesChange 
+interface CategoryDropdownProps {
+  value: string;
+  categories: string[];
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+}
+
+export function CategoryDropdown({
+  value,
+  categories,
+  onValueChange,
+  placeholder = "Select a category"
+}: CategoryDropdownProps) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className="w-full bg-white">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className="bg-white">
+        {categories?.map((category) => (
+          <SelectItem key={category} value={category}>
+            {category}
+          </SelectItem>
+        ))}
+        <SelectItem value="new">
+          <span className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add new category
+          </span>
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}
+
+export function CategorySelector({
+  mainCategory,
+  secondaryCategories,
+  onMainCategoryChange,
+  onSecondaryCategoriesChange
 }: CategorySelectorProps) {
-  const [showNewCategory, setShowNewCategory] = useState(false);
-  const [newCategory, setNewCategory] = useState("");
-  const [showSecondaryInput, setShowSecondaryInput] = useState(false);
-
-  const { data: categories } = useQuery({
-    queryKey: ["product-categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("main_category, secondary_categories")
-        .not("main_category", "is", null);
-
-      if (error) throw error;
-
-      // Collect all unique categories
-      const allCategories = new Set<string>();
-      
-      // Add main categories
-      data.forEach(item => {
-        if (item.main_category) {
-          allCategories.add(item.main_category);
-        }
-      });
-
-      // Add secondary categories
-      data.forEach(item => {
-        if (Array.isArray(item.secondary_categories)) {
-          item.secondary_categories.forEach((cat: string) => {
-            allCategories.add(cat);
-          });
-        }
-      });
-
-      // Include current values if they're not in the database yet
-      if (mainCategory) allCategories.add(mainCategory);
-      secondaryCategories.forEach(cat => allCategories.add(cat));
-      
-      return Array.from(allCategories).filter(Boolean).sort();
-    },
-  });
-
-  const handleMainCategoryChange = (value: string) => {
-    if (value === "new") {
-      setShowNewCategory(true);
-    } else {
-      onMainCategoryChange(value);
-    }
-  };
-
-  const handleNewCategorySubmit = () => {
-    if (newCategory.trim()) {
-      onMainCategoryChange(newCategory.trim());
-      setShowNewCategory(false);
-      setNewCategory("");
-    }
-  };
-
-  const handleAddSecondaryCategory = (category: string) => {
-    if (!secondaryCategories.includes(category) && category !== mainCategory) {
-      onSecondaryCategoriesChange([...secondaryCategories, category]);
-    }
-    setShowSecondaryInput(false);
-  };
-
   const handleRemoveSecondaryCategory = (categoryToRemove: string) => {
     onSecondaryCategoriesChange(
       secondaryCategories.filter(cat => cat !== categoryToRemove)
     );
   };
 
+  const handleAddSecondaryCategory = (category: string) => {
+    if (!secondaryCategories.includes(category) && category !== mainCategory) {
+      onSecondaryCategoriesChange([...secondaryCategories, category]);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <label htmlFor="main-category" className="text-sm font-medium">Main Category</label>
-        {showNewCategory ? (
-          <NewCategoryForm
-            value={newCategory}
-            onChange={setNewCategory}
-            onSubmit={handleNewCategorySubmit}
-            onCancel={() => setShowNewCategory(false)}
-          />
-        ) : (
-          <CategoryDropdown
-            value={mainCategory}
-            categories={categories || []}
-            onValueChange={handleMainCategoryChange}
-          />
-        )}
+        <label className="text-sm font-medium">Main Category</label>
+        <CategoryDropdown
+          value={mainCategory}
+          categories={[]}
+          onValueChange={onMainCategoryChange}
+        />
       </div>
 
       <div className="space-y-2">
@@ -123,31 +94,12 @@ export function CategorySelector({
               </button>
             </Badge>
           ))}
-          {showSecondaryInput ? (
-            <CategoryDropdown
-              value=""
-              categories={categories?.filter(cat => 
-                cat !== mainCategory && !secondaryCategories.includes(cat)
-              ) || []}
-              onValueChange={(value) => {
-                if (value === "new") {
-                  setShowNewCategory(true);
-                  setShowSecondaryInput(false);
-                } else {
-                  handleAddSecondaryCategory(value);
-                }
-              }}
-              placeholder="Select category..."
-            />
-          ) : (
-            <button
-              type="button"
-              onClick={() => setShowSecondaryInput(true)}
-              className="text-sm text-primary hover:text-primary/80"
-            >
-              + Add category
-            </button>
-          )}
+          <CategoryDropdown
+            value=""
+            categories={[]}
+            onValueChange={handleAddSecondaryCategory}
+            placeholder="Add secondary category..."
+          />
         </div>
       </div>
     </div>

@@ -1,15 +1,24 @@
 import { CategorySelector } from "../CategorySelector";
 
 interface ProductCategorySectionProps {
-  category: string;
-  onChange: (value: string) => void;
+  mainCategory: string;
+  secondaryCategories: string[];
+  onMainCategoryChange: (value: string) => void;
+  onSecondaryCategoriesChange: (categories: string[]) => void;
 }
 
-export function ProductCategorySection({ category, onChange }: ProductCategorySectionProps) {
+export function ProductCategorySection({
+  mainCategory,
+  secondaryCategories,
+  onMainCategoryChange,
+  onSecondaryCategoriesChange
+}: ProductCategorySectionProps) {
   return (
     <CategorySelector
-      value={category}
-      onChange={onChange}
+      mainCategory={mainCategory}
+      secondaryCategories={secondaryCategories}
+      onMainCategoryChange={onMainCategoryChange}
+      onSecondaryCategoriesChange={onSecondaryCategoriesChange}
     />
   );
 }
