@@ -17,11 +17,7 @@ export const useProducts = () => {
       
       let query = supabase
         .from('products')
-        .select(`
-          *,
-          product_variants(*),
-          brand:brands(name)
-        `)
+        .select('*, product_variants(*)')
 
       // Apply search filter if present
       if (searchQuery) {
@@ -63,10 +59,7 @@ export const useProducts = () => {
       }
       
       console.log('Fetched products:', data);
-      return data?.map(product => ({
-        ...product,
-        brand: product.brand?.name
-      })) || [];
+      return data || [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false
