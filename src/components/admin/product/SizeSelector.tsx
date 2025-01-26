@@ -20,14 +20,16 @@ export function SizeSelector({ selectedSizes, onChange }: SizeSelectorProps) {
   const [newSize, setNewSize] = useState("");
 
   const handleAddSizes = (sizesInput: string) => {
-    // Split by comma and filter out empty strings
     const sizesToAdd = sizesInput
       .split(",")
       .map(size => size.trim())
       .filter(size => size !== "")
-      .map(size => ({ label: size, value: size }));
+      .map(size => ({
+        id: crypto.randomUUID(),
+        name: size,
+        value: size
+      }));
 
-    // Filter out duplicates and add new sizes
     const uniqueNewSizes = sizesToAdd.filter(
       size => !selectedSizes.some(existing => existing.value === size.value)
     );
@@ -86,11 +88,11 @@ export function SizeSelector({ selectedSizes, onChange }: SizeSelectorProps) {
       <div className="flex flex-wrap gap-2 mt-2">
         {selectedSizes.map((size) => (
           <Badge 
-            key={size.value}
+            key={size.id}
             variant="secondary"
             className="flex items-center gap-1"
           >
-            {size.label}
+            {size.name}
             <X
               className="h-3 w-3 cursor-pointer"
               onClick={() => handleRemoveSize(size)}

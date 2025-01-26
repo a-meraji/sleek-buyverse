@@ -5,13 +5,11 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { ProductVariant } from "@/types/variant";
-import { ImageSelector } from "@/components/admin/ImageSelector";
-import { ProductDetailsFields } from "@/components/admin/product/ProductDetailsFields";
-import { CategorySelector } from "@/components/admin/product/CategorySelector";
-import { ImagePreview } from "@/components/admin/product/ImagePreview";
-import { VariantsManager } from "@/components/admin/product/VariantsManager";
-
-import { defaultValue } from "./rich-text/types";
+import { ImageSelector } from "../ImageSelector";
+import { ProductDetailsFields } from "./ProductDetailsFields";
+import { CategorySelector } from "./CategorySelector";
+import { ImagePreview } from "./ImagePreview";
+import { VariantsManager } from "./VariantsManager";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -20,8 +18,9 @@ interface ProductFormProps {
 export function ProductForm({ onClose }: ProductFormProps) {
   const [formData, setFormData] = useState<Partial<Product>>({
     name: "",
-    description: JSON.stringify(defaultValue),
-    category: "",
+    description: "",
+    main_category: "",
+    secondary_categories: [],
     image_url: "",
     sku: "",
     discount: 0,
@@ -75,8 +74,9 @@ export function ProductForm({ onClose }: ProductFormProps) {
 
       const productData = {
         name: formData.name,
-        description: formData.description || JSON.stringify(defaultValue),
-        category: formData.category || "",
+        description: formData.description || "",
+        main_category: formData.main_category || "",
+        secondary_categories: formData.secondary_categories || [],
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
         discount: formData.discount || 0,
@@ -198,8 +198,12 @@ export function ProductForm({ onClose }: ProductFormProps) {
         />
 
         <CategorySelector
-          value={formData.category ?? ""}
-          onChange={(value) => handleFormChange({ category: value })}
+          mainCategory={formData.main_category ?? ""}
+          secondaryCategories={formData.secondary_categories ?? []}
+          onMainCategoryChange={(value) => handleFormChange({ main_category: value })}
+          onSecondaryCategoriesChange={(categories) => 
+            handleFormChange({ secondary_categories: categories })
+          }
         />
 
         <VariantsManager
