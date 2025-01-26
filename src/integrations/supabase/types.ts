@@ -440,7 +440,7 @@ export type Database = {
       }
       products: {
         Row: {
-          brand: string | null
+          brand_id: string | null
           created_at: string
           description: string | null
           discount: number | null
@@ -452,7 +452,7 @@ export type Database = {
           sku: string | null
         }
         Insert: {
-          brand?: string | null
+          brand_id?: string | null
           created_at?: string
           description?: string | null
           discount?: number | null
@@ -464,7 +464,7 @@ export type Database = {
           sku?: string | null
         }
         Update: {
-          brand?: string | null
+          brand_id?: string | null
           created_at?: string
           description?: string | null
           discount?: number | null
@@ -475,7 +475,15 @@ export type Database = {
           secondary_categories?: Json | null
           sku?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
