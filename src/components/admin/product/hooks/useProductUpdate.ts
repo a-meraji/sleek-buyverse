@@ -9,31 +9,39 @@ export function useProductUpdate() {
 
   return useMutation({
     mutationFn: async ({ formData, variants }: { formData: Product, variants: ProductVariant[] }) => {
-      console.log('Updating product with data:', formData);
+      console.log('Starting product update with data:', formData);
       console.log('Secondary categories before update:', formData.secondary_categories);
       
-      const { error: productError } = await supabase
+      // Ensure secondary_categories is an array
+      const secondary_categories = Array.isArray(formData.secondary_categories) 
+        ? formData.secondary_categories 
+        : [];
+
+      const productData = {
+        name: formData.name,
+        description: formData.description,
+        main_category: formData.main_category,
+        secondary_categories, // Ensure we're passing the array directly
+        image_url: formData.image_url,
+        sku: formData.sku,
+        discount: formData.discount,
+      };
+
+      console.log('Sending update with product data:', productData);
+
+      const { data: updatedProduct, error: productError } = await supabase
         .from("products")
-        .update({
-          name: formData.name,
-          description: formData.description,
-          main_category: formData.main_category,
-          secondary_categories: formData.secondary_categories || [],
-          image_url: formData.image_url,
-          sku: formData.sku,
-          discount: formData.discount,
-        })
-        .eq("id", formData.id);
+        .update(productData)
+        .eq("id", formData.id)
+        .select()
+        .single();
 
       if (productError) {
         console.error('Error updating product:', productError);
         throw productError;
       }
 
-      console.log('Product updated successfully with categories:', {
-        main: formData.main_category,
-        secondary: formData.secondary_categories
-      });
+      console.log('Product updated successfully:', updatedProduct);
 
       // Delete existing variants
       const { error: deleteError } = await supabase
@@ -94,6 +102,8 @@ export function useProductUpdate() {
           throw imagesError;
         }
       }
+
+      return updatedProduct;
     },
     onSuccess: (_, { formData }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
