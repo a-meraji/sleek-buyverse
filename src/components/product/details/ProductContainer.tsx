@@ -3,9 +3,10 @@ import { ProductImage } from "@/types/product";
 
 interface ProductContainerProps {
   product: Product;
+  userId?: string | null;
 }
 
-export function ProductContainer({ product }: ProductContainerProps) {
+export function ProductContainer({ product, userId }: ProductContainerProps) {
   return (
     <div>
       <h1>{product.name}</h1>

@@ -79,7 +79,7 @@ export interface CartItemPriceProps {
 
 export interface ProductContainerProps {
   product: Product;
-  userId?: string;
+  userId?: string | null;
 }
 
 export interface ProductTableRowProps {
