@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react";
+import { useState } from "react";
+import { Plus, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -7,7 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CategorySelectorProps {
   mainCategory: string;
@@ -21,16 +25,56 @@ interface CategoryDropdownProps {
   categories: string[];
   onValueChange: (value: string) => void;
   placeholder?: string;
+  isMainCategory?: boolean;
 }
 
-export function CategoryDropdown({
+function CategoryDropdown({
   value,
   categories,
   onValueChange,
-  placeholder = "Select a category"
+  placeholder = "Select a category",
+  isMainCategory = false
 }: CategoryDropdownProps) {
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+
+  const handleNewCategory = () => {
+    if (newCategory.trim()) {
+      onValueChange(newCategory.trim());
+      setNewCategory("");
+      setIsAddingNew(false);
+    }
+  };
+
+  if (isAddingNew) {
+    return (
+      <div className="flex gap-2">
+        <Input
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+          placeholder="Enter new category"
+          className="bg-white"
+        />
+        <Button onClick={handleNewCategory} size="sm">Add</Button>
+        <Button 
+          onClick={() => setIsAddingNew(false)} 
+          variant="outline" 
+          size="sm"
+        >
+          Cancel
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <Select value={value} onValueChange={onValueChange}>
+    <Select value={value} onValueChange={(val) => {
+      if (val === "new") {
+        setIsAddingNew(true);
+      } else {
+        onValueChange(val);
+      }
+    }}>
       <SelectTrigger className="w-full bg-white">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
@@ -57,6 +101,35 @@ export function CategorySelector({
   onMainCategoryChange,
   onSecondaryCategoriesChange
 }: CategorySelectorProps) {
+  // Fetch existing categories
+  const { data: existingCategories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data: products } = await supabase
+        .from("products")
+        .select("main_category, secondary_categories");
+      
+      const mainCategories = new Set<string>();
+      const secondaryCategories = new Set<string>();
+      
+      products?.forEach(product => {
+        if (product.main_category) {
+          mainCategories.add(product.main_category);
+        }
+        if (product.secondary_categories) {
+          product.secondary_categories.forEach((cat: string) => {
+            secondaryCategories.add(cat);
+          });
+        }
+      });
+      
+      return {
+        mainCategories: Array.from(mainCategories),
+        secondaryCategories: Array.from(secondaryCategories)
+      };
+    }
+  });
+
   const handleRemoveSecondaryCategory = (categoryToRemove: string) => {
     onSecondaryCategoriesChange(
       secondaryCategories.filter(cat => cat !== categoryToRemove)
@@ -75,8 +148,9 @@ export function CategorySelector({
         <label className="text-sm font-medium">Main Category</label>
         <CategoryDropdown
           value={mainCategory}
-          categories={[]}
+          categories={existingCategories?.mainCategories || []}
           onValueChange={onMainCategoryChange}
+          isMainCategory={true}
         />
       </div>
 
@@ -96,7 +170,7 @@ export function CategorySelector({
           ))}
           <CategoryDropdown
             value=""
-            categories={[]}
+            categories={existingCategories?.secondaryCategories || []}
             onValueChange={handleAddSecondaryCategory}
             placeholder="Add secondary category..."
           />
