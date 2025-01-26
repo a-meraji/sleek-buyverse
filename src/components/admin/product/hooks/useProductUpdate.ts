@@ -21,10 +21,11 @@ export function useProductUpdate() {
         name: formData.name,
         description: formData.description,
         main_category: formData.main_category,
-        secondary_categories, // Ensure we're passing the array directly
+        secondary_categories,
         image_url: formData.image_url,
         sku: formData.sku,
         discount: formData.discount,
+        brand: formData.brand, // Ensure brand is included in the update
       };
 
       console.log('Sending update with product data:', productData);
