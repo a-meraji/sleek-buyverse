@@ -10,7 +10,7 @@ export function CartItem({ item, onQuantityChange, onRemove, readonly = false }:
     : null;
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow-sm">
+    <div className="flex flex-col gap-4 p-6 bg-white rounded-lg shadow-md border border-gray-100">
       <CartItemHeader
         name={item.product?.name || ''}
         productName={item.product?.name || ''}
@@ -25,7 +25,7 @@ export function CartItem({ item, onQuantityChange, onRemove, readonly = false }:
             type="number"
             value={item.quantity}
             onChange={(e) => onQuantityChange(item.id, Number(e.target.value))}
-            className="w-16 px-2 py-1 border rounded"
+            className="w-20 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             min="1"
             disabled={readonly}
           />
