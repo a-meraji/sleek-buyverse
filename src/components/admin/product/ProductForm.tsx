@@ -23,6 +23,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
     secondary_categories: [],
     image_url: "",
     sku: "",
+    brand: "",
     discount: 0,
   });
   const [additionalImages, setAdditionalImages] = useState<{ image_url: string }[]>([]);
@@ -79,6 +80,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
         secondary_categories: formData.secondary_categories || [],
         image_url: formData.image_url,
         sku: formData.sku?.trim() || generateSKU(formData.name),
+        brand: formData.brand?.trim() || "",
         discount: formData.discount || 0,
       };
 
@@ -190,10 +192,12 @@ export function ProductForm({ onClose }: ProductFormProps) {
           name={formData.name ?? ""}
           description={formData.description ?? ""}
           sku={formData.sku ?? ""}
+          brand={formData.brand ?? ""}
           discount={formData.discount}
           onNameChange={(value) => handleFormChange({ name: value })}
           onDescriptionChange={(value) => handleFormChange({ description: value })}
           onSkuChange={(value) => handleFormChange({ sku: value })}
+          onBrandChange={(value) => handleFormChange({ brand: value })}
           onDiscountChange={(value) => handleFormChange({ discount: value })}
         />
 
