@@ -19,8 +19,7 @@ export const useProducts = () => {
         .from('products')
         .select(`
           *,
-          product_variants(*),
-          brand:brands(name)
+          product_variants(*)
         `)
 
       // Apply search filter if present
@@ -63,10 +62,7 @@ export const useProducts = () => {
       }
       
       console.log('Fetched products:', data);
-      return data?.map(product => ({
-        ...product,
-        brand: product.brand?.name
-      })) || [];
+      return data || [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false
