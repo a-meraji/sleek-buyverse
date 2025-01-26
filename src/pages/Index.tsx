@@ -5,7 +5,6 @@ import HeroBanner from "@/components/home/HeroBanner";
 import { LoadingState } from "@/components/home/LoadingState";
 import { ErrorState } from "@/components/home/ErrorState";
 import { MainContent } from "@/components/home/MainContent";
-import { Product } from "@/types";
 
 const Index = () => {
   // Fetch latest products
