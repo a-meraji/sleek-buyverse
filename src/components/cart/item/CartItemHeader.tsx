@@ -11,9 +11,9 @@ export const CartItemHeader = ({
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h3 className="font-medium text-gray-900">{productName}</h3>
+        <h3 className="font-medium">{productName}</h3>
         {parameters && (
-          <p className="text-sm text-gray-500 mt-1">{parameters}</p>
+          <p className="text-sm text-muted-foreground">{parameters}</p>
         )}
       </div>
       {!readonly && (
@@ -21,7 +21,7 @@ export const CartItemHeader = ({
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-muted-foreground hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </Button>

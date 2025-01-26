@@ -1,30 +1,36 @@
 import { CartItemPriceProps } from "@/types";
 
-export const CartItemPrice = ({ 
-  price,
-  quantity, 
-  discount = 0,
-  variantPrice
-}: CartItemPriceProps) => {
-  const hasDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
-  const discountedPrice = hasDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
-  const total = discountedPrice * quantity;
+export const CartItemPrice = ({ variantPrice, quantity, discount }: CartItemPriceProps) => {
+  if (typeof variantPrice !== 'number') {
+    console.error('Invalid price:', { variantPrice });
+    return null;
+  }
+
+  const hasValidDiscount = typeof discount === 'number' && discount > 0 && discount <= 100;
+  const discountedPrice = hasValidDiscount ? variantPrice * (1 - discount / 100) : variantPrice;
+  const subtotal = discountedPrice * quantity;
 
   return (
     <div className="text-right">
-      <div className="font-medium text-gray-900">
-        ${total.toFixed(2)}
+      <div className="flex flex-col items-end">
+        {hasValidDiscount ? (
+          <>
+            <span className="text-sm text-gray-500 line-through">
+              ${variantPrice.toFixed(2)}
+            </span>
+            <span className="text-red-500">
+              ${discountedPrice.toFixed(2)}
+            </span>
+          </>
+        ) : (
+          <span>${variantPrice.toFixed(2)}</span>
+        )}
+        {quantity > 1 && (
+          <span className="text-sm text-gray-500">
+            Subtotal: ${subtotal.toFixed(2)}
+          </span>
+        )}
       </div>
-      {hasDiscount && (
-        <div className="text-sm">
-          <span className="text-gray-500 line-through mr-2">
-            ${(variantPrice * quantity).toFixed(2)}
-          </span>
-          <span className="text-green-600">
-            {discount}% off
-          </span>
-        </div>
-      )}
     </div>
   );
 };

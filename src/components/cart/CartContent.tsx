@@ -18,11 +18,11 @@ export const CartContent = ({
   readonly = false
 }: CartContentProps) => {
   return (
-    <div className="flex-1 overflow-auto px-6 py-4">
+    <div className="flex-1 overflow-auto p-4">
       {!cartItems?.length ? (
         <EmptyCart />
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {cartItems.map((item) => (
             <CartItem
               key={item.id}

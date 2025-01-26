@@ -21,6 +21,7 @@ export const CartSummary = ({
 }: CartSummaryProps) => {
   const navigate = useNavigate();
   
+  // Calculate subtotal from cart items
   const subtotal = cartItems?.reduce((sum, item) => {
     const variantPrice = item.product?.product_variants?.find(v => v.id === item.variant_id)?.price ?? 0;
     const discount = item.product?.discount;
@@ -29,11 +30,21 @@ export const CartSummary = ({
     return sum + (discountedPrice * item.quantity);
   }, 0) ?? 0;
 
-  const TAX_RATE = 0.08;
-  const SHIPPING_RATE = cartItems?.length ? 5.99 : 0;
+  // Calculate tax and shipping
+  const TAX_RATE = 0.08; // 8% tax rate
+  const SHIPPING_RATE = cartItems?.length ? 5.99 : 0; // Flat shipping rate if items exist
   const tax = subtotal * TAX_RATE;
   const shipping = SHIPPING_RATE;
   const total = readonly ? subtotal : (subtotal + tax + shipping);
+  
+  console.log('Cart summary calculations:', {
+    subtotal,
+    tax,
+    shipping,
+    total,
+    itemsCount: cartItems?.length,
+    mode: readonly ? 'readonly' : 'full'
+  });
   
   const handleCheckout = () => {
     onClose();
@@ -45,23 +56,23 @@ export const CartSummary = ({
   };
   
   return (
-    <div className="bg-gray-50 p-6 rounded-lg space-y-6">
+    <div className="space-y-6">
       <div className="space-y-4">
         {!readonly && (
           <>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Subtotal</span>
-              <span className="font-medium">${subtotal.toFixed(2)}</span>
+              <span className="text-muted-foreground">Subtotal</span>
+              <span>${subtotal.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Tax (8%)</span>
-              <span className="font-medium">${tax.toFixed(2)}</span>
+              <span className="text-muted-foreground">Tax (8%)</span>
+              <span>${tax.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Shipping</span>
-              <span className="font-medium">${shipping.toFixed(2)}</span>
+              <span className="text-muted-foreground">Shipping</span>
+              <span>${shipping.toFixed(2)}</span>
             </div>
 
             <Separator className="my-4" />
@@ -75,16 +86,17 @@ export const CartSummary = ({
       </div>
       
       <Button 
-        className="w-full py-6 text-lg bg-purple-600 hover:bg-purple-700"
+        className="w-full py-6 text-lg"
         size="lg"
         disabled={!itemsExist}
         onClick={handleCheckout}
+        aria-label={isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
       >
         {isAuthenticated ? 'Place Order' : 'Sign in to Checkout'}
       </Button>
 
       {!isAuthenticated && (
-        <p className="text-sm text-gray-500 text-center">
+        <p className="text-sm text-muted-foreground text-center">
           You need to sign in to complete your purchase
         </p>
       )}
