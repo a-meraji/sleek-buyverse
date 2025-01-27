@@ -88,8 +88,8 @@ export function BrandSelector({ value, onChange }: BrandSelectorProps) {
             onChange={(e) => setNewBrand(e.target.value)}
             placeholder="Enter new brand name"
           />
-          <Button onClick={handleAddBrand}>Add</Button>
-          <Button variant="outline" onClick={() => setIsAddingNew(false)}>
+          <Button type="button" onClick={handleAddBrand}>Add</Button>
+          <Button type="button" variant="outline" onClick={() => setIsAddingNew(false)}>
             Cancel
           </Button>
         </div>
@@ -107,7 +107,7 @@ export function BrandSelector({ value, onChange }: BrandSelectorProps) {
               ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={() => setIsAddingNew(true)}>
+          <Button type="button" variant="outline" onClick={() => setIsAddingNew(true)}>
             New Brand
           </Button>
         </div>
