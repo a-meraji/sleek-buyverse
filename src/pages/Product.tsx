@@ -35,7 +35,8 @@ const Product = () => {
           *,
           product_variants (*),
           product_images (*),
-          discount
+          discount,
+          brand
         `)
         .eq('id', id)
         .single();
@@ -45,7 +46,7 @@ const Product = () => {
         throw productError;
       }
 
-      console.log('Product fetched successfully with discount:', productData);
+      console.log('Product fetched successfully with brand:', productData);
       return productData;
     },
     staleTime: 1000 * 60 * 5,
