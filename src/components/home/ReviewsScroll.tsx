@@ -97,12 +97,12 @@ export function ReviewsScroll() {
           {/* Reviews container with custom scrolling animation */}
           <div className="relative overflow-hidden h-[80vh] md:h-[50vh]">
             <div className="absolute inset-0 overflow-hidden">
-              <div className="animate-scroll-vertical">
+              <div className="animate-scroll-vertical hover:pause">
                 <div className="space-y-6">
                   {[...reviews, ...reviews].map((review, index) => (
                     <div
                       key={`${review.id}-${index}`}
-                      className="bg-white p-6 rounded-lg shadow-sm animate-fade-in"
+                      className="bg-white p-6 rounded-lg shadow-sm"
                     >
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(review.rating)].map((_, i) => (
