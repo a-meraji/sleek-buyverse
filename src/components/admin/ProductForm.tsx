@@ -30,6 +30,7 @@ export function ProductForm({ onClose }: ProductFormProps) {
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
+  const [multipleSelect, setMultipleSelect] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -167,12 +168,18 @@ export function ProductForm({ onClose }: ProductFormProps) {
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
-  const handleImageSelect = (url: string) => {
+  const handleImageSelect = (url: string | string[]) => {
     console.log('Selected image URL:', url);
     if (isSelectingMainImage) {
-      handleFormChange({ image_url: url });
+      if (typeof url === 'string') {
+        handleFormChange({ image_url: url });
+      }
     } else {
-      setAdditionalImages(prev => [...prev, { image_url: url }]);
+      const newImages = Array.isArray(url) ? url : [url];
+      const additionalImagesData = newImages.map(imageUrl => ({
+        image_url: imageUrl
+      }));
+      setAdditionalImages(prev => [...prev, ...additionalImagesData]);
     }
     setShowImageSelector(false);
   };
@@ -233,6 +240,8 @@ export function ProductForm({ onClose }: ProductFormProps) {
             setShowImageSelector(true);
           }}
           onRemoveImage={handleRemoveImage}
+          multipleSelect={multipleSelect}
+          onMultipleSelectChange={setMultipleSelect}
         />
 
         <div className="flex justify-end gap-2">
@@ -249,8 +258,8 @@ export function ProductForm({ onClose }: ProductFormProps) {
         open={showImageSelector}
         onClose={() => setShowImageSelector(false)}
         onSelect={handleImageSelect}
+        multiple={!isSelectingMainImage && multipleSelect}
       />
     </>
   );
 }
-
