@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Folder, FolderPlus, Edit2, Trash2, ChevronRight } from "lucide-react";
+import { Folder, FolderPlus, Edit2, Trash2, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -32,6 +32,7 @@ export function FolderManager({
   const [newFolderName, setNewFolderName] = useState("");
   const [editingFolder, setEditingFolder] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
   const handleCreateFolder = async () => {
@@ -138,21 +139,37 @@ export function FolderManager({
     }
   };
 
+  const filteredFolders = folders.filter(folder => 
+    folder.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Input
-          placeholder="New folder name"
-          value={newFolderName}
-          onChange={(e) => setNewFolderName(e.target.value)}
-        />
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleCreateFolder}
-        >
-          <FolderPlus className="h-4 w-4" />
-        </Button>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="New folder name"
+            value={newFolderName}
+            onChange={(e) => setNewFolderName(e.target.value)}
+          />
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleCreateFolder}
+          >
+            <FolderPlus className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Search folders..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1"
+          />
+          <Search className="h-4 w-4 text-muted-foreground" />
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -165,7 +182,7 @@ export function FolderManager({
           All Images
         </Button>
         
-        {folders.map((folder) => (
+        {filteredFolders.map((folder) => (
           <div key={folder.id} className="flex items-center gap-2">
             {editingFolder === folder.id ? (
               <div className="flex-1 flex gap-2">

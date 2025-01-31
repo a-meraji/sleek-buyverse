@@ -28,19 +28,24 @@ export function ImageGrid({ images, onSelect, onClose, currentFolder, onImagesUp
   const handleDeleteImage = async (imageName: string) => {
     try {
       const filePath = currentFolder ? `${currentFolder}/${imageName}` : imageName;
+      console.log('Deleting image:', filePath);
       
       const { error } = await supabase.storage
         .from('images')
         .remove([filePath]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting image:', error);
+        throw error;
+      }
 
       toast({
         title: "Success",
         description: "Image deleted successfully",
       });
 
-      onImagesUpdate();
+      // Force reload of images
+      await onImagesUpdate();
     } catch (error) {
       console.error('Error deleting image:', error);
       toast({
