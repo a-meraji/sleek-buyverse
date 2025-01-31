@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { ImageGrid } from "./image-selector/ImageGrid";
 import { ImageUploader } from "./image-selector/ImageUploader";
-import { FolderManager } from "./image-selector/FolderManager";
+import { FolderList } from "./image-selector/folder-manager/FolderList";
+import { NewFolderDialog } from "./image-selector/folder-manager/NewFolderDialog";
+import { FolderSearch } from "./image-selector/folder-manager/FolderSearch";
 
 interface ImageSelectorProps {
   open: boolean;
@@ -20,6 +22,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
   const [folders, setFolders] = useState([]);
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
   const { toast } = useToast();
+const [searchFolder, setSearchFolder] = useState<string>("");
 
   const loadFolders = async () => {
     try {
@@ -43,8 +46,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
   const loadImages = async () => {
     try {
       setLoading(true);
-      console.log('Loading images from storage...');
-      
+
       const { data: files, error } = await supabase.storage
         .from('images')
         .list(currentFolder ? `${currentFolder}/` : '', {
@@ -68,7 +70,6 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
           };
         });
 
-      console.log('Processed image URLs:', imageUrls);
       setImages(imageUrls);
     } catch (error) {
       console.error('Error loading images:', error);
@@ -89,13 +90,21 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
     }
   }, [open, currentFolder]);
 
+  useEffect(()=>{
+    if(searchFolder.length>0){
+      const filteredFolders = folders.filter((folder:any)=>folder.name.toLowerCase().includes(searchFolder.toLowerCase()));
+      setFolders(filteredFolders);
+    }else{
+      loadFolders();
+    }
+  },[searchFolder])
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = event.target.files?.[0];
       if (!file) return;
 
       setUploading(true);
-      console.log('Uploading file:', file.name);
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
@@ -107,8 +116,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
 
       if (uploadError) throw uploadError;
 
-      console.log('File uploaded successfully:', fileName);
-      await loadImages();
+     await loadImages();
       
       toast({
         title: "Success",
@@ -133,9 +141,11 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
           <DialogTitle>Select Image</DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-4 gap-4">
-          <div className="col-span-1 border-r pr-4">
-            <FolderManager
+        <div dir="ltr" className="grid grid-cols-4 gap-4">
+          <div className="col-span-1 space-y-4 border-r pr-4">
+            <NewFolderDialog currentFolder={currentFolder} onFoldersUpdate={loadFolders} />
+          <FolderSearch onSearchChange={setSearchFolder} searchQuery={searchFolder}/>
+            <FolderList
               folders={folders}
               currentFolder={currentFolder}
               onFolderSelect={setCurrentFolder}
