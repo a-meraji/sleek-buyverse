@@ -39,6 +39,20 @@ export function ImageGrid({ images, onSelect, onClose, currentFolder, onImagesUp
         throw error;
       }
 
+      // Wait a bit to ensure the deletion is processed
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Verify the file is actually deleted
+      const { data: fileExists } = await supabase.storage
+        .from('images')
+        .list(currentFolder ? currentFolder + '/' : '', {
+          search: imageName
+        });
+
+      if (fileExists && fileExists.length > 0) {
+        throw new Error('File still exists after deletion');
+      }
+
       toast({
         title: "Success",
         description: "Image deleted successfully",
