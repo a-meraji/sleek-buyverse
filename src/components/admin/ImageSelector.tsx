@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { ImageGrid } from "./image-selector/ImageGrid";
 import { ImageUploader } from "./image-selector/ImageUploader";
-import { FolderManager } from "./image-selector/folder-manager/FolderManager";
+import { FolderList } from "./image-selector/folder-manager/FolderList";
 
 interface ImageSelectorProps {
   open: boolean;
@@ -135,7 +135,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
 
         <div className="grid grid-cols-4 gap-4">
           <div className="col-span-1 border-r pr-4">
-            <FolderManager
+            <FolderList
               folders={folders}
               currentFolder={currentFolder}
               onFolderSelect={setCurrentFolder}
