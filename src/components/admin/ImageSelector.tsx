@@ -148,7 +148,7 @@ export function ImageSelector({ open, onClose, onSelect, multiple = false }: Ima
     <Dialog open={open} onOpenChange={() => onClose()}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Select Image</DialogTitle>
+          <DialogTitle>Select Image{multiple ? 's' : ''}</DialogTitle>
         </DialogHeader>
 
         <div dir="ltr" className="grid grid-cols-4 gap-4">

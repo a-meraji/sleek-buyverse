@@ -29,9 +29,15 @@ export function ImageGrid({
         ? selectedImages.filter(img => img !== url)
         : [...selectedImages, url];
       setSelectedImages(newSelectedImages);
-      onSelect(newSelectedImages);
     } else {
       onSelect(url);
+      onClose();
+    }
+  };
+
+  const handleDone = () => {
+    if (selectedImages.length > 0) {
+      onSelect(selectedImages);
       onClose();
     }
   };
@@ -76,7 +82,7 @@ export function ImageGrid({
       {multiple && selectedImages.length > 0 && (
         <div className="flex justify-end">
           <button
-            onClick={onClose}
+            onClick={handleDone}
             className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
           >
             Done ({selectedImages.length} selected)
