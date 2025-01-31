@@ -1,13 +1,15 @@
 import { useToast } from "@/hooks/use-toast";
 import { ImageCard } from "./image-grid/ImageCard";
 import { deleteImage } from "./image-grid/DeleteImageHandler";
+import { useState } from "react";
 
 interface ImageGridProps {
   images: { name: string; url: string }[];
-  onSelect: (url: string) => void;
+  onSelect: (url: string | string[]) => void;
   onClose: () => void;
   currentFolder: string | null;
   onImagesUpdate: () => void;
+  multiple?: boolean;
 }
 
 export function ImageGrid({ 
@@ -15,9 +17,24 @@ export function ImageGrid({
   onSelect, 
   onClose, 
   currentFolder, 
-  onImagesUpdate 
+  onImagesUpdate,
+  multiple = false
 }: ImageGridProps) {
   const { toast } = useToast();
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+
+  const handleImageSelect = (url: string) => {
+    if (multiple) {
+      const newSelectedImages = selectedImages.includes(url)
+        ? selectedImages.filter(img => img !== url)
+        : [...selectedImages, url];
+      setSelectedImages(newSelectedImages);
+      onSelect(newSelectedImages);
+    } else {
+      onSelect(url);
+      onClose();
+    }
+  };
 
   const handleDeleteImage = async (imageName: string) => {
     try {
@@ -43,16 +60,29 @@ export function ImageGrid({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-4">
-      {images.map((image) => (
-        <ImageCard
-          key={image.name}
-          image={image}
-          onSelect={onSelect}
-          onClose={onClose}
-          onDelete={handleDeleteImage}
-        />
-      ))}
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-4">
+        {images.map((image) => (
+          <ImageCard
+            key={image.name}
+            image={image}
+            onSelect={() => handleImageSelect(image.url)}
+            onClose={onClose}
+            onDelete={handleDeleteImage}
+            isSelected={multiple ? selectedImages.includes(image.url) : false}
+          />
+        ))}
+      </div>
+      {multiple && selectedImages.length > 0 && (
+        <div className="flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+          >
+            Done ({selectedImages.length} selected)
+          </button>
+        </div>
+      )}
     </div>
   );
 }
