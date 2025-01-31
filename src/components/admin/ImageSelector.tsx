@@ -21,8 +21,8 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
   const [loading, setLoading] = useState(true);
   const [folders, setFolders] = useState([]);
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
+  const [searchFolder, setSearchFolder] = useState<string>("");
   const { toast } = useToast();
-const [searchFolder, setSearchFolder] = useState<string>("");
 
   const loadFolders = async () => {
     try {
@@ -46,6 +46,7 @@ const [searchFolder, setSearchFolder] = useState<string>("");
   const loadImages = async () => {
     try {
       setLoading(true);
+      console.log('Loading images from storage...');
 
       const { data: files, error } = await supabase.storage
         .from('images')
@@ -70,6 +71,7 @@ const [searchFolder, setSearchFolder] = useState<string>("");
           };
         });
 
+      console.log('Processed image URLs:', imageUrls);
       setImages(imageUrls);
     } catch (error) {
       console.error('Error loading images:', error);
@@ -90,43 +92,50 @@ const [searchFolder, setSearchFolder] = useState<string>("");
     }
   }, [open, currentFolder]);
 
-  useEffect(()=>{
-    if(searchFolder.length>0){
-      const filteredFolders = folders.filter((folder:any)=>folder.name.toLowerCase().includes(searchFolder.toLowerCase()));
+  useEffect(() => {
+    if (searchFolder.length > 0) {
+      const filteredFolders = folders.filter((folder: any) => 
+        folder.name.toLowerCase().includes(searchFolder.toLowerCase())
+      );
       setFolders(filteredFolders);
-    }else{
+    } else {
       loadFolders();
     }
-  },[searchFolder])
+  }, [searchFolder]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      const file = event.target.files?.[0];
-      if (!file) return;
+      const files = Array.from(event.target.files || []);
+      if (files.length === 0) return;
 
       setUploading(true);
+      console.log('Uploading files:', files.map(f => f.name));
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = currentFolder ? `${currentFolder}/${fileName}` : fileName;
+      const uploadPromises = files.map(async (file) => {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = currentFolder ? `${currentFolder}/${fileName}` : fileName;
 
-      const { error: uploadError } = await supabase.storage
-        .from('images')
-        .upload(filePath, file);
+        const { error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
+        console.log('File uploaded successfully:', fileName);
+      });
 
-     await loadImages();
+      await Promise.all(uploadPromises);
+      await loadImages();
       
       toast({
         title: "Success",
-        description: "Image uploaded successfully",
+        description: `${files.length} image${files.length > 1 ? 's' : ''} uploaded successfully`,
       });
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error uploading images:', error);
       toast({
         title: "Error",
-        description: "Failed to upload image",
+        description: "Failed to upload images",
         variant: "destructive",
       });
     } finally {
@@ -143,8 +152,14 @@ const [searchFolder, setSearchFolder] = useState<string>("");
 
         <div dir="ltr" className="grid grid-cols-4 gap-4">
           <div className="col-span-1 space-y-4 border-r pr-4">
-            <NewFolderDialog currentFolder={currentFolder} onFoldersUpdate={loadFolders} />
-          <FolderSearch onSearchChange={setSearchFolder} searchQuery={searchFolder}/>
+            <NewFolderDialog 
+              currentFolder={currentFolder} 
+              onFoldersUpdate={loadFolders} 
+            />
+            <FolderSearch 
+              onSearchChange={setSearchFolder} 
+              searchQuery={searchFolder}
+            />
             <FolderList
               folders={folders}
               currentFolder={currentFolder}

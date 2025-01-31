@@ -21,49 +21,32 @@ interface DeleteFolderButtonProps {
   onUpdate: () => void;
 }
 
-export function DeleteFolderButton({ 
-  folderId, 
-  currentFolder, 
-  onFolderSelect, 
-  onUpdate 
+export function DeleteFolderButton({
+  folderId,
+  currentFolder,
+  onFolderSelect,
+  onUpdate,
 }: DeleteFolderButtonProps) {
   const { toast } = useToast();
 
-  const handleDeleteFolder = async () => {
+  const handleDelete = async () => {
     try {
-      // First, get all files in the folder
-      const { data: files, error: listError } = await supabase.storage
-        .from('images')
-        .list(folderId + '/');
-
-      if (listError) throw listError;
-
-      // Delete all files in the folder if any exist
-      if (files && files.length > 0) {
-        console.log('Deleting files:', files.map(f => `${folderId}/${f.name}`));
-        const { error: deleteFilesError } = await supabase.storage
-          .from('images')
-          .remove(files.map(file => `${folderId}/${file.name}`));
-
-        if (deleteFilesError) throw deleteFilesError;
-      }
-
-      // Then delete the folder from the database
-      const { error: deleteFolderError } = await supabase
+      const { error } = await supabase
         .from('image_folders')
         .delete()
         .eq('id', folderId);
 
-      if (deleteFolderError) throw deleteFolderError;
-
-      toast({
-        title: "Success",
-        description: "Folder and its contents deleted successfully",
-      });
+      if (error) throw error;
 
       if (currentFolder === folderId) {
         onFolderSelect(null);
       }
+
+      toast({
+        title: "Success",
+        description: "Folder deleted successfully",
+      });
+      
       onUpdate();
     } catch (error) {
       console.error('Error deleting folder:', error);
@@ -79,25 +62,26 @@ export function DeleteFolderButton({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          variant="ghost"
           size="icon"
-          className="hover:bg-destructive hover:text-destructive-foreground"
+          variant="ghost"
+          className="h-8 w-8 hover:bg-red-100 hover:text-red-600"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Folder</AlertDialogTitle>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this folder? This action cannot be undone and will delete all images inside the folder.
+            This action cannot be undone. This will permanently delete the folder
+            and all its contents.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={handleDeleteFolder}
-            className="bg-destructive hover:bg-destructive/90"
+            onClick={handleDelete}
+            className="bg-red-500 hover:bg-red-600"
           >
             Delete
           </AlertDialogAction>

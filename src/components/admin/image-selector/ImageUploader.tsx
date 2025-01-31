@@ -12,6 +12,7 @@ export function ImageUploader({ onUpload, isUploading }: ImageUploaderProps) {
       <Input
         type="file"
         accept="image/*"
+        multiple
         onChange={onUpload}
         disabled={isUploading}
         className="cursor-pointer"
