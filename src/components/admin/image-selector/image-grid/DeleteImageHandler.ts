@@ -14,33 +14,24 @@ export async function deleteImage(filePath: string): Promise<void> {
       throw deleteError;
     }
 
-    // Wait longer for deletion to be processed (3 seconds)
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Verify deletion immediately
+    const { data: fileExists, error: listError } = await supabase.storage
+      .from('images')
+      .list(filePath.split('/').slice(0, -1).join('/'), {
+        search: filePath.split('/').pop()
+      });
 
-    // Verify deletion with retries
-    let retries = 3;
-    while (retries > 0) {
-      console.log(`Verifying deletion (attempts remaining: ${retries})...`);
-      
-      const { data: fileExists } = await supabase.storage
-        .from('images')
-        .list(filePath.split('/').slice(0, -1).join('/'), {
-          search: filePath.split('/').pop()
-        });
-
-      if (!fileExists || fileExists.length === 0) {
-        console.log('Image successfully deleted:', filePath);
-        return;
-      }
-
-      retries--;
-      if (retries > 0) {
-        // Wait between retries
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
+    if (listError) {
+      console.error('Error verifying deletion:', listError);
+      throw listError;
     }
 
-    throw new Error('File still exists after multiple deletion attempts');
+    if (fileExists && fileExists.length > 0) {
+      console.error('File still exists after deletion attempt');
+      throw new Error('Failed to delete file');
+    }
+
+    console.log('Image successfully deleted:', filePath);
   } catch (error) {
     console.error('Error in deleteImage function:', error);
     throw error;
