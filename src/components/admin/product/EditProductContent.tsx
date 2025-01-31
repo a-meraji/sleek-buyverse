@@ -17,6 +17,8 @@ interface EditProductContentProps {
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
   isSubmitting: boolean;
+  multipleSelect?: boolean;
+  onMultipleSelectChange?: (enabled: boolean) => void;
 }
 
 export function EditProductContent({
@@ -30,6 +32,8 @@ export function EditProductContent({
   onSubmit,
   onClose,
   isSubmitting,
+  multipleSelect,
+  onMultipleSelectChange
 }: EditProductContentProps) {
   console.log('Current form data:', formData);
   console.log('Current variants:', variants);
@@ -71,6 +75,8 @@ export function EditProductContent({
         onChooseImage={onImageSelect}
         onAddAdditionalImage={onAddAdditionalImage}
         onRemoveImage={onRemoveImage}
+        multipleSelect={multipleSelect}
+        onMultipleSelectChange={onMultipleSelectChange}
       />
 
       <div className="flex justify-end gap-4 pt-6">

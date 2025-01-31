@@ -12,10 +12,11 @@ import { FolderSearch } from "./image-selector/folder-manager/FolderSearch";
 interface ImageSelectorProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (url: string) => void;
+  onSelect: (url: string | string[]) => void;
+  multiple?: boolean;
 }
 
-export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
+export function ImageSelector({ open, onClose, onSelect, multiple = false }: ImageSelectorProps) {
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState<{ name: string; url: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,6 +186,7 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
                 onClose={onClose}
                 currentFolder={currentFolder}
                 onImagesUpdate={loadImages}
+                multiple={multiple}
               />
             )}
           </div>
