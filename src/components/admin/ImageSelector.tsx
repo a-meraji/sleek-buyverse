@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { ImageGrid } from "./image-selector/ImageGrid";
 import { ImageUploader } from "./image-selector/ImageUploader";
-import { FolderManager } from "./image-selector/folder-manager/FolderManager";
+import { FolderManager } from "./folder-manager/FolderManager";
 
 interface ImageSelectorProps {
   open: boolean;
