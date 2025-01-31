@@ -158,6 +158,8 @@ export function ImageSelector({ open, onClose, onSelect }: ImageSelectorProps) {
                 images={images}
                 onSelect={onSelect}
                 onClose={onClose}
+                currentFolder={currentFolder}
+                onImagesUpdate={loadImages}
               />
             )}
           </div>

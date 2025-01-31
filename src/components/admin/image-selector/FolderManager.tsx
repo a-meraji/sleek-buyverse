@@ -1,9 +1,20 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Folder, FolderPlus, Edit2, ChevronRight } from "lucide-react";
+import { Folder, FolderPlus, Edit2, Trash2, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface FolderManagerProps {
   folders: any[];
@@ -84,6 +95,49 @@ export function FolderManager({
     }
   };
 
+  const handleDeleteFolder = async (folderId: string) => {
+    try {
+      // First, delete all images in the folder
+      const { data: files } = await supabase.storage
+        .from('images')
+        .list(folderId + '/');
+
+      if (files && files.length > 0) {
+        const filePaths = files.map(file => `${folderId}/${file.name}`);
+        const { error: deleteFilesError } = await supabase.storage
+          .from('images')
+          .remove(filePaths);
+
+        if (deleteFilesError) throw deleteFilesError;
+      }
+
+      // Then delete the folder from the database
+      const { error: deleteFolderError } = await supabase
+        .from('image_folders')
+        .delete()
+        .eq('id', folderId);
+
+      if (deleteFolderError) throw deleteFolderError;
+
+      toast({
+        title: "Success",
+        description: "Folder deleted successfully",
+      });
+
+      if (currentFolder === folderId) {
+        onFolderSelect(null);
+      }
+      onFoldersUpdate();
+    } catch (error) {
+      console.error('Error deleting folder:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete folder",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -157,6 +211,34 @@ export function FolderManager({
                 >
                   <Edit2 className="h-4 w-4" />
                 </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Folder</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete this folder? This action cannot be undone and will delete all images inside the folder.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteFolder(folder.id)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </>
             )}
           </div>
