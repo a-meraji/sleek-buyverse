@@ -220,6 +220,35 @@ export type Database = {
           },
         ]
       }
+      image_folders: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          parent_folder_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          parent_folder_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          parent_folder_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "image_folders_parent_folder_id_fkey"
+            columns: ["parent_folder_id"]
+            isOneToOne: false
+            referencedRelation: "image_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketing_campaigns: {
         Row: {
           created_at: string
