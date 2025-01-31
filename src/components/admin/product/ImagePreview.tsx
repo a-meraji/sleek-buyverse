@@ -1,5 +1,7 @@
 import { Image, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { ProductImage } from "@/types";
 
 interface ImagePreviewProps {
@@ -9,6 +11,8 @@ interface ImagePreviewProps {
   onChooseImage: () => void;
   onAddAdditionalImage: () => void;
   onRemoveImage?: (imageUrl: string) => void;
+  onMultipleSelectChange?: (enabled: boolean) => void;
+  multipleSelect?: boolean;
 }
 
 export function ImagePreview({ 
@@ -17,7 +21,9 @@ export function ImagePreview({
   additionalImages = [],
   onChooseImage,
   onAddAdditionalImage,
-  onRemoveImage 
+  onRemoveImage,
+  onMultipleSelectChange,
+  multipleSelect = false
 }: ImagePreviewProps) {
   return (
     <div className="space-y-4">
@@ -57,7 +63,21 @@ export function ImagePreview({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Additional Images</label>
+          <div className="flex items-center space-x-4">
+            <label className="text-sm font-medium">Additional Images</label>
+            {onMultipleSelectChange && (
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="multiple-select"
+                  checked={multipleSelect}
+                  onCheckedChange={onMultipleSelectChange}
+                />
+                <Label htmlFor="multiple-select" className="text-sm text-muted-foreground">
+                  Multiple Selection
+                </Label>
+              </div>
+            )}
+          </div>
           <Button
             type="button"
             variant="outline"

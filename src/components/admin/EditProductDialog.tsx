@@ -34,6 +34,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
+  const [multipleSelect, setMultipleSelect] = useState(false);
   const updateProduct = useProductUpdate();
   const deleteProduct = useProductDelete();
   const { toast } = useToast();
@@ -108,18 +109,24 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
     setFormData(prev => prev ? { ...prev, ...updates } : null);
   };
 
-  const handleImageSelect = (url: string) => {
+  const handleImageSelect = (urls: string | string[]) => {
     if (isSelectingMainImage) {
-      handleFormChange({ image_url: url });
+      if (typeof urls === 'string') {
+        handleFormChange({ image_url: urls });
+      }
     } else {
-      const newImage = {
+      const newImages = Array.isArray(urls) ? urls : [urls];
+      const existingImages = formData?.product_images || [];
+      
+      const additionalImages = newImages.map(url => ({
         id: crypto.randomUUID(),
         product_id: formData?.id || '',
         image_url: url,
-        display_order: formData?.product_images?.length || 0
-      };
+        display_order: existingImages.length + newImages.indexOf(url)
+      }));
+
       handleFormChange({ 
-        product_images: [...(formData?.product_images || []), newImage]
+        product_images: [...existingImages, ...additionalImages]
       });
     }
     setShowImageSelector(false);
@@ -199,6 +206,8 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
               onSubmit={handleSubmit}
               onClose={handleClose}
               isSubmitting={updateProduct.isPending}
+              multipleSelect={multipleSelect}
+              onMultipleSelectChange={setMultipleSelect}
             />
           )}
         </DialogContent>
@@ -208,6 +217,7 @@ export function EditProductDialog({ product, onClose }: EditProductDialogProps) 
         showImageSelector={showImageSelector}
         onClose={() => setShowImageSelector(false)}
         onSelect={handleImageSelect}
+        multiple={!isSelectingMainImage && multipleSelect}
       />
     </>
   );
