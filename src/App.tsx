@@ -17,6 +17,7 @@ import ReturnsExchanges from "@/pages/ReturnsExchanges";
 import ShippingPolicy from "@/pages/ShippingPolicy";
 import Admin from "@/pages/Admin";
 import CarouselsUI from "@/pages/CarouselsUI";
+import Hero from "@/pages/Hero";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/watch" element={<Watch />} />
             <Route path="/carousels" element={<CarouselsUI />} />
+            <Route path="/hero" element={<Hero />} />
             <Route path="/about" element={<About />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/cart" element={<Cart />} />
