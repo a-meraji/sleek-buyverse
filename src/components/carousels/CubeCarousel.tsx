@@ -21,25 +21,29 @@ export function CubeCarousel({ products }: CubeCarouselProps) {
 
   return (
     <div className="relative h-[600px] w-full overflow-hidden mb-24">
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center perspective-[1000px]">
         <div 
-          className="relative w-[400px] h-[500px] preserve-3d"
+          className="relative w-[400px] h-[500px]"
           style={{ 
             transform: `translateZ(-300px) rotateY(${activeIndex * -90}deg)`,
             transformStyle: 'preserve-3d',
-            transition: 'transform 0.5s ease'
+            transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
           {products.slice(0, 4).map((product, index) => (
             <div
               key={product.id}
-              className="absolute w-full h-full backface-visible"
+              className="absolute w-full h-full"
               style={{
                 transform: `rotateY(${index * 90}deg) translateZ(300px)`,
                 transformStyle: 'preserve-3d',
+                backfaceVisibility: 'visible',
+                WebkitBackfaceVisibility: 'visible',
+                transition: 'opacity 0.8s ease',
+                opacity: Math.abs(((activeIndex - index) % 4 + 4) % 4) <= 1 ? 1 : 1
               }}
             >
-              <div className="w-full h-full">
+              <div className="w-full h-full [transform-style:preserve-3d]">
                 <ProductCard
                   id={product.id}
                   name={product.name}
