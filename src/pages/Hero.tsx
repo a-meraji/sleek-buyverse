@@ -381,6 +381,257 @@ export default function Hero() {
           </div>
         </Container>
       </section>
+
+      {/* Premium Fashion Boutique */}
+      <section className="relative min-h-[80vh] flex items-center" style={{
+        backgroundImage: 'url(https://images.unsplash.com/photo-1490481651871-ab68de25d43d)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}>
+        <div className="absolute inset-0 bg-black/50" />
+        <Container className="relative z-10">
+          <div className="max-w-2xl text-white">
+            <span className="inline-block px-4 py-1 mb-6 text-xs font-medium tracking-wider uppercase bg-white/20 rounded-full">New Collection 2024</span>
+            <h1 className="text-6xl font-light mb-6">Timeless Elegance Redefined</h1>
+            <p className="text-lg text-gray-200 mb-8">Discover our curated collection of premium fashion pieces that transcend seasons.</p>
+            <Button size="lg" className="bg-white text-black hover:bg-gray-100">
+              Shop Collection
+            </Button>
+          </div>
+        </Container>
+      </section>
+
+      {/* Designer Accessories */}
+      <section className="bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] text-white">
+        <Container className="py-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-5xl font-serif mb-6">Luxury Accessories</h2>
+              <p className="text-gray-300 mb-8">Elevate your style with our exclusive collection of designer accessories.</p>
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="p-4 border border-white/10 rounded-lg">
+                  <h3 className="font-medium mb-2">Free Shipping</h3>
+                  <p className="text-sm text-gray-400">On orders over $200</p>
+                </div>
+                <div className="p-4 border border-white/10 rounded-lg">
+                  <h3 className="font-medium mb-2">Returns</h3>
+                  <p className="text-sm text-gray-400">30-day money back</p>
+                </div>
+              </div>
+              <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black">
+                Explore Collection
+              </Button>
+            </div>
+            <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1509631179647-0177331693ae"
+                alt="Designer Accessories"
+                className="rounded-lg shadow-2xl"
+              />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* High-End Cosmetics */}
+      <section className="bg-gradient-to-br from-pink-50 to-purple-50">
+        <Container className="py-24">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-purple-600 font-medium">Luxury Beauty</span>
+            <h2 className="text-4xl font-light mt-2 mb-4">Experience Premium Skincare</h2>
+            <p className="text-gray-600">Discover our collection of high-end beauty products crafted for your skin.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-xl shadow-sm">
+              <Star className="w-10 h-10 text-purple-500 mb-4" />
+              <h3 className="font-medium mb-2">Premium Quality</h3>
+              <p className="text-gray-600 text-sm">Only the finest ingredients</p>
+            </div>
+            <div className="bg-white p-8 rounded-xl shadow-sm">
+              <Heart className="w-10 h-10 text-purple-500 mb-4" />
+              <h3 className="font-medium mb-2">Cruelty Free</h3>
+              <p className="text-gray-600 text-sm">Ethically produced</p>
+            </div>
+            <div className="bg-white p-8 rounded-xl shadow-sm">
+              <Shield className="w-10 h-10 text-purple-500 mb-4" />
+              <h3 className="font-medium mb-2">Dermatologist Tested</h3>
+              <p className="text-gray-600 text-sm">Safe for all skin types</p>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Vintage Fashion */}
+      <section className="relative min-h-[90vh] flex items-center" style={{
+        backgroundImage: 'url(https://images.unsplash.com/photo-1445205170230-053b83016050)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}>
+        <div className="absolute inset-0 bg-black/40" />
+        <Container className="relative z-10">
+          <div className="max-w-xl">
+            <h2 className="text-5xl font-serif text-white mb-6">Timeless Vintage Collection</h2>
+            <p className="text-lg text-gray-200 mb-8">Carefully curated vintage pieces that tell a story.</p>
+            <div className="flex gap-4">
+              <Button className="bg-white text-black hover:bg-gray-100">
+                Shop Women
+              </Button>
+              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+                Shop Men
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Athleisure Wear */}
+      <section className="bg-gradient-to-r from-blue-600 to-violet-600 text-white">
+        <Container className="py-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm">Active Lifestyle</span>
+              <h2 className="text-6xl font-bold">MOVE<br />WITH<br />STYLE</h2>
+              <p className="text-lg text-blue-100">Performance meets fashion in our latest athleisure collection.</p>
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
+                Shop Now
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <img 
+                src="https://images.unsplash.com/photo-1483721310020-03333e577078"
+                alt="Athleisure"
+                className="rounded-lg"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8"
+                alt="Athleisure"
+                className="rounded-lg mt-8"
+              />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Minimalist Fashion */}
+      <section className="bg-[#f8f8f8]">
+        <Container className="py-24">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-light mb-6">Less is More</h2>
+            <p className="text-gray-600 mb-12">Curated minimalist pieces for the modern wardrobe.</p>
+            <div className="grid sm:grid-cols-3 gap-8 mb-12">
+              <div className="bg-white p-8 rounded-lg shadow-sm">
+                <h3 className="font-medium">Sustainable</h3>
+                <p className="text-sm text-gray-500 mt-2">Eco-friendly materials</p>
+              </div>
+              <div className="bg-white p-8 rounded-lg shadow-sm">
+                <h3 className="font-medium">Timeless</h3>
+                <p className="text-sm text-gray-500 mt-2">Classic designs</p>
+              </div>
+              <div className="bg-white p-8 rounded-lg shadow-sm">
+                <h3 className="font-medium">Versatile</h3>
+                <p className="text-sm text-gray-500 mt-2">Mix and match</p>
+              </div>
+            </div>
+            <Button className="bg-black text-white hover:bg-gray-900">
+              View Collection
+            </Button>
+          </div>
+        </Container>
+      </section>
+
+      {/* Luxury Skincare */}
+      <section className="bg-gradient-to-br from-amber-50 to-rose-50">
+        <Container className="py-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <span className="text-rose-600 font-medium">Luxury Skincare</span>
+              <h2 className="text-4xl font-light mt-2 mb-6">Your Skin Deserves the Best</h2>
+              <p className="text-gray-600 mb-8">Experience the transformation with our premium skincare collection.</p>
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="p-4 bg-white rounded-lg shadow-sm">
+                  <Star className="w-6 h-6 text-amber-400 mb-2" />
+                  <p className="text-sm text-gray-600">Natural Ingredients</p>
+                </div>
+                <div className="p-4 bg-white rounded-lg shadow-sm">
+                  <Shield className="w-6 h-6 text-amber-400 mb-2" />
+                  <p className="text-sm text-gray-600">Dermatologist Tested</p>
+                </div>
+              </div>
+              <Button className="bg-rose-600 text-white hover:bg-rose-700">
+                Shop Skincare
+              </Button>
+            </div>
+            <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881"
+                alt="Luxury Skincare"
+                className="rounded-2xl shadow-lg"
+              />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Designer Shoes */}
+      <section className="bg-black text-white">
+        <Container className="py-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <h2 className="text-7xl font-bold">STEP INTO LUXURY</h2>
+              <p className="text-gray-300">Exclusive collection of designer footwear.</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border border-white/20 p-4 rounded-lg">
+                  <h3 className="font-medium mb-2">Handcrafted</h3>
+                  <p className="text-sm text-gray-400">Italian leather</p>
+                </div>
+                <div className="border border-white/20 p-4 rounded-lg">
+                  <h3 className="font-medium mb-2">Limited Edition</h3>
+                  <p className="text-sm text-gray-400">Exclusive designs</p>
+                </div>
+              </div>
+              <Button className="bg-white text-black hover:bg-gray-100">
+                View Collection
+              </Button>
+            </div>
+            <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2"
+                alt="Designer Shoes"
+                className="rounded-lg"
+              />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Bridal Collection */}
+      <section className="relative min-h-[90vh] flex items-center" style={{
+        backgroundImage: 'url(https://images.unsplash.com/photo-1549416878-b9ca95e26903)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/90 to-white/50" />
+        <Container className="relative z-10">
+          <div className="max-w-xl">
+            <span className="text-gray-600 font-medium">Bridal Collection</span>
+            <h2 className="text-5xl font-serif mt-2 mb-6">Your Perfect Day Awaits</h2>
+            <p className="text-gray-600 mb-8">Exquisite bridal wear and accessories for your special day.</p>
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg">
+                <h3 className="font-medium mb-1">Custom Fitting</h3>
+                <p className="text-sm text-gray-600">Perfect fit guaranteed</p>
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg">
+                <h3 className="font-medium mb-1">Consultation</h3>
+                <p className="text-sm text-gray-600">Personal stylist</p>
+              </div>
+            </div>
+            <Button className="bg-black text-white hover:bg-gray-900">
+              Book Appointment
+            </Button>
+          </div>
+        </Container>
+      </section>
     </div>
   );
 }
