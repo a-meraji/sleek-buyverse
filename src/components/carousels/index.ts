@@ -28,3 +28,4 @@ export * from "./MasonryCarousel";
 export * from "./TimelineCarousel";
 export * from "./PerspectiveCarousel";
 export * from "./WaterfallCarousel";
+export * from "./CleanNeomorphicCarousel";

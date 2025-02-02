@@ -32,7 +32,8 @@ import {
   MasonryCarousel,
   TimelineCarousel,
   PerspectiveCarousel,
-  WaterfallCarousel
+  WaterfallCarousel,
+  CleanNeomorphicCarousel
 } from "@/components/carousels";
 
 export default function CarouselsUI() {
@@ -167,6 +168,11 @@ export default function CarouselsUI() {
         </section>
 
         {/* New Carousels */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Clean Neumorphic Carousel</h2>
+          <CleanNeomorphicCarousel products={products} />
+        </section>
+
         <section>
           <h2 className="text-2xl font-semibold mb-6">Circular Carousel</h2>
           <CircularCarousel products={products} />
