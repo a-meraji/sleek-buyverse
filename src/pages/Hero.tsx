@@ -1,37 +1,34 @@
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ShoppingBag, Play, ArrowDownToLine, Sparkles, Rocket, Globe, Shield, Users, Zap } from "lucide-react";
+import { ArrowRight, ShoppingBag, Star, Truck, Shield, Gift, Clock, CreditCard, Heart, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Hero() {
   return (
     <div className="space-y-32 pb-32">
-      {/* E-commerce Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
+      {/* Luxury Fashion Hero */}
+      <section className="relative overflow-hidden bg-[#1a1a1a] text-white">
         <Container className="relative z-10 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h1 className="text-5xl font-bold leading-tight">
-                Discover Your Style, <br />
-                Elevate Your Wardrobe
+              <h1 className="text-5xl font-serif leading-tight">
+                Discover Luxury <br />
+                <span className="text-[#c4a47c]">Fashion</span>
               </h1>
-              <p className="text-lg text-violet-100">
-                Shop the latest trends in fashion with our curated collection of premium clothing and accessories.
+              <p className="text-lg text-gray-300">
+                Explore our curated collection of designer pieces that define elegance.
               </p>
               <div className="flex gap-4">
-                <Button size="lg" variant="secondary">
-                  <ShoppingBag className="mr-2 h-5 w-5" />
-                  Shop Now
-                </Button>
-                <Button size="lg" variant="outline" className="bg-white/10">
-                  Learn More
+                <Button size="lg" className="bg-[#c4a47c] hover:bg-[#b39371]">
+                  Shop Collection
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80"
-                alt="Fashion Model"
+                src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800"
+                alt="Luxury Fashion"
                 className="rounded-lg shadow-2xl"
               />
             </div>
@@ -39,335 +36,348 @@ export default function Hero() {
         </Container>
       </section>
 
-      {/* SaaS Hero */}
-      <section className="bg-slate-50">
-        <Container className="py-20">
-          <div className="max-w-3xl mx-auto text-center space-y-8">
-            <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-sm font-medium">
-              New Features Available
-            </span>
-            <h1 className="text-5xl font-bold text-slate-900">
-              Transform Your Workflow with AI-Powered Automation
-            </h1>
-            <p className="text-xl text-slate-600">
-              Streamline your business processes and boost productivity with our intelligent automation platform.
-            </p>
-            <div className="flex justify-center gap-4">
-              <Button size="lg">
-                Start Free Trial
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button size="lg" variant="outline">
-                <Play className="mr-2 h-5 w-5" />
-                Watch Demo
-              </Button>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* Mobile App Hero */}
-      <section className="bg-gradient-to-b from-purple-50 to-white">
-        <Container className="py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <span className="inline-block px-3 py-1 rounded-full bg-purple-100 text-purple-600 text-sm font-medium">
-                #1 Fitness App
-              </span>
-              <h1 className="text-5xl font-bold text-purple-900">
-                Your Personal <br />
-                Fitness Journey <br />
-                Starts Here
-              </h1>
-              <p className="text-lg text-purple-700">
-                Track your workouts, nutrition, and progress with our comprehensive fitness app.
-              </p>
-              <div className="flex gap-4">
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  Download App
-                  <ArrowDownToLine className="ml-2 h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-            <div className="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?w=800&q=80"
-                alt="Fitness App"
-                className="rounded-3xl shadow-2xl"
-              />
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* Educational Platform Hero */}
-      <section className="bg-gradient-to-r from-blue-50 to-indigo-50">
+      {/* Streetwear Hero */}
+      <section className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
         <Container className="py-20">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-sm font-medium">
-              Learn at Your Own Pace
+            <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium">
+              New Collection Drop
             </span>
-            <h1 className="text-5xl font-bold text-slate-900">
-              Unlock Your Potential with Expert-Led Courses
+            <h1 className="text-6xl font-black">
+              STREET <br /> CULTURE
             </h1>
-            <p className="text-xl text-slate-600">
-              Access thousands of courses from industry experts and transform your career.
+            <p className="text-xl text-purple-100">
+              Express yourself with our latest streetwear collection.
             </p>
             <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <Sparkles className="h-8 w-8 text-blue-500 mb-4" />
-                <h3 className="font-semibold">Expert Teachers</h3>
+              <div className="bg-white/10 p-6 rounded-xl backdrop-blur-lg">
+                <Star className="h-8 w-8 text-yellow-400 mb-4" />
+                <h3 className="font-bold">Limited Edition</h3>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <Globe className="h-8 w-8 text-blue-500 mb-4" />
-                <h3 className="font-semibold">Global Community</h3>
+              <div className="bg-white/10 p-6 rounded-xl backdrop-blur-lg">
+                <Sparkles className="h-8 w-8 text-yellow-400 mb-4" />
+                <h3 className="font-bold">Exclusive Drops</h3>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <Shield className="h-8 w-8 text-blue-500 mb-4" />
-                <h3 className="font-semibold">Lifetime Access</h3>
+              <div className="bg-white/10 p-6 rounded-xl backdrop-blur-lg">
+                <Heart className="h-8 w-8 text-yellow-400 mb-4" />
+                <h3 className="font-bold">Member Access</h3>
               </div>
             </div>
           </div>
         </Container>
       </section>
 
-      {/* Startup Hero */}
-      <section className="bg-black text-white">
+      {/* Home Decor Hero */}
+      <section className="bg-[#f8f5f0]">
         <Container className="py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white text-sm font-medium">
-                Revolutionary AI Technology
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <h1 className="text-5xl font-light text-gray-800">
+                Transform Your Space
+              </h1>
+              <p className="text-xl text-gray-600">
+                Discover unique home decor pieces that reflect your personal style.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-white rounded-lg shadow-sm">
+                  <Truck className="h-6 w-6 text-gray-600 mb-2" />
+                  <p className="text-sm text-gray-600">Free Shipping</p>
+                </div>
+                <div className="p-4 bg-white rounded-lg shadow-sm">
+                  <Shield className="h-6 w-6 text-gray-600 mb-2" />
+                  <p className="text-sm text-gray-600">Quality Guarantee</p>
+                </div>
+              </div>
+              <Button className="bg-gray-900 hover:bg-gray-800">
+                Shop Now
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <img 
+                src="https://images.unsplash.com/photo-1531497865144-0464ef8fb9a9?w=400"
+                alt="Home Decor"
+                className="rounded-lg"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400"
+                alt="Home Decor"
+                className="rounded-lg mt-8"
+              />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Electronics Store Hero */}
+      <section className="bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+        <Container className="py-20">
+          <div className="relative">
+            <div className="max-w-2xl space-y-8">
+              <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium">
+                New Tech Arrivals
               </span>
               <h1 className="text-6xl font-bold leading-tight">
-                The Future of <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">
-                  AI-Powered
-                </span> <br />
-                Innovation
+                Future of <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                  Technology
+                </span>
               </h1>
-              <p className="text-lg text-gray-400">
-                Transforming industries with cutting-edge artificial intelligence solutions.
+              <p className="text-xl text-gray-300">
+                Discover cutting-edge electronics and gadgets.
               </p>
-              <Button size="lg" className="bg-white text-black hover:bg-gray-100">
-                Get Early Access
-                <Rocket className="ml-2 h-5 w-5" />
-              </Button>
+              <div className="flex gap-4">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                  Shop Gadgets
+                </Button>
+                <Button size="lg" variant="outline" className="border-white/20">
+                  View Deals
+                </Button>
+              </div>
             </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-violet-500 rounded-3xl blur-3xl opacity-20"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80"
-                alt="AI Technology"
-                className="relative rounded-3xl shadow-2xl"
-              />
-            </div>
+            <div className="absolute right-0 top-0 w-1/3 aspect-square rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl" />
           </div>
         </Container>
       </section>
 
-      {/* Travel Agency Hero */}
-      <section className="relative">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1600&q=80')] bg-cover bg-center">
-          <div className="absolute inset-0 bg-black/40"></div>
-        </div>
-        <Container className="relative py-32">
-          <div className="max-w-2xl text-white space-y-8">
-            <h1 className="text-6xl font-bold">
-              Explore the World's Beauty
-            </h1>
-            <p className="text-xl text-gray-200">
-              Discover breathtaking destinations and create unforgettable memories with our curated travel experiences.
-            </p>
-            <div className="flex gap-4">
-              <Button size="lg" className="bg-white text-black hover:bg-gray-100">
-                Plan Your Trip
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                View Destinations
-              </Button>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* Real Estate Hero */}
-      <section className="bg-gradient-to-b from-emerald-50 to-white">
+      {/* Beauty Store Hero */}
+      <section className="bg-gradient-to-r from-pink-50 to-purple-50">
         <Container className="py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h1 className="text-5xl font-bold text-emerald-900">
-                Find Your Dream Home
+              <span className="inline-block px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-sm font-medium">
+                Natural Beauty
+              </span>
+              <h1 className="text-5xl font-light text-gray-800">
+                Discover Your <br />
+                Natural Glow
               </h1>
-              <p className="text-lg text-emerald-700">
-                Discover premium properties in prime locations with our expert real estate services.
+              <p className="text-lg text-gray-600">
+                Premium skincare and beauty products for your daily routine.
               </p>
-              <div className="p-6 bg-white rounded-xl shadow-lg space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Location</label>
-                    <input type="text" placeholder="Enter city" className="mt-1 w-full rounded-lg border-gray-300 shadow-sm" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Price Range</label>
-                    <select className="mt-1 w-full rounded-lg border-gray-300 shadow-sm">
-                      <option>Any</option>
-                      <option>$100k - $200k</option>
-                      <option>$200k - $500k</option>
-                      <option>$500k+</option>
-                    </select>
-                  </div>
-                </div>
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                  Search Properties
+              <div className="flex gap-4">
+                <Button className="bg-pink-600 hover:bg-pink-700 text-white">
+                  Shop Beauty
                 </Button>
               </div>
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80"
-                alt="Luxury Home"
-                className="rounded-lg shadow-2xl"
+                src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800"
+                alt="Beauty Products"
+                className="rounded-2xl shadow-lg"
+              />
+              <div className="absolute -bottom-8 -left-8 bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-center gap-4">
+                  <Star className="h-8 w-8 text-yellow-400" />
+                  <div>
+                    <p className="font-semibold">Trusted by</p>
+                    <p className="text-sm text-gray-500">10k+ customers</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Sports Store Hero */}
+      <section className="bg-gray-900 text-white">
+        <Container className="py-20">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <h1 className="text-7xl font-black uppercase leading-none">
+                Push Your <br />
+                <span className="text-yellow-500">Limits</span>
+              </h1>
+              <p className="text-xl text-gray-300">
+                Professional sports gear for athletes and enthusiasts.
+              </p>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <h3 className="text-3xl font-bold text-yellow-500">50+</h3>
+                  <p className="text-sm text-gray-400">Brands</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-3xl font-bold text-yellow-500">1000+</h3>
+                  <p className="text-sm text-gray-400">Products</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-3xl font-bold text-yellow-500">24/7</h3>
+                  <p className="text-sm text-gray-400">Support</p>
+                </div>
+              </div>
+              <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-black">
+                Shop Equipment
+              </Button>
+            </div>
+            <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800"
+                alt="Sports Equipment"
+                className="rounded-lg"
               />
             </div>
           </div>
         </Container>
       </section>
 
-      {/* Healthcare Hero */}
-      <section className="bg-gradient-to-r from-cyan-50 to-blue-50">
+      {/* Jewelry Store Hero */}
+      <section className="bg-gradient-to-b from-amber-50 to-white">
         <Container className="py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <span className="inline-block px-3 py-1 rounded-full bg-cyan-100 text-cyan-600 text-sm font-medium">
-                24/7 Healthcare Support
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <span className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm font-medium">
+              Handcrafted Excellence
+            </span>
+            <h1 className="text-5xl font-serif text-gray-900">
+              Timeless Elegance in Every Piece
+            </h1>
+            <p className="text-xl text-gray-600">
+              Discover our collection of fine jewelry and precious stones.
+            </p>
+            <div className="grid sm:grid-cols-4 gap-8">
+              <div className="text-center">
+                <Gift className="h-8 w-8 text-amber-700 mx-auto mb-4" />
+                <p className="text-sm text-gray-600">Gift Wrapping</p>
+              </div>
+              <div className="text-center">
+                <Shield className="h-8 w-8 text-amber-700 mx-auto mb-4" />
+                <p className="text-sm text-gray-600">Certified</p>
+              </div>
+              <div className="text-center">
+                <Truck className="h-8 w-8 text-amber-700 mx-auto mb-4" />
+                <p className="text-sm text-gray-600">Free Shipping</p>
+              </div>
+              <div className="text-center">
+                <CreditCard className="h-8 w-8 text-amber-700 mx-auto mb-4" />
+                <p className="text-sm text-gray-600">Secure Payment</p>
+              </div>
+            </div>
+            <Button className="bg-amber-800 hover:bg-amber-900 text-white">
+              Explore Collection
+            </Button>
+          </div>
+        </Container>
+      </section>
+
+      {/* Furniture Store Hero */}
+      <section className="bg-[#2c3e50] text-white">
+        <Container className="py-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white text-sm font-medium">
+                Modern Living
               </span>
-              <h1 className="text-5xl font-bold text-cyan-900">
-                Your Health, <br />
-                Our Priority
+              <h1 className="text-6xl font-light">
+                Design Your <br />
+                Perfect Space
               </h1>
-              <p className="text-lg text-cyan-700">
-                Access quality healthcare services from the comfort of your home with our telemedicine platform.
+              <p className="text-xl text-gray-300">
+                Contemporary furniture for modern homes.
               </p>
               <div className="flex gap-4">
-                <Button className="bg-cyan-600 hover:bg-cyan-700">
-                  Book Appointment
+                <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
+                  View Catalog
                 </Button>
-                <Button variant="outline" className="border-cyan-600 text-cyan-600">
-                  Learn More
+                <Button size="lg" variant="outline" className="border-white/20">
+                  Book Consultation
                 </Button>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="bg-white p-6 rounded-xl shadow-sm">
-                  <Users className="h-8 w-8 text-cyan-500 mb-4" />
-                  <h3 className="font-semibold">Expert Doctors</h3>
-                </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm">
-                  <Shield className="h-8 w-8 text-cyan-500 mb-4" />
-                  <h3 className="font-semibold">Secure Platform</h3>
-                </div>
-              </div>
-              <div className="space-y-4 mt-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm">
-                  <Zap className="h-8 w-8 text-cyan-500 mb-4" />
-                  <h3 className="font-semibold">Quick Response</h3>
-                </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm">
-                  <Globe className="h-8 w-8 text-cyan-500 mb-4" />
-                  <h3 className="font-semibold">24/7 Support</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* Gaming Platform Hero */}
-      <section className="bg-gray-900 text-white">
-        <Container className="py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <span className="inline-block px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-sm font-medium">
-                Level Up Your Gaming
-              </span>
-              <h1 className="text-6xl font-bold leading-tight">
-                Enter the World of
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                  Epic Gaming
-                </span>
-              </h1>
-              <p className="text-lg text-gray-400">
-                Join millions of players worldwide in the most immersive gaming experience.
-              </p>
-              <div className="flex gap-4">
-                <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
-                  Play Now
-                </Button>
-                <Button size="lg" variant="outline" className="border-purple-500 text-purple-400">
-                  Watch Trailer
-                </Button>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-3xl opacity-20"></div>
               <img 
-                src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80"
-                alt="Gaming"
-                className="relative rounded-3xl shadow-2xl"
+                src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400"
+                alt="Furniture"
+                className="rounded-lg"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1505693314120-0d443867891c?w=400"
+                alt="Furniture"
+                className="rounded-lg mt-8"
               />
             </div>
           </div>
         </Container>
       </section>
 
-      {/* Food Delivery Hero */}
-      <section className="bg-orange-50">
+      {/* Kids Store Hero */}
+      <section className="bg-gradient-to-r from-blue-400 to-purple-400 text-white">
         <Container className="py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <span className="inline-block px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-sm font-medium">
-                Free Delivery on First Order
-              </span>
-              <h1 className="text-5xl font-bold text-orange-900">
-                Delicious Food,
-                <br />
-                Delivered Fast
+              <h1 className="text-5xl font-bold">
+                Magic and Wonder <br />
+                for Little Ones
               </h1>
-              <p className="text-lg text-orange-700">
-                Order from your favorite local restaurants with just a few taps.
+              <p className="text-xl">
+                Quality toys and clothing for children of all ages.
               </p>
-              <div className="flex gap-4">
-                <Button size="lg" className="bg-orange-600 hover:bg-orange-700">
-                  Order Now
-                </Button>
-                <Button size="lg" variant="outline" className="border-orange-600 text-orange-600">
-                  View Menu
-                </Button>
-              </div>
-              <div className="grid grid-cols-3 gap-6 pt-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">30min</div>
-                  <div className="text-sm text-orange-700">Fast Delivery</div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/20 p-4 rounded-lg backdrop-blur-lg">
+                  <Clock className="h-6 w-6 mb-2" />
+                  <p className="text-sm">Fast Delivery</p>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">500+</div>
-                  <div className="text-sm text-orange-700">Restaurants</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">24/7</div>
-                  <div className="text-sm text-orange-700">Support</div>
+                <div className="bg-white/20 p-4 rounded-lg backdrop-blur-lg">
+                  <Shield className="h-6 w-6 mb-2" />
+                  <p className="text-sm">Safe Materials</p>
                 </div>
               </div>
+              <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100">
+                Explore Toys
+              </Button>
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80"
-                alt="Food Delivery"
-                className="rounded-lg shadow-2xl"
+                src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=800"
+                alt="Kids Store"
+                className="rounded-2xl"
               />
             </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Sustainable Fashion Hero */}
+      <section className="bg-[#eef2f7]">
+        <Container className="py-20">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-600 text-sm font-medium">
+              Eco-Friendly Fashion
+            </span>
+            <h1 className="text-4xl font-medium text-gray-900">
+              Style that Respects Our Planet
+            </h1>
+            <p className="text-lg text-gray-600">
+              Sustainable and ethical fashion for conscious consumers.
+            </p>
+            <div className="grid sm:grid-cols-3 gap-8">
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <img 
+                  src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=200"
+                  alt="Sustainable Fashion"
+                  className="w-full h-40 object-cover rounded-lg mb-4"
+                />
+                <h3 className="font-medium">Organic Materials</h3>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <img 
+                  src="https://images.unsplash.com/photo-1581497396202-5645e76a3a8e?w=200"
+                  alt="Sustainable Fashion"
+                  className="w-full h-40 object-cover rounded-lg mb-4"
+                />
+                <h3 className="font-medium">Fair Trade</h3>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <img 
+                  src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=200"
+                  alt="Sustainable Fashion"
+                  className="w-full h-40 object-cover rounded-lg mb-4"
+                />
+                <h3 className="font-medium">Zero Waste</h3>
+              </div>
+            </div>
+            <Button className="bg-green-600 hover:bg-green-700 text-white">
+              Shop Sustainable
+            </Button>
           </div>
         </Container>
       </section>
