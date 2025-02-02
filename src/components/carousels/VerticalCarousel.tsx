@@ -19,7 +19,7 @@ export function VerticalCarousel({ products }: VerticalCarouselProps) {
         opts={{
           align: "start",
           loop: true,
-          vertical: true,
+          axis: "y",
         }}
         className="h-full"
       >
