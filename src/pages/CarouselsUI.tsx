@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types";
 import { Navbar } from "@/components/Navbar";
-import { 
+import { CarouselSection } from "@/components/carousels/sections/CarouselSection";
+import {
   BasicCarousel,
   FadeCarousel,
   GridCarousel,
@@ -68,170 +69,137 @@ export default function CarouselsUI() {
       <main className="container mx-auto py-8 space-y-16">
         <h1 className="text-4xl font-bold text-center mb-12">Product Carousel Showcase</h1>
         
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Special Offers Carousel</h2>
+        <CarouselSection title="Special Offers Carousel">
           <SpecialOffersCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Basic Carousel</h2>
+        <CarouselSection title="Basic Carousel">
           <BasicCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Modern Carousel</h2>
+        <CarouselSection title="Modern Carousel">
           <ModernCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Minimal Carousel</h2>
+        <CarouselSection title="Minimal Carousel">
           <MinimalCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Grid Carousel</h2>
+        <CarouselSection title="Grid Carousel">
           <GridCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Infinite Carousel</h2>
+        <CarouselSection title="Infinite Carousel">
           <InfiniteCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Fade Carousel</h2>
+        <CarouselSection title="Fade Carousel">
           <FadeCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">3D Carousel</h2>
+        <CarouselSection title="3D Carousel">
           <ThreeDCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Snap Carousel</h2>
+        <CarouselSection title="Snap Carousel">
           <SnapCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Vertical Carousel</h2>
+        <CarouselSection title="Vertical Carousel">
           <VerticalCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Zoom Carousel</h2>
+        <CarouselSection title="Zoom Carousel">
           <ZoomCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Gradient Carousel</h2>
+        <CarouselSection title="Gradient Carousel">
           <GradientCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Border Carousel</h2>
+        <CarouselSection title="Border Carousel">
           <BorderCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Shadow Carousel</h2>
+        <CarouselSection title="Shadow Carousel">
           <ShadowCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Floating Carousel</h2>
+        <CarouselSection title="Floating Carousel">
           <FloatingCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Glass Carousel</h2>
+        <CarouselSection title="Glass Carousel">
           <GlassCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Neumorphic Carousel</h2>
+        <CarouselSection title="Neumorphic Carousel">
           <NeumorphicCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Outline Carousel</h2>
+        <CarouselSection title="Outline Carousel">
           <OutlineCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Colorful Carousel</h2>
+        <CarouselSection title="Colorful Carousel">
           <ColorfulCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Minimalist Carousel</h2>
+        <CarouselSection title="Minimalist Carousel">
           <MinimalistCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Dark Carousel</h2>
+        <CarouselSection title="Dark Carousel">
           <DarkCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Parallax Scroll Carousel</h2>
+        <CarouselSection title="Parallax Scroll Carousel">
           <ParallaxScrollCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Clean Neumorphic Carousel</h2>
+        <CarouselSection title="Clean Neumorphic Carousel">
           <CleanNeomorphicCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Circular Carousel</h2>
+        <CarouselSection title="Circular Carousel">
           <CircularCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Infinite Scroll Carousel</h2>
+        <CarouselSection title="Infinite Scroll Carousel">
           <InfiniteScrollCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Stacked Carousel</h2>
+        <CarouselSection title="Stacked Carousel">
           <StackedCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Cube Carousel</h2>
+        <CarouselSection title="Cube Carousel">
           <CubeCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Parallax Carousel</h2>
+        <CarouselSection title="Parallax Carousel">
           <ParallaxCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Cascade Carousel</h2>
+        <CarouselSection title="Cascade Carousel">
           <CascadeCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Masonry Carousel</h2>
+        <CarouselSection title="Masonry Carousel">
           <MasonryCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Timeline Carousel</h2>
+        <CarouselSection title="Timeline Carousel">
           <TimelineCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Perspective Carousel</h2>
+        <CarouselSection title="Perspective Carousel">
           <PerspectiveCarousel products={products} />
-        </section>
+        </CarouselSection>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Waterfall Carousel</h2>
+        <CarouselSection title="Waterfall Carousel">
           <WaterfallCarousel products={products} />
-        </section>
+        </CarouselSection>
       </main>
     </div>
   );
