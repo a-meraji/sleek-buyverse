@@ -1,0 +1,100 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Product } from "@/types";
+import { Navbar } from "@/components/Navbar";
+import { 
+  BasicCarousel,
+  FadeCarousel,
+  GridCarousel,
+  InfiniteCarousel,
+  MinimalCarousel,
+  ModernCarousel,
+  SnapCarousel,
+  ThreeDCarousel,
+  VerticalCarousel,
+  ZoomCarousel
+} from "@/components/carousels";
+
+export default function CarouselsUI() {
+  const { data: products, isLoading } = useQuery({
+    queryKey: ['carousel-products'],
+    queryFn: async () => {
+      console.log('Fetching products for carousels');
+      const { data, error } = await supabase
+        .from('products')
+        .select('*, product_variants(*)')
+        .limit(10);
+
+      if (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+      }
+
+      console.log('Fetched products:', data);
+      return data as Product[];
+    },
+  });
+
+  if (isLoading || !products) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="container mx-auto py-8 space-y-16">
+        <h1 className="text-4xl font-bold text-center mb-12">Product Carousel Showcase</h1>
+        
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Basic Carousel</h2>
+          <BasicCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Modern Carousel</h2>
+          <ModernCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Minimal Carousel</h2>
+          <MinimalCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Grid Carousel</h2>
+          <GridCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Infinite Carousel</h2>
+          <InfiniteCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Fade Carousel</h2>
+          <FadeCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">3D Carousel</h2>
+          <ThreeDCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Snap Carousel</h2>
+          <SnapCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Vertical Carousel</h2>
+          <VerticalCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Zoom Carousel</h2>
+          <ZoomCarousel products={products} />
+        </section>
+      </main>
+    </div>
+  );
+}
