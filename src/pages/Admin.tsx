@@ -5,7 +5,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Store, LayoutDashboard, Package, ShoppingCart, Users, MessageSquare, Star, Megaphone } from "lucide-react";
+import { Store, LayoutDashboard, Package, ShoppingCart, Users, MessageSquare, Star, Megaphone, FileText } from "lucide-react";
 import { AdminProducts } from "@/components/admin/AdminProducts";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminUsers } from "@/components/admin/AdminUsers";
@@ -13,6 +13,7 @@ import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { AdminReviews } from "@/components/admin/AdminReviews";
 import { AdminCampaigns } from "@/components/admin/AdminCampaigns";
+import { AdminBlog } from "@/components/admin/blog/AdminBlog";
 import { SessionBadge } from "@/components/admin/chat/components/session-card/SessionBadge";
 import { useUnreadAdminMessages } from "@/components/admin/chat/hooks/useUnreadAdminMessages";
 import {
@@ -24,8 +25,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-
-// ... keep existing code (component logic)
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -74,6 +73,7 @@ export default function Admin() {
     { id: "users", label: "Users", icon: Users, component: AdminUsers },
     { id: "reviews", label: "Reviews", icon: Star, component: AdminReviews, badge: pendingReviewsCount },
     { id: "chat", label: "Chat", icon: MessageSquare, component: AdminChat, badge: unreadMessages },
+    { id: "blog", label: "Blog", icon: FileText, component: AdminBlog },
   ];
 
   const ActiveComponent = menuItems.find(item => item.id === activeTab)?.component;
