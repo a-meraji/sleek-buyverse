@@ -30,31 +30,35 @@ export function CubeCarousel({ products }: CubeCarouselProps) {
             transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
-          {products.slice(0, 4).map((product, index) => (
-            <div
-              key={product.id}
-              className="absolute w-full h-full"
-              style={{
-                transform: `rotateY(${index * 90}deg) translateZ(300px)`,
-                transformStyle: 'preserve-3d',
-                backfaceVisibility: 'visible',
-                WebkitBackfaceVisibility: 'visible',
-                transition: 'opacity 0.8s ease',
-                opacity: Math.abs(((activeIndex - index) % 4 + 4) % 4) <= 1 ? 1 : 1
-              }}
-            >
-              <div className="w-full h-full [transform-style:preserve-3d]">
-                <ProductCard
-                  id={product.id}
-                  name={product.name}
-                  image={product.image_url}
-                  product_variants={product.product_variants}
-                  discount={product.discount}
-                  brand={product.brand}
-                />
+          {products.slice(0, 4).map((product, index) => {
+            const isActive = ((activeIndex % 4) + 4) % 4 === index;
+            return (
+              <div
+                key={product.id}
+                className="absolute w-full h-full"
+                style={{
+                  transform: `rotateY(${index * 90}deg) translateZ(300px)`,
+                  transformStyle: 'preserve-3d',
+                  backfaceVisibility: 'visible',
+                  WebkitBackfaceVisibility: 'visible',
+                  transition: 'opacity 0.8s ease',
+                  opacity: isActive ? 1 : 0.6,
+                  backgroundColor: isActive ? 'white' : 'transparent'
+                }}
+              >
+                <div className="w-full h-full [transform-style:preserve-3d]">
+                  <ProductCard
+                    id={product.id}
+                    name={product.name}
+                    image={product.image_url}
+                    product_variants={product.product_variants}
+                    discount={product.discount}
+                    brand={product.brand}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
