@@ -20,27 +20,38 @@ export function CubeCarousel({ products }: CubeCarouselProps) {
   };
 
   return (
-    <div className="relative h-[600px] perspective-1000">
-      <div className="relative w-full h-full transform-style-3d transition-transform duration-500"
-           style={{ transform: `rotateY(${activeIndex * -90}deg)` }}>
-        {products.slice(0, 4).map((product, index) => (
-          <div
-            key={product.id}
-            className="absolute w-full h-full backface-hidden"
-            style={{
-              transform: `rotateY(${index * 90}deg) translateZ(300px)`,
-            }}
-          >
-            <ProductCard
-              id={product.id}
-              name={product.name}
-              image={product.image_url}
-              product_variants={product.product_variants}
-              discount={product.discount}
-              brand={product.brand}
-            />
-          </div>
-        ))}
+    <div className="relative h-[600px] w-full overflow-hidden mb-24">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div 
+          className="relative w-[400px] h-[500px] preserve-3d"
+          style={{ 
+            transform: `translateZ(-300px) rotateY(${activeIndex * -90}deg)`,
+            transformStyle: 'preserve-3d',
+            transition: 'transform 0.5s ease'
+          }}
+        >
+          {products.slice(0, 4).map((product, index) => (
+            <div
+              key={product.id}
+              className="absolute w-full h-full backface-visible"
+              style={{
+                transform: `rotateY(${index * 90}deg) translateZ(300px)`,
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <div className="w-full h-full">
+                <ProductCard
+                  id={product.id}
+                  name={product.name}
+                  image={product.image_url}
+                  product_variants={product.product_variants}
+                  discount={product.discount}
+                  brand={product.brand}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <Button
