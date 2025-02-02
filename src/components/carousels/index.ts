@@ -30,3 +30,4 @@ export { PerspectiveCarousel } from "./PerspectiveCarousel";
 export { WaterfallCarousel } from "./WaterfallCarousel";
 export { CleanNeomorphicCarousel } from "./CleanNeomorphicCarousel";
 export { SpecialOffersCarousel } from "./SpecialOffersCarousel";
+export { ParallaxScrollCarousel } from "./ParallaxScrollCarousel";
