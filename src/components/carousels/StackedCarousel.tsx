@@ -30,16 +30,17 @@ export function StackedCarousel({ products }: StackedCarouselProps) {
 
         // Calculate styling based on position
         const zIndex = products.length - distance;
-        const translateY = distance * 10; // Smaller vertical offset
-        const rotate = distance === 0 ? 0 : (distance % 2 === 0 ? 3 : -3); // Alternate rotation
-        const scale = Math.max(1 - distance * 0.1, 0.7);
+        const translateX = distance * 15; // Add horizontal offset
+        const translateY = distance * 15; // Increase vertical offset
+        const rotate = distance === 0 ? 0 : (distance % 2 === 0 ? 5 : -5); // Increase rotation angle
+        const scale = Math.max(1 - distance * 0.08, 0.85); // Adjust scale to be more visible
 
         return (
           <div
             key={product.id}
             className="absolute transition-all duration-300 w-80 bg-white shadow-lg rounded-lg"
             style={{
-              transform: `translateY(${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
+              transform: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
               zIndex,
             }}
           >
