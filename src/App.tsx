@@ -17,6 +17,7 @@ import ReturnsExchanges from "@/pages/ReturnsExchanges";
 import ShippingPolicy from "@/pages/ShippingPolicy";
 import Admin from "@/pages/Admin";
 import CarouselsUI from "@pages/CarouselsUI";
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -27,7 +28,7 @@ function App() {
           <Route element={<RootLayout />}>
             <Route path="/" element={<Index />} />
             <Route path="/watch" element={<Watch />} />
-            <Route path="/Carousels" element={<CarouselsUI />} />
+            <Route path="/carousels" element={<CarouselsUI />} />
             <Route path="/about" element={<About />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/cart" element={<Cart />} />
