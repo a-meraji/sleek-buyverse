@@ -22,19 +22,24 @@ export function StackedCarousel({ products }: StackedCarouselProps) {
   return (
     <div className="relative h-[600px] flex items-center justify-center">
       {products.map((product, index) => {
-        const offset = (index - activeIndex + products.length) % products.length;
-        const zIndex = products.length - offset;
-        const opacity = Math.max(1 - offset * 0.2, 0.3);
-        const scale = Math.max(1 - offset * 0.1, 0.8);
-        const translateY = offset * 20;
+        // Calculate the distance from active index
+        const distance = (index - activeIndex + products.length) % products.length;
+        
+        // Only show active card and 3 cards behind it
+        if (distance > 3) return null;
+
+        // Calculate styling based on position
+        const zIndex = products.length - distance;
+        const translateY = distance * 10; // Smaller vertical offset
+        const rotate = distance === 0 ? 0 : (distance % 2 === 0 ? 3 : -3); // Alternate rotation
+        const scale = Math.max(1 - distance * 0.1, 0.7);
 
         return (
           <div
             key={product.id}
-            className="absolute transition-all duration-300 w-80"
+            className="absolute transition-all duration-300 w-80 bg-white shadow-lg rounded-lg"
             style={{
-              transform: `translateY(${translateY}px) scale(${scale})`,
-              opacity,
+              transform: `translateY(${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
               zIndex,
             }}
           >
