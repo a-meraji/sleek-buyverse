@@ -34,7 +34,8 @@ import {
   PerspectiveCarousel,
   WaterfallCarousel,
   CleanNeomorphicCarousel,
-  ParallaxScrollCarousel
+  ParallaxScrollCarousel,
+  SpecialOffersCarousel
 } from "@/components/carousels";
 
 export default function CarouselsUI() {
@@ -67,7 +68,11 @@ export default function CarouselsUI() {
       <main className="container mx-auto py-8 space-y-16">
         <h1 className="text-4xl font-bold text-center mb-12">Product Carousel Showcase</h1>
         
-        {/* Original Carousels */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Special Offers Carousel</h2>
+          <SpecialOffersCarousel products={products} />
+        </section>
+
         <section>
           <h2 className="text-2xl font-semibold mb-6">Basic Carousel</h2>
           <BasicCarousel products={products} />
@@ -173,8 +178,6 @@ export default function CarouselsUI() {
           <ParallaxScrollCarousel products={products} />
         </section>
 
-        {/* Rest of the carousels */}
-        {/* New Carousels */}
         <section>
           <h2 className="text-2xl font-semibold mb-6">Clean Neumorphic Carousel</h2>
           <CleanNeomorphicCarousel products={products} />
