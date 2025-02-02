@@ -29,3 +29,4 @@ export * from "./TimelineCarousel";
 export * from "./PerspectiveCarousel";
 export * from "./WaterfallCarousel";
 export * from "./CleanNeomorphicCarousel";
+export * from "./ParallaxScrollCarousel";

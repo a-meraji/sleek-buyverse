@@ -33,7 +33,8 @@ import {
   TimelineCarousel,
   PerspectiveCarousel,
   WaterfallCarousel,
-  CleanNeomorphicCarousel
+  CleanNeomorphicCarousel,
+  ParallaxScrollCarousel
 } from "@/components/carousels";
 
 export default function CarouselsUI() {
@@ -167,6 +168,12 @@ export default function CarouselsUI() {
           <DarkCarousel products={products} />
         </section>
 
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Parallax Scroll Carousel</h2>
+          <ParallaxScrollCarousel products={products} />
+        </section>
+
+        {/* Rest of the carousels */}
         {/* New Carousels */}
         <section>
           <h2 className="text-2xl font-semibold mb-6">Clean Neumorphic Carousel</h2>
