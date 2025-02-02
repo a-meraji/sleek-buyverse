@@ -12,7 +12,17 @@ import {
   SnapCarousel,
   ThreeDCarousel,
   VerticalCarousel,
-  ZoomCarousel
+  ZoomCarousel,
+  GradientCarousel,
+  BorderCarousel,
+  ShadowCarousel,
+  FloatingCarousel,
+  GlassCarousel,
+  NeumorphicCarousel,
+  OutlineCarousel,
+  ColorfulCarousel,
+  MinimalistCarousel,
+  DarkCarousel
 } from "@/components/carousels";
 
 export default function CarouselsUI() {
@@ -93,6 +103,56 @@ export default function CarouselsUI() {
         <section>
           <h2 className="text-2xl font-semibold mb-6">Zoom Carousel</h2>
           <ZoomCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Gradient Carousel</h2>
+          <GradientCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Border Carousel</h2>
+          <BorderCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Shadow Carousel</h2>
+          <ShadowCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Floating Carousel</h2>
+          <FloatingCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Glass Carousel</h2>
+          <GlassCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Neumorphic Carousel</h2>
+          <NeumorphicCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Outline Carousel</h2>
+          <OutlineCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Colorful Carousel</h2>
+          <ColorfulCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Minimalist Carousel</h2>
+          <MinimalistCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Dark Carousel</h2>
+          <DarkCarousel products={products} />
         </section>
       </main>
     </div>
