@@ -16,7 +16,7 @@ import Profile from "@/pages/Profile";
 import ReturnsExchanges from "@/pages/ReturnsExchanges";
 import ShippingPolicy from "@/pages/ShippingPolicy";
 import Admin from "@/pages/Admin";
-import CarouselsUI from "@pages/CarouselsUI";
+import CarouselsUI from "@/pages/CarouselsUI";
 
 const queryClient = new QueryClient();
 
