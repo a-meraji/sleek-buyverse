@@ -19,6 +19,7 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
   const [mainImageUrl, setMainImageUrl] = useState("");
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
 
   const generateSlug = (text: string) => {
     return text
@@ -55,6 +56,7 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
       setMetaDescription("");
       setContent("");
       setMainImageUrl("");
+      setCategories([]);
     } catch (error) {
       console.error('Error creating blog post:', error);
       toast.error("Failed to create blog post");
