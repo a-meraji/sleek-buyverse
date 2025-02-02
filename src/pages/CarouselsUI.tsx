@@ -22,7 +22,17 @@ import {
   OutlineCarousel,
   ColorfulCarousel,
   MinimalistCarousel,
-  DarkCarousel
+  DarkCarousel,
+  CircularCarousel,
+  InfiniteScrollCarousel,
+  StackedCarousel,
+  CubeCarousel,
+  ParallaxCarousel,
+  CascadeCarousel,
+  MasonryCarousel,
+  TimelineCarousel,
+  PerspectiveCarousel,
+  WaterfallCarousel
 } from "@/components/carousels";
 
 export default function CarouselsUI() {
@@ -55,6 +65,7 @@ export default function CarouselsUI() {
       <main className="container mx-auto py-8 space-y-16">
         <h1 className="text-4xl font-bold text-center mb-12">Product Carousel Showcase</h1>
         
+        {/* Original Carousels */}
         <section>
           <h2 className="text-2xl font-semibold mb-6">Basic Carousel</h2>
           <BasicCarousel products={products} />
@@ -153,6 +164,57 @@ export default function CarouselsUI() {
         <section>
           <h2 className="text-2xl font-semibold mb-6">Dark Carousel</h2>
           <DarkCarousel products={products} />
+        </section>
+
+        {/* New Carousels */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Circular Carousel</h2>
+          <CircularCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Infinite Scroll Carousel</h2>
+          <InfiniteScrollCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Stacked Carousel</h2>
+          <StackedCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Cube Carousel</h2>
+          <CubeCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Parallax Carousel</h2>
+          <ParallaxCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Cascade Carousel</h2>
+          <CascadeCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Masonry Carousel</h2>
+          <MasonryCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Timeline Carousel</h2>
+          <TimelineCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Perspective Carousel</h2>
+          <PerspectiveCarousel products={products} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Waterfall Carousel</h2>
+          <WaterfallCarousel products={products} />
         </section>
       </main>
     </div>

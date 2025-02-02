@@ -70,12 +70,32 @@ export default {
         "scroll-vertical": {
           from: { transform: "translateY(0)" },
           to: { transform: "translateY(-50%)" },
+        },
+        "scroll-horizontal": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "rotate-360": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "pulse-soft": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.8" },
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "scroll-vertical": "scroll-vertical 25s linear infinite",
+        "scroll-horizontal": "scroll-horizontal 25s linear infinite",
+        "rotate-slow": "rotate-360 15s linear infinite",
+        "float": "float 3s ease-in-out infinite",
+        "pulse-soft": "pulse-soft 2s ease-in-out infinite"
       },
     },
   },
