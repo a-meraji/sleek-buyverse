@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { RichTextContent } from "@/components/product/RichTextContent";
 import { formatDistance } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -60,14 +59,10 @@ export default function BlogPost() {
         alt={blog.title}
         className="w-full h-[400px] object-cover rounded-lg mb-8"
       />
-      {blog.summary && (
-        <p className="text-lg text-muted-foreground mb-8">
-          {blog.summary}
-        </p>
-      )}
-      <div className="prose prose-lg max-w-none">
-        <RichTextContent content={blog.content} />
-      </div>
+      <div 
+        className="prose prose-lg max-w-none"
+        dangerouslySetInnerHTML={{ __html: blog.content }}
+      />
     </article>
   );
 }
