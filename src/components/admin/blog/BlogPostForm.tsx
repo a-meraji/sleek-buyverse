@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { ImageSelector } from "@/components/admin/ImageSelector";
-import { RichTextEditor } from "@/components/admin/product/RichTextEditor";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageSelector } from "@/components/admin/ImageSelector";
+import { TitleMetaSection } from "./form/TitleMetaSection";
+import { MainImageSection } from "./form/MainImageSection";
+import { ContentEditorSection } from "./form/ContentEditorSection";
+import { FormActions } from "./form/FormActions";
 
 interface BlogPostFormProps {
   onSuccess?: () => void;
@@ -19,7 +18,6 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
   const [mainImageUrl, setMainImageUrl] = useState("");
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
 
   const generateSlug = (text: string) => {
@@ -34,7 +32,6 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
       if (isSelectingMainImage) {
         setMainImageUrl(url);
       } else {
-        // Insert image URL into content at cursor position
         const imageHtml = `\n![Blog content image](${url})\n`;
         setContent(prev => prev + imageHtml);
       }
@@ -70,7 +67,6 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
       setMetaDescription("");
       setContent("");
       setMainImageUrl("");
-      setCategories([]);
     } catch (error) {
       console.error('Error creating blog post:', error);
       toast.error("Failed to create blog post");
@@ -81,79 +77,31 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <Label htmlFor="title">Title</Label>
-        <Input
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          maxLength={60}
-          required
-        />
-        <p className="text-sm text-gray-500 mt-1">
-          {60 - title.length} characters remaining
-        </p>
-      </div>
+      <TitleMetaSection
+        title={title}
+        metaDescription={metaDescription}
+        onTitleChange={setTitle}
+        onMetaDescriptionChange={setMetaDescription}
+      />
 
-      <div>
-        <Label htmlFor="metaDescription">Meta Description</Label>
-        <Textarea
-          id="metaDescription"
-          value={metaDescription}
-          onChange={(e) => setMetaDescription(e.target.value)}
-          maxLength={160}
-          required
-        />
-        <p className="text-sm text-gray-500 mt-1">
-          {160 - metaDescription.length} characters remaining
-        </p>
-      </div>
+      <MainImageSection
+        mainImageUrl={mainImageUrl}
+        onImageSelect={() => {
+          setIsSelectingMainImage(true);
+          setShowImageSelector(true);
+        }}
+      />
 
-      <div>
-        <Label>Main Image</Label>
-        <div className="mt-2 space-y-2">
-          {mainImageUrl && (
-            <img
-              src={mainImageUrl}
-              alt="Blog post main image"
-              className="w-full h-48 object-cover rounded-lg"
-            />
-          )}
-          <Button 
-            type="button" 
-            onClick={() => {
-              setIsSelectingMainImage(true);
-              setShowImageSelector(true);
-            }}
-          >
-            {mainImageUrl ? "Change Image" : "Select Image"}
-          </Button>
-        </div>
-      </div>
+      <ContentEditorSection
+        content={content}
+        onContentChange={setContent}
+        onInsertImage={() => {
+          setIsSelectingMainImage(false);
+          setShowImageSelector(true);
+        }}
+      />
 
-      <div>
-        <Label>Content</Label>
-        <div className="mt-2 space-y-2">
-          <Button 
-            type="button"
-            variant="outline"
-            onClick={() => {
-              setIsSelectingMainImage(false);
-              setShowImageSelector(true);
-            }}
-          >
-            Insert Image
-          </Button>
-          <RichTextEditor
-            value={content}
-            onChange={setContent}
-          />
-        </div>
-      </div>
-
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create Post"}
-      </Button>
+      <FormActions isSubmitting={isSubmitting} />
 
       <ImageSelector
         open={showImageSelector}
