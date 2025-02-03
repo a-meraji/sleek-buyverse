@@ -8,7 +8,7 @@ interface EditorToolbarProps {
 
 export function EditorToolbar({ onInsertImage, onTogglePreview, showPreview }: EditorToolbarProps) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center gap-2">
       <Button 
         type="button"
         variant="outline"

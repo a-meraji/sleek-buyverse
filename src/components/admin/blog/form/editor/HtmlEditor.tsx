@@ -23,7 +23,7 @@ export function HtmlEditor({ content, onContentChange, onCursorPosition }: HtmlE
       onChange={(e) => onContentChange(e.target.value)}
       className="min-h-[400px] font-mono"
       placeholder="Enter HTML content here..."
-      onSelect={handleInsertImageClick}
+      onClick={handleInsertImageClick}
     />
   );
 }

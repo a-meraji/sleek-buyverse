@@ -22,7 +22,11 @@ export function ContentEditorSection({
       <div className="flex items-center justify-between">
         <Label>Content (HTML)</Label>
         <EditorToolbar 
-          onInsertImage={() => onInsertImage(0)}
+          onInsertImage={() => {
+            if (!showPreview) {
+              onInsertImage(0);
+            }
+          }}
           onTogglePreview={() => setShowPreview(!showPreview)}
           showPreview={showPreview}
         />
