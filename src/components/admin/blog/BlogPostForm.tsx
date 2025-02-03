@@ -19,6 +19,7 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null);
 
   const generateSlug = (text: string) => {
     return text
@@ -32,8 +33,14 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
       if (isSelectingMainImage) {
         setMainImageUrl(url);
       } else {
-        const imageHtml = `\n![Blog content image](${url})\n`;
-        setContent(prev => prev + imageHtml);
+        // Insert image tag at cursor position or at the end
+        const imgTag = `<img src="${url}" alt="Blog content image" class="w-full rounded-lg" />`;
+        if (cursorPosition !== null) {
+          const newContent = content.slice(0, cursorPosition) + imgTag + content.slice(cursorPosition);
+          setContent(newContent);
+        } else {
+          setContent(prev => prev + imgTag);
+        }
       }
     }
     setShowImageSelector(false);
@@ -75,6 +82,16 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
     }
   };
 
+  const handleInsertImage = () => {
+    // Store current cursor position before opening image selector
+    const textarea = document.querySelector('textarea');
+    if (textarea) {
+      setCursorPosition(textarea.selectionStart);
+    }
+    setIsSelectingMainImage(false);
+    setShowImageSelector(true);
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <TitleMetaSection
@@ -95,10 +112,7 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
       <ContentEditorSection
         content={content}
         onContentChange={setContent}
-        onInsertImage={() => {
-          setIsSelectingMainImage(false);
-          setShowImageSelector(true);
-        }}
+        onInsertImage={handleInsertImage}
       />
 
       <FormActions isSubmitting={isSubmitting} />
