@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface ContentEditorSectionProps {
   content: string;
   onContentChange: (value: string) => void;
-  onInsertImage: () => void;
+  onInsertImage: (cursorPosition: number) => void;
 }
 
 export function ContentEditorSection({
@@ -15,6 +15,14 @@ export function ContentEditorSection({
   onInsertImage
 }: ContentEditorSectionProps) {
   const [showPreview, setShowPreview] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleInsertImage = () => {
+    if (textareaRef.current) {
+      const cursorPosition = textareaRef.current.selectionStart;
+      onInsertImage(cursorPosition);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -24,7 +32,7 @@ export function ContentEditorSection({
           <Button 
             type="button"
             variant="outline"
-            onClick={onInsertImage}
+            onClick={handleInsertImage}
           >
             Insert Image
           </Button>
@@ -45,6 +53,7 @@ export function ContentEditorSection({
         />
       ) : (
         <Textarea
+          ref={textareaRef}
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
           className="min-h-[400px] font-mono"
