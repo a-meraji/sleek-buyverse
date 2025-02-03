@@ -147,11 +147,13 @@ export function BlogPostList() {
       ))}
 
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-4xl">
-          <BlogPostForm 
-            initialData={editingPost}
-            onSuccess={handleEditSuccess}
-          />
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="space-y-6 pb-6">
+            <BlogPostForm 
+              initialData={editingPost}
+              onSuccess={handleEditSuccess}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </div>
