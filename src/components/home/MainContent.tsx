@@ -1,5 +1,6 @@
 import { Product } from "@/types";
 import { ProductCarousel } from "@/components/home/ProductCarousel";
+import { BlogCarousel } from "@/components/blog/BlogCarousel";
 
 interface MainContentProps {
   products: Product[];
@@ -19,6 +20,7 @@ export function MainContent({ products, popularProducts }: MainContentProps) {
           title="Popular Products" 
           products={popularProducts} 
         />
+        <BlogCarousel />
       </div>
     </div>
   );
