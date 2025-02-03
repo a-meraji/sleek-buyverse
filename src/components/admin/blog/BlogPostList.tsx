@@ -118,7 +118,9 @@ export function BlogPostList() {
             <div className="space-y-2">
               <h3 className="font-medium">{post.title}</h3>
               {post.summary && (
-                <p className="text-sm text-gray-600">{post.summary}</p>
+                <p className="text-sm text-gray-600 line-clamp-2 max-h-12 overflow-hidden">
+                  {post.summary}
+                </p>
               )}
               <p className="text-sm text-gray-500">
                 Created: {new Date(post.created_at).toLocaleDateString()}
