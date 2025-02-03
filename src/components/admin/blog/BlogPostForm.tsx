@@ -48,7 +48,19 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
     setIsSubmitting(true);
 
     try {
+      // Validate required fields
+      if (!formData.title || !formData.content || !formData.mainImageUrl) {
+        throw new Error("Please fill in all required fields");
+      }
+
       const slug = generateSlug(formData.title);
+      console.log("Creating blog post with data:", {
+        title: formData.title,
+        slug,
+        meta_description: formData.metaDescription,
+        content: formData.content,
+        main_image_url: formData.mainImageUrl,
+      });
       
       const { error } = await supabase
         .from('blog_posts')
@@ -61,7 +73,10 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
           status: 'draft'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
 
       toast.success("Blog post created successfully!");
       onSuccess?.();
@@ -74,7 +89,7 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
       });
     } catch (error) {
       console.error('Error creating blog post:', error);
-      toast.error("Failed to create blog post");
+      toast.error(error instanceof Error ? error.message : "Failed to create blog post");
     } finally {
       setIsSubmitting(false);
     }
