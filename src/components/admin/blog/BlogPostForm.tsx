@@ -5,6 +5,8 @@ import { ContentEditorSection } from "./form/ContentEditorSection";
 import { FormActions } from "./form/FormActions";
 import { useBlogPostForm } from "./form/hooks/useBlogPostForm";
 import { useImageSelector } from "./form/hooks/useImageSelector";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface BlogPostFormProps {
   initialData?: any;
@@ -51,6 +53,17 @@ export function BlogPostForm({ initialData, onSuccess }: BlogPostFormProps) {
           setFormData(prev => ({ ...prev, metaDescription }))
         }
       />
+
+      <div className="space-y-2">
+        <Label htmlFor="summary">Summary</Label>
+        <Textarea
+          id="summary"
+          value={formData.summary}
+          onChange={(e) => setFormData(prev => ({ ...prev, summary: e.target.value }))}
+          placeholder="Write a brief summary of the blog post..."
+          className="h-24"
+        />
+      </div>
 
       <MainImageSection
         mainImageUrl={formData.mainImageUrl}

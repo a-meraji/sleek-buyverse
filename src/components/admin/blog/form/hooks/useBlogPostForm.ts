@@ -7,6 +7,7 @@ interface BlogFormData {
   metaDescription: string;
   content: string;
   mainImageUrl: string;
+  summary: string;
 }
 
 interface UseBlogPostFormProps {
@@ -20,6 +21,7 @@ export function useBlogPostForm({ initialData, onSuccess }: UseBlogPostFormProps
     metaDescription: initialData?.meta_description || "",
     content: initialData?.content || "",
     mainImageUrl: initialData?.main_image_url || "",
+    summary: initialData?.summary || "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,6 +49,7 @@ export function useBlogPostForm({ initialData, onSuccess }: UseBlogPostFormProps
         meta_description: formData.metaDescription,
         content: formData.content,
         main_image_url: formData.mainImageUrl,
+        summary: formData.summary,
       };
 
       console.log("Submitting blog post data:", postData);
@@ -84,6 +87,7 @@ export function useBlogPostForm({ initialData, onSuccess }: UseBlogPostFormProps
           metaDescription: "",
           content: "",
           mainImageUrl: "",
+          summary: "",
         });
       }
     } catch (error) {

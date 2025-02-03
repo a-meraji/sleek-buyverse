@@ -114,9 +114,12 @@ export function BlogPostList() {
           key={post.id}
           className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow"
         >
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
               <h3 className="font-medium">{post.title}</h3>
+              {post.summary && (
+                <p className="text-sm text-gray-600">{post.summary}</p>
+              )}
               <p className="text-sm text-gray-500">
                 Created: {new Date(post.created_at).toLocaleDateString()}
               </p>
