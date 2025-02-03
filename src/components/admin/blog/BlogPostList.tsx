@@ -55,6 +55,27 @@ export function BlogPostList() {
     }
   };
 
+  const handleUnpublish = async (id: string) => {
+    try {
+      console.log("Unpublishing post:", id);
+      const { error } = await supabase
+        .from('blog_posts')
+        .update({ 
+          status: 'draft',
+          published_at: null
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast.success("Post unpublished successfully!");
+      refetch();
+    } catch (error) {
+      console.error('Error unpublishing post:', error);
+      toast.error("Failed to unpublish post");
+    }
+  };
+
   const handleDelete = async (id: string) => {
     try {
       console.log("Deleting post:", id);
@@ -104,13 +125,21 @@ export function BlogPostList() {
               </p>
             </div>
             <div className="flex gap-2">
-              {post.status === 'draft' && (
+              {post.status === 'draft' ? (
                 <Button
                   onClick={() => handlePublish(post.id)}
                   variant="outline"
                   size="sm"
                 >
                   Publish
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => handleUnpublish(post.id)}
+                  variant="outline"
+                  size="sm"
+                >
+                  Unpublish
                 </Button>
               )}
               <Button 
