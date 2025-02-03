@@ -9,12 +9,17 @@ interface BlogFormData {
   mainImageUrl: string;
 }
 
-export function useBlogPostForm(onSuccess?: () => void) {
+interface UseBlogPostFormProps {
+  initialData?: any;
+  onSuccess?: () => void;
+}
+
+export function useBlogPostForm({ initialData, onSuccess }: UseBlogPostFormProps) {
   const [formData, setFormData] = useState<BlogFormData>({
-    title: "",
-    metaDescription: "",
-    content: "",
-    mainImageUrl: "",
+    title: initialData?.title || "",
+    metaDescription: initialData?.meta_description || "",
+    content: initialData?.content || "",
+    mainImageUrl: initialData?.main_image_url || "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,42 +41,54 @@ export function useBlogPostForm(onSuccess?: () => void) {
       }
 
       const slug = generateSlug(formData.title);
-      console.log("Creating blog post with data:", {
+      const postData = {
         title: formData.title,
         slug,
         meta_description: formData.metaDescription,
         content: formData.content,
         main_image_url: formData.mainImageUrl,
-      });
+      };
+
+      console.log("Submitting blog post data:", postData);
       
-      const { error } = await supabase
-        .from('blog_posts')
-        .insert({
-          title: formData.title,
-          slug,
-          meta_description: formData.metaDescription,
-          content: formData.content,
-          main_image_url: formData.mainImageUrl,
-          status: 'draft'
-        });
+      let error;
+      if (initialData) {
+        // Update existing post
+        const { error: updateError } = await supabase
+          .from('blog_posts')
+          .update(postData)
+          .eq('id', initialData.id);
+        error = updateError;
+      } else {
+        // Create new post
+        const { error: insertError } = await supabase
+          .from('blog_posts')
+          .insert({
+            ...postData,
+            status: 'draft'
+          });
+        error = insertError;
+      }
 
       if (error) {
         console.error("Supabase error:", error);
         throw error;
       }
 
-      toast.success("Blog post created successfully!");
+      toast.success(initialData ? "Blog post updated successfully!" : "Blog post created successfully!");
       onSuccess?.();
       
-      setFormData({
-        title: "",
-        metaDescription: "",
-        content: "",
-        mainImageUrl: "",
-      });
+      if (!initialData) {
+        setFormData({
+          title: "",
+          metaDescription: "",
+          content: "",
+          mainImageUrl: "",
+        });
+      }
     } catch (error) {
-      console.error('Error creating blog post:', error);
-      toast.error(error instanceof Error ? error.message : "Failed to create blog post");
+      console.error('Error saving blog post:', error);
+      toast.error(error instanceof Error ? error.message : "Failed to save blog post");
     } finally {
       setIsSubmitting(false);
     }

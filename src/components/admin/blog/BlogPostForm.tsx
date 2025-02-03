@@ -7,16 +7,17 @@ import { useBlogPostForm } from "./form/hooks/useBlogPostForm";
 import { useImageSelector } from "./form/hooks/useImageSelector";
 
 interface BlogPostFormProps {
+  initialData?: any;
   onSuccess?: () => void;
 }
 
-export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
+export function BlogPostForm({ initialData, onSuccess }: BlogPostFormProps) {
   const {
     formData,
     setFormData,
     isSubmitting,
     handleSubmit
-  } = useBlogPostForm(onSuccess);
+  } = useBlogPostForm({ initialData, onSuccess });
 
   const {
     showImageSelector,
@@ -69,7 +70,10 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
         }}
       />
 
-      <FormActions isSubmitting={isSubmitting} />
+      <FormActions 
+        isSubmitting={isSubmitting}
+        isEditing={!!initialData}
+      />
 
       <ImageSelector
         open={showImageSelector}
