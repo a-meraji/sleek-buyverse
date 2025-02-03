@@ -18,6 +18,7 @@ import ShippingPolicy from "@/pages/ShippingPolicy";
 import Admin from "@/pages/Admin";
 import CarouselsUI from "@/pages/CarouselsUI";
 import Hero from "@/pages/Hero";
+import BlogPost from "@/pages/BlogPost";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="/returns-exchanges" element={<ReturnsExchanges />} />
             <Route path="/shipping-policy" element={<ShippingPolicy />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
           </Route>
         </Routes>
         <Toaster />
