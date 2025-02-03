@@ -12,10 +12,12 @@ interface BlogPostFormProps {
 }
 
 export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
-  const [title, setTitle] = useState("");
-  const [metaDescription, setMetaDescription] = useState("");
-  const [content, setContent] = useState("");
-  const [mainImageUrl, setMainImageUrl] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    metaDescription: "",
+    content: "",
+    mainImageUrl: "",
+  });
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSelectingMainImage, setIsSelectingMainImage] = useState(true);
@@ -31,12 +33,11 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
   const handleImageSelect = (url: string | string[]) => {
     if (typeof url === 'string') {
       if (isSelectingMainImage) {
-        setMainImageUrl(url);
+        setFormData(prev => ({ ...prev, mainImageUrl: url }));
       } else {
-        // Insert image tag at cursor position
         const imgTag = `<img src="${url}" alt="Blog content image" class="w-full rounded-lg" />`;
-        const newContent = content.slice(0, cursorPosition) + imgTag + content.slice(cursorPosition);
-        setContent(newContent);
+        const newContent = formData.content.slice(0, cursorPosition) + imgTag + formData.content.slice(cursorPosition);
+        setFormData(prev => ({ ...prev, content: newContent }));
       }
     }
     setShowImageSelector(false);
@@ -47,16 +48,16 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
     setIsSubmitting(true);
 
     try {
-      const slug = generateSlug(title);
+      const slug = generateSlug(formData.title);
       
       const { error } = await supabase
         .from('blog_posts')
         .insert({
-          title,
+          title: formData.title,
           slug,
-          meta_description: metaDescription,
-          content,
-          main_image_url: mainImageUrl,
+          meta_description: formData.metaDescription,
+          content: formData.content,
+          main_image_url: formData.mainImageUrl,
           status: 'draft'
         });
 
@@ -65,11 +66,12 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
       toast.success("Blog post created successfully!");
       onSuccess?.();
       
-      // Reset form
-      setTitle("");
-      setMetaDescription("");
-      setContent("");
-      setMainImageUrl("");
+      setFormData({
+        title: "",
+        metaDescription: "",
+        content: "",
+        mainImageUrl: "",
+      });
     } catch (error) {
       console.error('Error creating blog post:', error);
       toast.error("Failed to create blog post");
@@ -78,23 +80,19 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
     }
   };
 
-  const handleInsertImage = (position: number) => {
-    setCursorPosition(position);
-    setIsSelectingMainImage(false);
-    setShowImageSelector(true);
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <TitleMetaSection
-        title={title}
-        metaDescription={metaDescription}
-        onTitleChange={setTitle}
-        onMetaDescriptionChange={setMetaDescription}
+        title={formData.title}
+        metaDescription={formData.metaDescription}
+        onTitleChange={(title) => setFormData(prev => ({ ...prev, title }))}
+        onMetaDescriptionChange={(metaDescription) => 
+          setFormData(prev => ({ ...prev, metaDescription }))
+        }
       />
 
       <MainImageSection
-        mainImageUrl={mainImageUrl}
+        mainImageUrl={formData.mainImageUrl}
         onImageSelect={() => {
           setIsSelectingMainImage(true);
           setShowImageSelector(true);
@@ -102,9 +100,13 @@ export function BlogPostForm({ onSuccess }: BlogPostFormProps) {
       />
 
       <ContentEditorSection
-        content={content}
-        onContentChange={setContent}
-        onInsertImage={handleInsertImage}
+        content={formData.content}
+        onContentChange={(content) => setFormData(prev => ({ ...prev, content }))}
+        onInsertImage={(position) => {
+          setCursorPosition(position);
+          setIsSelectingMainImage(false);
+          setShowImageSelector(true);
+        }}
       />
 
       <FormActions isSubmitting={isSubmitting} />
